@@ -1,0 +1,34 @@
+//@import "../../sass/var";
+.header{
+  //background-color: #07c4a8;
+  background: $color-sys;
+  color: #fff;
+}
+.login-wrap{
+  //background: rgba(56, 157, 170, 0.82);;
+  background: $color-sys;
+}
+.collapse-btn:hover{
+  background: $color-sys;
+}
+
+.plugins-tips{
+  background: #f2f2f2;
+}
+.plugins-tips a{
+  color: $color-theme;
+}
+.el-upload--text em {
+  color: $color-theme;
+}
+.pure-button{
+  background: $color-theme;
+}
+.pagination > .active > a, .pagination > .active > a:hover, .pagination > .active > a:focus, .pagination > .active > span, .pagination > .active > span:hover, .pagination > .active > span:focus {
+  background-color: $color-theme !important;
+  border-color: $color-theme !important;
+}
+.tags-li.active {
+  border: 1px solid $color-theme;
+  background-color: $color-theme;
+}

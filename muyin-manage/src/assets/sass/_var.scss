@@ -1,0 +1,116 @@
+
+
+$color-black: #000 !default;
+$color-white: #fff !default;
+$color-border: #EBEEF5 !default;
+
+
+/*
+* 方案一
+*/
+//主题颜色- 按钮 文字
+$color-theme: #faa54b !default;
+$color-one:#fef3e8 !default;
+$color-two: #f58f20 !default;
+$color-three: #eb5505 !default;
+//框架颜色
+$color-sys:#74cae2 !default;
+$color-sys-two: #00a4ff !default;
+$color-sys-three: #e8f6ff !default;
+//登录背景
+$color-login-shadow:#74cae2 !default;
+@mixin login-bg{
+  background: url(../../assets/img/bg9.jpg) no-repeat center bottom;
+  background-size:auto 100%;
+}
+
+
+/*
+* 方案二
+*/
+//主题颜色- 按钮 文字
+//$color-theme: #74cae2 !default;
+//$color-one:#e8f6ff !default;
+//$color-two: #74cae2 !default;
+//$color-three: #00a4ff !default;
+////框架颜色
+//$color-sys:#faa54b !default;
+//$color-sys-two: #f58f20 !default;
+//$color-sys-three: #fef3e8 !default;
+////登录背景
+//$color-login-shadow:#faa54b !default;
+//@mixin login-bg{
+//  background: url(../../assets/img/bg2.jpg) no-repeat center bottom;
+//  background-size:auto 100% ;
+//}
+
+/*
+* 方案三
+*/
+//主题颜色- 按钮 文字
+//$color-theme: #258cf3 !default;
+//$color-one:#e8f6ff !default;
+//$color-two: #258cf3 !default;
+//$color-three: #3676b6 !default;
+////框架颜色
+//$color-sys:#ef4a51 !default;
+//$color-sys-two: #f11924 !default;
+//$color-sys-three: #fdebed !default;
+////登录背景
+//$color-login-shadow:#ef4a51 !default;
+//@mixin login-bg{
+//  background: url(../../assets/img/bg1.jpg) no-repeat center top;
+//  background-size: auto 100%;
+//}
+
+/*
+* 方案四
+*/
+//主题颜色- 按钮 文字
+//$color-theme: #66b1ff !default;
+//$color-one:#e8f6ff !default;
+//$color-two: #79bbff !default;
+//$color-three: #409EFF !default;
+////框架颜色
+//$color-sys:#1873a2 !default;
+//$color-sys-two: #3676b6 !default;
+//$color-sys-three: #e8f6ff !default;
+////登录背景
+//$color-login-shadow:#faa54b !default;
+//@mixin login-bg{
+//  background: url(../../assets/img/bg6.jpg) no-repeat center top;
+//  background-size: 100%;
+//}
+
+/*
+* 方案五
+*/
+////主题颜色- 按钮 文字
+//$color-theme: #faa54b !default;
+//$color-one:#fef3e8 !default;
+//$color-two: #f58f20 !default;
+//$color-three: #eb5505 !default;
+////框架颜色
+//$color-sys:#178a2b !default;
+//$color-sys-two: #eb5505 !default;
+//$color-sys-three: #e8f6ff !default;
+////登录背景
+//$color-login-shadow:#178a2b !default;
+//@mixin login-bg{
+//  background: url(../../assets/img/bg5.jpg) no-repeat center top;
+//  background-size: auto 100%;
+//}
+
+/*
+* 方案六-弃用
+*/
+//主题颜色- 按钮 文字
+//$color-theme: #faa54b !default;
+//$color-one:#fef3e8 !default;
+//$color-two: #f58f20 !default;
+//$color-three: #eb5505 !default;
+////框架颜色
+//$color-sys:#a7d534 !default;
+//$color-sys-two: #eb5505 !default;
+//$color-sys-three: #e8f6ff !default;
+
