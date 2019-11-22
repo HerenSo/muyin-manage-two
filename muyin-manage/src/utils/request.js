@@ -11,7 +11,7 @@ import router from '../router'
 
 axios.defaults.withCredentials = true;
 // 生产环境
-// axios.defaults.baseURL = 'http://120.79.56.120:8080' ;
+axios.defaults.baseURL = 'http://120.79.56.120:8080' ;
 // axios.defaults.baseURL = 'https://www.geeso.cn/';
 axios.interceptors.request.use( config => {
     config.transformRequest = [function (data) {

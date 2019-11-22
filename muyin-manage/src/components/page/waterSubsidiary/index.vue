@@ -145,7 +145,7 @@
             // 获取数据
             getData() {
                 this.loading = true;
-                this.$axios.post("/member-order/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,this.query).then(res => {
+                this.$axios.post("/feign/wallet-bill/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,this.query).then(res => {
                     if(res.code == 200) {
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
