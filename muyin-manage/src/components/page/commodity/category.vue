@@ -56,7 +56,7 @@
         <el-drawer :title="title" :visible.sync="editVisible" size="40%" direction="rtl" :before-close="handleClose">
             <div class="demo-drawer__content">
                 <el-form ref="form" :model="form" label-width="100px">
-                    <el-form-item label="父级分类" required>
+                    <el-form-item label="父级分类">
                         <el-cascader
                                 v-model="form.parentCode"
                                 :options="category"
@@ -132,9 +132,9 @@
             let authorities = JSON.parse(localStorage.getItem("user_information"));
             authorities.authorities.map((item) => {
                 switch (item.authority) {
-                    case 'ROLE_COMMODITY_EDIT':this.right.edit = true;break;
-                    case 'ROLE_COMMODITY_DEL':this.right.del = true;break;
-                    case 'ROLE_COMMODITY_ADD':this.right.add = true;break;
+                    case 'ROLE_COMMODITY_CATEGORY_EDIT':this.right.edit = true;break;
+                    case 'ROLE_COMMODITY_CATEGORY_DEL':this.right.del = true;break;
+                    case 'ROLE_COMMODITY_CATEGORY_ADD':this.right.add = true;break;
                     default:break;
                 }
             })
@@ -192,15 +192,15 @@
                 })
             },
             saveEdit(){
-                if(!this.form.parentCode){
-                    this.$message.error("请选择父级分类！");
-                    return;
-                }
+                // if(!this.form.parentCode){
+                //     this.$message.error("请选择父级分类！");
+                //     return;
+                // }
                 if(!this.form.name){
                     this.$message.error("请输入分类名称！");
                     return;
                 }
-                if(!this.form.iconUrl){
+                if(!this.form.iconUrl && this.form.parentCode){
                     this.$message.error("请上传缩略图！");
                     return;
                 }

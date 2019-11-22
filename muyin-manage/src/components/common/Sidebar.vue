@@ -62,12 +62,16 @@ export default {
                     title: '统计',
                     subs: [
                         {
-                            index: 'analyze/user',
+                            index: '/analyze/user',
                             title: '用户分析'
                         },
                         {
                             index: 'table',
                             title: '订单分析'
+                        },
+                        {
+                            index: '/waterSubsidiary/index',
+                            title: '流水明细'
                         },
                         ]
                 },
@@ -95,6 +99,14 @@ export default {
                         {
                             index: '/order/index',
                             title: '订单管理'
+                        },
+                        {
+                            index: '/article/index',
+                            title: '文章管理'
+                        },
+                        {
+                            index: '/banner/index',
+                            title: '轮播图管理'
                         },
                     ]
                 },
@@ -136,12 +148,12 @@ export default {
                             title: '菜单管理'
                         },
                         {
-                            index: '/article/index',
-                            title: '文章管理'
+                            index: '/basicsSetting/index',
+                            title: '基础设置'
                         },
                         {
-                            index: '/banner/index',
-                            title: '轮播图管理'
+                            index: '/integralSetting/index',
+                            title: '积分设置'
                         },
                     ]
                 },

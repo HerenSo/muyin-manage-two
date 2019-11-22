@@ -20,6 +20,11 @@ export default new Router({
                     meta: { title: '用户分析' }
                 },
                 {
+                    path: '/waterSubsidiary/index',
+                    component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/waterSubsidiary/index.vue'),
+                    meta: { title: '流水明细' }
+                },
+                {
                     path: '/member/index',
                     component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/member/index.vue'),
                     meta: { title: '用户管理' }
@@ -53,6 +58,16 @@ export default new Router({
                     path: '/information/index',
                     component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/information/index.vue'),
                     meta: { title: '平台信息' }
+                },
+                {
+                    path: '/basicsSetting/index',
+                    component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/basicsSetting/index.vue'),
+                    meta: { title: '基础设置' }
+                },
+                {
+                    path: '/integralSetting/index',
+                    component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/integralSetting/index.vue'),
+                    meta: { title: '积分设置' }
                 },
                 {
                     path: '/role/index',

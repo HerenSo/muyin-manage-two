@@ -174,6 +174,7 @@
                                 :on-remove="handleRemove"
                                 :on-change="handleChange"
                                 :file-list="fileList"
+                                ref="banner"
                                 :data="{isInsert:true,type:1}"
                                 list-type="picture">
                             <el-button size="small" type="primary">点击上传</el-button>
@@ -747,6 +748,7 @@
                 this.dynamicTags = [];
                 this.inputValue = {};
                 this.commodityDetails = {};
+                this.$refs.banner.clearFiles();
             },
             refresh(){ // 刷新
                 this.getData();
