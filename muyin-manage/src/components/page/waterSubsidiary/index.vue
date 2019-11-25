@@ -6,7 +6,7 @@
         <el-button type="primary" icon="el-icon-refresh" class="handle-del " @click="refresh">刷新</el-button>
         <!--        <el-button type="primary" icon="el-icon-lx-add" class="handle-del " @click="handleEdit" v-if="right.add">新增</el-button>-->
 <!--        <el-button type="primary" icon="el-icon-delete" class="handle-del" @click="delAllSelection" v-if="right.del">批量删除</el-button>-->
-        <el-select v-model="query.type" placeholder="交易类型" class="handle-select mr10" @change="refresh">
+        <el-select v-model="query.type" placeholder="交易类型" class="handle-select mr10 ml-10" @change="refresh">
           <el-option key="" label="全部" value=""></el-option>
         </el-select>
         <el-select v-model="query.paidType" placeholder="交易方式" class="handle-select mr10" @change="refresh">
@@ -145,7 +145,7 @@
             // 获取数据
             getData() {
                 this.loading = true;
-                this.$axios.post("/feign/wallet-bill/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,this.query).then(res => {
+                this.$axios.post("/wallet-bill/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,this.query).then(res => {
                     if(res.code == 200) {
                         this.tableData = res.data.records;
                         this.total = res.data.pages;

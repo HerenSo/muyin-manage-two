@@ -207,7 +207,7 @@
                 })
             },
             getSignRecord() { // 获取签到记录
-                this.$axios.post("/feign/user-sign-record/selectPageList?pageNum="+this.querySignRecord.pageNum+"&pageSize="+this.querySignRecord.pageSize,{}).then(res => {
+                this.$axios.post("/user-sign-record/selectPageList?pageNum="+this.querySignRecord.pageNum+"&pageSize="+this.querySignRecord.pageSize,{}).then(res => {
                     if(res.code == 200) {
                         this.signRecord = res.data.records;
                         this.signRecord.map(item => {

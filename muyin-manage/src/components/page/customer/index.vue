@@ -304,7 +304,7 @@
                 })
             },
             getAccount() {
-                this.$axios.post("/feign/wallet-bill/selectPageList?pageNum="+this.account.pageNum+"&pageSize="+this.account.pageSize,this.account).then(res => {
+                this.$axios.post("/wallet-bill/selectPageList?pageNum="+this.account.pageNum+"&pageSize="+this.account.pageSize,this.account).then(res => {
                     if(res.code == 200) {
                         this.tableAccount = res.data.records;
                         this.totalAccount = res.data.pages;

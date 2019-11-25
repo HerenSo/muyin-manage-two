@@ -58,10 +58,10 @@
           <template slot-scope="scope">
             <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>
             <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>
-              <el-button type="text" icon="el-icon-delete" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
-              <el-button type="text" icon="el-icon-delete" class="red" @click="handleUpdateStatus(2, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
-              <el-button type="text" icon="el-icon-delete" class="red" @click="handleUpdateStatus(3, scope.row)" v-if="scope.row.status ==4">下架</el-button>
-              <el-button type="text" icon="el-icon-delete" class="red" @click="handleUpdateStatus(4, scope.row)" v-if="scope.row.status ==3">上架</el-button>
+              <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
+              <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleUpdateStatus(2, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
+              <el-button type="text" icon="el-icon-sold-out" class="red" @click="handleUpdateStatus(3, scope.row)" v-if="scope.row.status ==4">下架</el-button>
+              <el-button type="text" icon="el-icon-sell" class="" @click="handleUpdateStatus(4, scope.row)" v-if="scope.row.status ==3 || scope.row.status===1">上架</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -474,8 +474,17 @@
                 //     this.$message.error("请输入内容！");
                 //     return;
                 // }
+                if(this.fileList.length == 0){
+                    this.$message.error("请上传轮播图！");
+                    return;
+                }
+                console.log(this.fileList)
                 this.fileList.map(item => {
-                    this.attachmentsList.push(item.response.data.id)
+                    if(item.id) {
+                        this.attachmentsList.push(item.id);
+                    }else{
+                        this.attachmentsList.push(item.response.data.id);
+                    }
                 })
                 this.form.attachmentsList = this.attachmentsList;
                 console.log("fileList",this.form.attachmentsList);
@@ -624,6 +633,7 @@
             },
             handleChange(file, fileList) { // 轮播图上传
                 this.fileList = fileList.slice(-3);
+
             },
             handleEditorFileChange(response, file, fileList){ // 商品详情 图片上传
                 // this.editorFileList = fileList.slice(-3);

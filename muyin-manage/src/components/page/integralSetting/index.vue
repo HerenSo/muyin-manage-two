@@ -85,7 +85,7 @@
         methods: {
             // 获取 列表数据
             getData() {
-                this.$axios.post('/feign/sign-award/selectList',{}).then((res) => {
+                this.$axios.post('/sign-award/selectList',{}).then((res) => {
                     if(res.code == 200){
                         this.tableData = res.data;
                     }else{
@@ -103,7 +103,7 @@
                     return;
                 }
                 this.subloading = true;
-                this.$axios.post("/feign/sign-award/insertOrUpdate",this.form).then(res => {
+                this.$axios.post("/sign-award/insertOrUpdate",this.form).then(res => {
                     if(res.code == 200){
                         this.$message.success(this.title+"成功！");
                         this.editVisible = false;
@@ -127,7 +127,7 @@
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 }).then(() => {
-                    this.$axios.delete("/feign/sign-award/delete?id=" + row.id).then(res => {
+                    this.$axios.delete("/sign-award/delete?id=" + row.id).then(res => {
                         if (res.code == 200) {
                             this.$message.success("删除成功！");
                             this.getData();
@@ -144,7 +144,7 @@
                     this.multipleSelection.map(item => {
                         ids.push(item.id);
                     })
-                    this.$axios.post("/feign/sign-award/deleteBatch",ids).then(res => {
+                    this.$axios.post("/sign-award/deleteBatch",ids).then(res => {
                         if (res.code == 200) {
                             this.$message.success("批量删除成功！");
                             this.getData();

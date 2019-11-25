@@ -217,8 +217,9 @@
             },
             handleEdit(index, row) {
                 this.editVisible = true;
+                let rows = row;
                 if(row){
-                    this.form = row;
+                    this.form = rows;
                     this.title = '编辑';
                 }else{
                     this.title = '新增';
