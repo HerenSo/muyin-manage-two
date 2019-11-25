@@ -376,10 +376,11 @@
                 this.subloading = false;
                 this.form = {};
             },
-            // 选分类 选商品
+            //  选商品
             handleCommodityChange(val){
 
             },
+            // 选分类
             handleCheckChange(data, checked, indeterminate) {
                 console.log(data, checked, indeterminate);
                 if(checked){
