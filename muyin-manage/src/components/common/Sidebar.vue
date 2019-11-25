@@ -62,11 +62,7 @@ export default {
                     title: '统计',
                     subs: [
                         {
-                            index: '/analyze/user',
-                            title: '用户分析'
-                        },
-                        {
-                            index: 'table',
+                            index: '/analyze/order',
                             title: '订单分析'
                         },
                         {

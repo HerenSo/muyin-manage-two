@@ -20,6 +20,11 @@ export default new Router({
                     meta: { title: '用户分析' }
                 },
                 {
+                    path: '/analyze/order',
+                    component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/analyze/order.vue'),
+                    meta: { title: '订单分析' }
+                },
+                {
                     path: '/waterSubsidiary/index',
                     component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/waterSubsidiary/index.vue'),
                     meta: { title: '流水明细' }

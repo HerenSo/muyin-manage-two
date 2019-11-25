@@ -10,7 +10,16 @@
                 <el-button type="primary" icon="el-icon-plus" @click="handleEdit" v-if="right.add">新增</el-button>
                 <el-button type="primary" icon="el-icon-delete" @click="delAllSelection" v-if="right.del">批量删除</el-button>
             </div>
-            <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange" v-loading="loading">
+            <el-table
+                    :data="tableData"
+                    border
+                    class="table"
+                    ref="multipleTable"
+                    @selection-change="handleSelectionChange"
+                    v-loading="loading"
+                    row-key="id"
+                    default-expand-all
+                    :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="name" label="分类名称" >
                 </el-table-column>
@@ -139,8 +148,8 @@
                 }
             })
             //数据
-            this.getData();
             this.getCategory();
+            this.getData();
 
         },
         methods: {
@@ -156,12 +165,19 @@
                     if(res.code == 200){
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
-                        // this.tableData.map(item => {
-                        //     let parentCode = item.parentCode;
-                        //     item.parentCode = [];
-                        //     item.parentCode.push(parentCode);
-                        //     // item.parentCode = JSON.parse(item.parentCode);
-                        // })
+                        this.tableData.map((item,index) => {
+                            // let parentCode = item.parentCode;
+                            // item.parentCode = [];
+                            // item.parentCode.push(parentCode);
+                            // item.parentCode = JSON.parse(item.parentCode);
+                            if(item.subCategorys.length >0){
+                                item.hasChildren = true;
+                                item.children = item.subCategorys;
+                            }
+                            item.id=index;
+                        })
+                        this.$forceUpdate();
+                        console.log(this.tableData)
                     }else{
                         this.$message.error(res.msg);
                     }
@@ -200,6 +216,7 @@
                     this.$message.error("请输入分类名称！");
                     return;
                 }
+                this.form.parentCode = JSON.stringify(this.form.parentCode)
                 if(!this.form.iconUrl && this.form.parentCode){
                     this.$message.error("请上传缩略图！");
                     return;
@@ -217,9 +234,13 @@
             },
             handleEdit(index, row) {
                 this.editVisible = true;
-                let rows = row;
                 if(row){
-                    this.form = rows;
+                    this.form.code = row.code;
+                    this.form.name = row.name;
+                    this.form.iconUrl = row.iconUrl;
+                    this.form.parentCode = [];
+                    this.form.parentCode.push(row.parentCode);
+                    this.$forceUpdate();
                     this.title = '编辑';
                 }else{
                     this.title = '新增';

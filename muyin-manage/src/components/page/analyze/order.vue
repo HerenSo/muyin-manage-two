@@ -1,27 +1,28 @@
 <template>
   <div class="p-20 bg-fff" >
-    <el-collapse v-model="activeName" class="statistics" @change="handleCollapse">
-      <el-collapse-item  name="1" disabled>
-        <template slot="title">
-          <el-link type="primary">昨日</el-link>
+<!--    <el-collapse v-model="activeName" class="statistics" @change="handleCollapse">-->
+<!--      <el-collapse-item  name="1" disabled>-->
+<!--        <template slot="title">-->
+      <div class="mb-20">
           <el-date-picker
                   v-model="queryTime"
-                  type="daterange"
                   align="right"
-                  unlink-panels
+                  type="datetimerange"
                   range-separator="至"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
-                  :picker-options="pickerOptions">
+                  @change="getData"
+                  :default-time="['00:00:00']">
           </el-date-picker>
-        </template>
+      </div>
+<!--        </template>-->
         <el-row :gutter="20" class="mgb20">
           <el-col :span="8">
             <el-card shadow="hover" :body-style="{padding: '0px'}">
               <div class="grid-content grid-con-1">
                 <i class="el-icon-lx-goods grid-con-icon"></i>
                 <div class="grid-cont-right">
-                  <div class="grid-num">{{info.orderCount}}</div>
+                  <div class="grid-num">{{info.orderCount || 0}}</div>
                   <div>订单量</div>
                 </div>
               </div>
@@ -32,7 +33,7 @@
               <div class="grid-content grid-con-2">
                 <i class="el-icon-lx-recharge grid-con-icon"></i>
                 <div class="grid-cont-right">
-                  <div class="grid-num">{{info.paidAmount + info.walletCost}}</div>
+                  <div class="grid-num">{{(info.paidAmount + info.walletCost) || 0}}</div>
                   <div>订单总金额</div>
                 </div>
               </div>
@@ -43,14 +44,14 @@
               <div class="grid-content grid-con-3">
                 <i class="el-icon-lx-redpacket grid-con-icon"></i>
                 <div class="grid-cont-right">
-                  <div class="grid-num">{{info.supplyPrice}}</div>
+                  <div class="grid-num">{{info.supplyPrice || 0}}</div>
                   <div>成本</div>
                 </div>
               </div>
             </el-card>
           </el-col>
         </el-row>
-      </el-collapse-item>
+<!--      </el-collapse-item>-->
 <!--      <el-collapse-item title="7日核心指标" name="3">-->
 <!--        <template slot="title">-->
 <!--          7日核心指标<i class="header-icon el-icon-info"></i>-->
@@ -84,7 +85,7 @@
 <!--          <schart ref="line2" class="schart" canvasId="line2" :data="data" type="line" :options="options2"></schart>-->
 <!--        </el-card>-->
 <!--      </el-collapse-item>-->
-    </el-collapse>
+<!--    </el-collapse>-->
 
   </div>
 </template>
@@ -189,6 +190,14 @@
                 },
                 pickerOptions: {
                     shortcuts: [{
+                        text: '昨天',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    },{
                         text: '最近一周',
                         onClick(picker) {
                             const end = new Date();
@@ -228,6 +237,7 @@
             }
         },
         created(){
+            this.yestodayHandle();
             this.getData();
             this.handleListener();
             this.changeDate();
@@ -246,11 +256,29 @@
                 this.$set(this.query,"queryEndTime",this.queryTime[1]);
                 this.$axios.post("/statistical-order/selectStatisticalOrder",this.query).then(res => {
                     if(res.code == 200) {
-                        this.info = res.data;
+                        if(res.data){
+                            this.info = res.data;
+                        }else{
+                            this.info = {
+
+                            };
+                        }
+
                     }else{
                         this.$massage.error(res.msg);
                     }
                 })
+            },
+            yestodayHandle(){
+                //昨天的时间
+                var day1 = new Date();
+                day1.setTime(day1.getTime()-24*60*60*1000);
+                var s1 = day1.getFullYear()+"-" + (day1.getMonth()+1) + "-" + day1.getDate();
+                //今天的时间
+                var day2 = new Date();
+                day2.setTime(day2.getTime());
+                var s2 = day2.getFullYear()+"-" + (day2.getMonth()+1) + "-" + day2.getDate();
+                this.queryTime = [s1+" 00:00:00",s2+" 00:00:00"]
             },
             changeDate(){
                 const now = new Date().getTime();

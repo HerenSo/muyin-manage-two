@@ -419,6 +419,9 @@
                 this.$axios.get("/commodity/selectCommodityDetail?code="+code).then(res => {
                     if(res.code == 200) {
                         this.form = res.data;
+                        let categoryCode = this.form.categoryCode;
+                        this.form.categoryCode = [];
+                        this.form.categoryCode.push(categoryCode);
                         this.fileList =  res.data.attachmentsList;
                         this.commodityDetails =  res.data.commodityDetails;
                         this.commodityAttrs =  res.data.commodityAttrs;

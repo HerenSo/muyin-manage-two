@@ -71,7 +71,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-drawer :title="title" :visible.sync="editVisible" size="40%" direction="rtl" :before-close="handleClose">
+        <el-drawer :title="title" :visible.sync="editVisible" size="70%" direction="rtl" :before-close="handleClose">
             <div class="demo-drawer__content">
                 <el-form ref="form" :model="form" label-width="120px">
                     <el-form-item label="优惠券名称" required>
@@ -95,12 +95,20 @@
                         </el-date-picker>
                     </el-form-item>
                     <el-form-item label="适用范围" required>
-                        <el-select v-model="form.scope" placeholder="适用范围" value-key="value" multiple>
-                            <el-option key="0" label="无限制" value="0"></el-option>
-                            <el-option key="1" label="部分商品可用" value="1"></el-option>
-                            <el-option key="2" label="部分商品不可用" value="2"></el-option>
-                            <el-option key="3" label="限在线配送订单" value="3"></el-option>
+                        <el-select v-model="form.scope" placeholder="适用范围" value-key="value">
+                            <el-option key="0" label="无限制" :value="0"></el-option>
+                            <el-option key="1" label="部分商品可用" :value="1"></el-option>
+                            <el-option key="2" label="部分商品不可用" :value="2"></el-option>
+                            <el-option key="3" label="限在线配送订单" :value="3"></el-option>
                         </el-select>
+                    </el-form-item>
+                    <el-form-item label="选择商品" required>
+                      <el-tree
+                              :data="category"
+                              :props="props"
+                              show-checkbox
+                              @check-change="handleCheckChange">
+                      </el-tree>
                     </el-form-item>
                     <el-form-item label="叠加类型" required>
                         <el-select v-model="form.superpositionRule" placeholder="叠加类型">
@@ -144,6 +152,11 @@
                 editorOption: {
                     placeholder: 'Hello World'
                 },
+                props: {
+                    id:'code',
+                    label: 'name',
+                    children: 'subCategorys'
+                },
                 typeValue:'',
                 category:[],
                 right:{ // 权限
@@ -168,6 +181,7 @@
             })
 
             this.getData();
+            this.getCategory();
         },
         methods: {
             // 获取数据
@@ -177,14 +191,35 @@
                     if(res.code == 200) {
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
-                        this.tableData.map(item => {
-                            item.scope = (item.scope+'').split(",");
-                        })
 
                     }else{
                         this.$massage.error(res.msg);
                     }
                     this.loading = false;
+                })
+            },
+            getCategory(){// 获取分类
+                let params = {
+                    type:0,
+                    status:0
+                }
+                this.$axios.post("/category/queryCategoryTree",params).then(res => {
+                    if(res.code == 200){
+                        this.category = res.data;
+                        // this.category.map(item => {
+                        //     if(item.subCategorys.length == 0){
+                        //         delete item.subCategorys;
+                        //     }else{
+                        //         item.subCategorys.map(i => {
+                        //             if(i.subCategorys.length == 0){
+                        //                 delete i.subCategorys;
+                        //             }
+                        //         })
+                        //     }
+                        // })
+                    }else{
+                        this.$massage.error(res.msg);
+                    }
                 })
             },
             getDetails(code){
