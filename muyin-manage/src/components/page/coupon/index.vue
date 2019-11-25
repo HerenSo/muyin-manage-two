@@ -71,7 +71,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-drawer :title="title" :visible.sync="editVisible" size="70%" direction="rtl" :before-close="handleClose">
+        <el-drawer :title="title" :visible.sync="editVisible" size="70%" direction="rtl" :before-close="handleClose" class="commodity_drawer">
             <div class="demo-drawer__content">
                 <el-form ref="form" :model="form" label-width="120px">
                     <el-form-item label="优惠券名称" required>
@@ -103,12 +103,40 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="选择商品" required>
-                      <el-tree
-                              :data="category"
-                              :props="props"
-                              show-checkbox
-                              @check-change="handleCheckChange">
-                      </el-tree>
+                      <div style="display: flex">
+                        <el-tree
+                                :data="category"
+                                :props="props"
+                                show-checkbox
+                                @check-change="handleCheckChange">
+                        </el-tree>
+                        <div style="flex: 1; padding:0 10px">
+                          <el-table :data="tableDataCommodity" border class="table" ref="multipleTable" :loading="loadingCommodity" header-cell-class-name="table-header" @selection-change="handleCommodityChange">
+                            <el-table-column type="selection" width="55" align="center"></el-table-column>
+                            <!--        <el-table-column prop="code" label="编号"></el-table-column>-->
+                            <el-table-column prop="name" label="商品名称" ></el-table-column>
+                            <el-table-column prop="createName" label="缩略图" width="120" align="center">
+                              <template slot-scope="scope">
+                                <el-image :src="scope.row.iconUrl" style="width: 50px; height: 50px" fit="cover">
+                                  <div slot="error" class="image-slot">
+                                    <i class="el-icon-picture f50 color-border"></i>
+                                  </div>
+                                </el-image>
+                              </template>
+                            </el-table-column>
+                          </el-table>
+                          <div class="pagination">
+                            <el-pagination
+                                    background
+                                    layout="total, prev, pager, next, jumper"
+                                    :current-page="queryCommodity.pageNum"
+                                    :page-count="totalCommodity"
+                                    @current-change="handlePageChange"
+                                    @size-change="handleSizeChange"
+                            ></el-pagination>
+                          </div>
+                        </div>
+                      </div>
                     </el-form-item>
                     <el-form-item label="叠加类型" required>
                         <el-select v-model="form.superpositionRule" placeholder="叠加类型">
@@ -159,6 +187,14 @@
                 },
                 typeValue:'',
                 category:[],
+                tableDataCommodity:[],
+                queryCommodity: {
+                    status:'',
+                    pageNum: 1,
+                    pageSize: 10
+                },
+                totalCommodity:'',
+                loadingCommodity:false,
                 right:{ // 权限
                     add:false,
                     edit:false,
@@ -206,20 +242,22 @@
                 this.$axios.post("/category/queryCategoryTree",params).then(res => {
                     if(res.code == 200){
                         this.category = res.data;
-                        // this.category.map(item => {
-                        //     if(item.subCategorys.length == 0){
-                        //         delete item.subCategorys;
-                        //     }else{
-                        //         item.subCategorys.map(i => {
-                        //             if(i.subCategorys.length == 0){
-                        //                 delete i.subCategorys;
-                        //             }
-                        //         })
-                        //     }
-                        // })
                     }else{
                         this.$massage.error(res.msg);
                     }
+                })
+            },
+            // 获取商品数据
+            getCommodity() {
+                this.loadingCommodity = true;
+                this.$axios.post("/commodity/selectPageList?pageNum="+this.queryCommodity.pageNum+"&pageSize="+this.queryCommodity.pageSize,this.queryCommodity).then(res => {
+                    if(res.code == 200) {
+                        this.tableDataCommodity = res.data.records;
+                        this.totalCommodity = res.data.pages;
+                    }else{
+                        this.$massage.error(res.msg);
+                    }
+                    this.loadingCommodity = false;
                 })
             },
             getDetails(code){
@@ -338,6 +376,20 @@
                 this.subloading = false;
                 this.form = {};
             },
+            // 选分类 选商品
+            handleCommodityChange(val){
+
+            },
+            handleCheckChange(data, checked, indeterminate) {
+                console.log(data, checked, indeterminate);
+                if(checked){
+                    this.queryCommodity.categoryCode = data.code;
+                    this.queryCommodity.pageNum = 1;
+                    this.getCommodity();
+                }else {
+                    this.tableDataCommodity = [];
+                }
+            },
             refresh(){ // 刷新
                 this.getData();
             }
@@ -346,6 +398,10 @@
 </script>
 
 <style lang="scss" scoped>
+
+  .commodity_drawer .el-drawer__body{
+    overflow-y: auto;
+  }
     .handle-box {
         margin-bottom: 20px;
     }

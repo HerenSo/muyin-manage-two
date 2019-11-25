@@ -11,37 +11,36 @@
             router
         >
             <template v-for="item in items">
-                <template v-if="item.subs">
-                    <el-submenu :index="item.index" :key="item.index">
+                <template v-if="item.subMenus.length>0">
+                    <el-submenu :index="item.url" :key="index">
                         <template slot="title">
                             <i :class="item.icon"></i>
-                            <span slot="title">{{ item.title }}</span>
+                            <span slot="title">{{ item.name }}</span>
                         </template>
-                        <template v-for="subItem in item.subs">
-                            <el-submenu
-                                v-if="subItem.subs"
-                                :index="subItem.index"
-                                :key="subItem.index"
-                            >
-                                <template slot="title">{{ subItem.title }}</template>
-                                <el-menu-item
-                                    v-for="(threeItem,i) in subItem.subs"
-                                    :key="i"
-                                    :index="threeItem.index"
-                                >{{ threeItem.title }}</el-menu-item>
-                            </el-submenu>
+                        <template v-for="subItem in item.subMenus">
+<!--                            <el-submenu-->
+<!--                                v-if="subItem.subMenus.length>0"-->
+<!--                                :index="subItem.url"-->
+<!--                                :key="subItem.url"-->
+<!--                            >-->
+<!--                                <template slot="title">{{ subItem.name }}</template>-->
+<!--                                <el-menu-item-->
+<!--                                    v-for="(threeItem,i) in subItem.subMenus"-->
+<!--                                    :key="i"-->
+<!--                                    :index="threeItem.url"-->
+<!--                                >{{ threeItem.name }}</el-menu-item>-->
+<!--                            </el-submenu>-->
                             <el-menu-item
-                                v-else
-                                :index="subItem.index"
-                                :key="subItem.index"
-                            >{{ subItem.title }}</el-menu-item>
+                                :index="subItem.url"
+                                :key="subItem.url"
+                            >{{ subItem.name }}</el-menu-item>
                         </template>
                     </el-submenu>
                 </template>
                 <template v-else>
-                    <el-menu-item :index="item.index" :key="item.index">
+                    <el-menu-item :index="index" :key="index">
                         <i :class="item.icon"></i>
-                        <span slot="title">{{ item.title }}</span>
+                        <span slot="title">{{ item.name }}</span>
                     </el-menu-item>
                 </template>
             </template>
@@ -256,6 +255,8 @@ export default {
             this.collapse = msg;
             bus.$emit('collapse-content', msg);
         });
+        let authorities = JSON.parse(localStorage.getItem("user_information"));
+        this.items = authorities.menus;
     }
 };
 </script>
