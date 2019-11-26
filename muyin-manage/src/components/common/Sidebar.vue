@@ -10,7 +10,7 @@
             unique-opened
             router
         >
-            <template v-for="item in items">
+            <template v-for="(item,index) in items">
                 <template v-if="item.subMenus.length>0">
                     <el-submenu :index="item.url" :key="index">
                         <template slot="title">

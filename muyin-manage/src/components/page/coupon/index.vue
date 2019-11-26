@@ -31,7 +31,7 @@
                 </el-table-column>
                 <el-table-column  label="适用范围">
                     <template slot-scope="scope">
-                        <span v-for="(item,index) in scope.row.scope" :key="index">{{item == "0" ? "无限制":(item == "1"?"部分商品可用":(item == "2"?"部分商品不可用":"限在线配送订单"))}}</span>
+                        {{scope.row.scope == "0" ? "无限制":(scope.row.scope == "1"?"部分商品可用":(scope.row.scope == "2"?"部分商品不可用":"限在线配送订单"))}}
                     </template>
                 </el-table-column>
                 <el-table-column label="叠加类型" prop="superpositionRule" align="center" width="120" >
@@ -102,16 +102,28 @@
                             <el-option key="3" label="限在线配送订单" :value="3"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="选择商品" required>
-                      <div style="display: flex">
+                    <el-form-item label="选择商品" required v-if="form.scope == 1 || form.scope == 2">
+                      <div class="selectedCommodity">
                         <el-tree
-                                :data="category"
-                                :props="props"
-                                show-checkbox
-                                @check-change="handleCheckChange">
+                                class="categoryTree"
+                          :data="category"
+                          :props="props"
+                          show-checkbox
+                          highlight-current
+                          node-key="code"
+                          accordion
+                          @current-change="handleCheckChange"
+                          @check="handleCheckCategory">
                         </el-tree>
-                        <div style="flex: 1; padding:0 10px">
-                          <el-table :data="tableDataCommodity" border class="table" ref="multipleTable" :loading="loadingCommodity" header-cell-class-name="table-header" @selection-change="handleCommodityChange">
+                        <div class="commodityTable">
+                          <el-table
+                                  :data="tableDataCommodity"
+                                  border class="table"
+                                  ref="multipleCommodityTable"
+                                  :loading="loadingCommodity"
+                                  header-cell-class-name="table-header"
+                                  @selection-change="handleCommodityChange"
+                                  @select="handleCommoditySelect">
                             <el-table-column type="selection" width="55" align="center"></el-table-column>
                             <!--        <el-table-column prop="code" label="编号"></el-table-column>-->
                             <el-table-column prop="name" label="商品名称" ></el-table-column>
@@ -127,6 +139,7 @@
                           </el-table>
                           <div class="pagination">
                             <el-pagination
+                                    v-if="tableDataCommodity.length > 0"
                                     background
                                     layout="total, prev, pager, next, jumper"
                                     :current-page="queryCommodity.pageNum"
@@ -136,6 +149,24 @@
                             ></el-pagination>
                           </div>
                         </div>
+                      </div>
+                      <div class="pt-10">已选分类：
+                        <el-tag
+                                :key="tag"
+                                v-for="(tag,i) in couponConditionsList"
+                                size="medium"
+                                style="margin-left: 0;margin-right: 10px">
+                          {{tag.name}}
+                        </el-tag>
+                      </div>
+                      <div>已选商品：
+                        <el-tag
+                                :key="tag"
+                                v-for="(tag,i) in couponCommodityList"
+                                size="medium"
+                                style="margin-left: 0;margin-right: 10px">
+                          {{tag.name}}
+                        </el-tag>
                       </div>
                     </el-form-item>
                     <el-form-item label="叠加类型" required>
@@ -191,10 +222,12 @@
                 queryCommodity: {
                     status:'',
                     pageNum: 1,
-                    pageSize: 10
+                    pageSize: 5
                 },
                 totalCommodity:'',
                 loadingCommodity:false,
+                couponConditionsList:[], // 已选分类
+                couponCommodityList:[], // 已选商品
                 right:{ // 权限
                     add:false,
                     edit:false,
@@ -218,6 +251,7 @@
 
             this.getData();
             this.getCategory();
+            this.getCommodity();
         },
         methods: {
             // 获取数据
@@ -227,7 +261,6 @@
                     if(res.code == 200) {
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
-
                     }else{
                         this.$massage.error(res.msg);
                     }
@@ -254,6 +287,21 @@
                     if(res.code == 200) {
                         this.tableDataCommodity = res.data.records;
                         this.totalCommodity = res.data.pages;
+                        this.tableDataCommodity.forEach(item => {
+                            // this.couponCommodityList.map(i => {
+                            //     if(item.code == i.code){
+                            //         console.log(item.name)
+                            //         this.$refs.multipleCommodityTable.toggleRowSelection(item,true);
+                            //     }
+                            // })
+
+                            if(this.couponCommodityList.find(i => item.code == i.code)){
+                                this.$nextTick(function () {
+                                    this.$refs.multipleCommodityTable.toggleRowSelection(item,true);
+                                }.bind(this));
+                            }
+                        })
+
                     }else{
                         this.$massage.error(res.msg);
                     }
@@ -271,6 +319,7 @@
             },
             // 保存编辑
             saveEdit() {
+                this.form.couponConditionsList = this.couponConditionsList.concat(this.couponCommodityList);
                 if(!this.form.couponName){
                     this.$message.error("请输入优惠券名称！");
                     return;
@@ -287,7 +336,22 @@
                     this.$message.error("请输入优惠券有效触发金额！");
                     return;
                 }
-                this.form.scope = this.form.scope.join(',');
+                if(!this.form.starttime){
+                    this.$message.error("请选择生效时间！");
+                    return;
+                }
+                if(!this.form.endtime){
+                    this.$message.error("请选择失效时间！");
+                    return;
+                }
+                if(!this.form.scope){
+                    this.$message.error("请选择适用范围！");
+                    return;
+                }
+                if((this.form.scope == 1 || this.form.scope == 2) && this.form.couponConditionsList.length == 0){
+                    this.$message.error("请选择分类或商品！");
+                    return;
+                }
                 this.$set(this.form, 'type', 0);
                 this.subloading = true;
                 this.$axios.post("/coupon/insertOrUpdate",this.form).then(res => {
@@ -303,7 +367,28 @@
             handleEdit(index, row) {
                 this.editVisible = true;
                 if(row ){
-                    this.form = row;
+                    this.form ={
+                        code:row.code,
+                        couponName:row.couponName,
+                        preferentialAmount : row.preferentialAmount,
+                        paymentAmount : row.paymentAmount,
+                        triggerAmount : row.triggerAmount,
+                        starttime : row.starttime,
+                        endtime : row.endtime,
+                        scope : row.scope,
+                        superpositionRule : row.superpositionRule,
+                        couponConditionsList : row.couponConditionsList
+                    };
+                    this.couponConditionsList = []; // 已选分类
+                    this.couponCommodityList = []; // 已选商品
+                    this.form.couponConditionsList.map(item => {
+                        if(item.commodityCode){ // 商品
+                            this.couponCommodityList.push(item);
+                        }
+                        if(item.categoryCode){ // 分类
+                            this.couponConditionsList.push(item);
+                        }
+                    })
                     this.title = '编辑';
                 }else{
                     this.title = '新增';
@@ -327,7 +412,7 @@
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 }).then(() => {
-                    this.$axios.delete("/coupon/delete?number=" + row.code).then(res => {
+                    this.$axios.delete("/coupon/delete?code=" + row.code).then(res => {
                         if (res.code == 200) {
                             this.$message.success("删除成功！");
                             this.getData();
@@ -340,7 +425,6 @@
                 this.multipleSelection = val;
             },
             delAllSelection() { //批量删除
-                // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 }).then(() => {
@@ -375,21 +459,57 @@
                 this.editVisible = false;
                 this.subloading = false;
                 this.form = {};
+                this.getCategory();
+                this.queryCommodity.pageNum = 1;
+                this.getCommodity();
             },
             //  选商品
-            handleCommodityChange(val){
+            handleCommoditySelect(selection, row){
+                // console.log(selection, row)
+                if(!this.loadingCommodity){
+                    if(this.couponCommodityList.find((item) => (row.code == item.commodityCode))){
+                        this.couponCommodityList = this.couponCommodityList.filter((item) => (row.code != item.code));
+                    }else{
+                        this.couponCommodityList.push({name:row.name,commodityCode:row.code,code:row.code,type:this.form.scope == 1?1:0});
+                    }
+                }
 
             },
+            handleCommodityChange(val){
+                // console.log(val,)
+                // if(val.length >0){
+                //     val.map(item => {
+                //         this.couponCommodityList.push({categoryCode:item.categoryCode,name:item.name,commodityCode:item.code,type:this.form.scope == 1?1:0});
+                //     })
+                // }
+            },
             // 选分类
-            handleCheckChange(data, checked, indeterminate) {
-                console.log(data, checked, indeterminate);
-                if(checked){
+            handleCheckCategory(row,data){
+                // console.log(row,data);
+                this.couponConditionsList = [];
+                let categoryItem = {};
+                data.checkedNodes.map((item,index) => {
+                    // console.log(item)
+                    if(item.parentCode || item.subCategorys.length == 0){
+                        categoryItem = {
+                            categoryCode:item.code,
+                            name:item.name,
+                            type:this.form.scope == 1?1:0,
+                        }
+                        this.couponConditionsList.push(categoryItem)
+                    }
+                })
+                console.log(this.couponConditionsList)
+            },
+            handleCheckChange(data,row) {
+                // console.log(data,row);
+                // if(checked){
                     this.queryCommodity.categoryCode = data.code;
                     this.queryCommodity.pageNum = 1;
                     this.getCommodity();
-                }else {
-                    this.tableDataCommodity = [];
-                }
+                // }else {
+                //     this.tableDataCommodity = [];
+                // }
             },
             refresh(){ // 刷新
                 this.getData();
@@ -398,10 +518,23 @@
     };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
 
   .commodity_drawer .el-drawer__body{
     overflow-y: auto;
+  }
+  .selectedCommodity{
+    display: flex;
+    width: 100%;
+    border:1px solid #ededed;
+  }
+  .categoryTree{
+    flex: 1;
+    border-right:1px solid #ededed;
+  }
+  .commodityTable{
+    flex: 3;
+    /*padding: 0 10px;*/
   }
     .handle-box {
         margin-bottom: 20px;

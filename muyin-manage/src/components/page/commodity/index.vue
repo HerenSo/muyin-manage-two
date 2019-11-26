@@ -57,7 +57,7 @@
         <el-table-column label="操作" width="120" align="center" fixed="right">
           <template slot-scope="scope">
             <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>
-            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>
+<!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>-->
               <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
               <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleUpdateStatus(2, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
               <el-button type="text" icon="el-icon-sold-out" class="red" @click="handleUpdateStatus(3, scope.row)" v-if="scope.row.status ==4">下架</el-button>

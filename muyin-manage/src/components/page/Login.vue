@@ -61,11 +61,14 @@ export default {
                 if (valid) {
                     this.$set(this.param, 'dataType', 'form');
                     this.$axios.post("/login",this.param).then(res => {
-                        console.log(res);
-                        this.$message.success('登录成功');
-                        localStorage.setItem('ms_username', this.param.username);
-                        localStorage.setItem('user_information', JSON.stringify(res.data));
-                        this.$router.push('/');
+                        if(res.code == 200) {
+                            this.$message.success('登录成功');
+                            localStorage.setItem('ms_username', this.param.username);
+                            localStorage.setItem('user_information', JSON.stringify(res.data));
+                            this.$router.push('/');
+                        }else{
+                            this.$massage.error(res.msg);
+                        }
                     })
 
                 } else {

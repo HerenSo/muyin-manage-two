@@ -7,7 +7,7 @@ export default new Router({
     routes: [
         {
             path: '/',
-            redirect: '/analyze/user'
+            redirect: '/analyze/order'
         },
         {
             path: '/',
