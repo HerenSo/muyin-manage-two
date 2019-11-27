@@ -264,9 +264,8 @@
                         if(res.data){
                             this.info = res.data;
                         }else{
-                            this.info = {
-
-                            };
+                            this.info = {};
+                            this.$massage.error(res.msg);
                         }
 
                     }else{

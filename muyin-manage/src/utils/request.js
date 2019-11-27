@@ -62,6 +62,12 @@ axios.interceptors.response.use(response => {
         }else if(response.data.code == 11){
             // Message.error("呀！你已被挤下线");
             router.push("/login")
+        }else if(response.data.code == 21){
+            // Message.error("呀！你已被挤下线");
+            router.push("/login")
+        }else if(response.data.code == 36){
+            // Message.error("呀！你已被挤下线");
+            router.push("/login")
         }else{
             // Message.error(response.data.msg);
         }
