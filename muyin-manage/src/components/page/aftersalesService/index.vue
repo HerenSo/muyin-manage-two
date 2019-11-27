@@ -114,7 +114,7 @@
             // 获取数据
             getData() {
                 this.loading = true;
-                this.$axios.post("/feign/member-order-service/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,this.query).then(res => {
+                this.$axios.post("/member-order-service/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,this.query).then(res => {
                     if(res.code == 200) {
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
@@ -127,19 +127,24 @@
             // 状态改变操作
             handleUpdateStatus(status, row) {
                 let msg = "";
+                let url = "";
                 if(status == 1){
                     msg = "审核通过";
+                    url = "/member-order/confirmOrderService";
                 }else if(status == 9){
                     msg = "审核不通过";
+                    url = "/member-order/refuseRefund";
                 }else if(status == 6 && (scope.row.type ==0 || scope.row.type ==2)){
                     msg = "收到退还货物";
+                    url = "/member-order/confirmRefund";
                 }else if(status == 6 && scope.row.type ==3){
                     msg = "换货送达";
+                    url = "/member-order/confirmOrderServiceReceived";
                 }
                 this.$confirm("确定"+msg+"吗？", '提示', {
                     type: 'warning'
                 }).then(() => {
-                    this.$axios.post("/commodity/updateCommodityStatus",{code:row.code,status:status,dataType:'form'}).then(res => {
+                    this.$axios.get(url+"?number="+row.orderNumber).then(res => {
                         if (res.code == 200) {
                             this.$message.success(msg+"成功！");
                             this.getData();

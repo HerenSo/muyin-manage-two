@@ -44,11 +44,15 @@
         </el-table-column>
         <el-table-column prop="visitCount" label="预览量" width="80" align="center"></el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="160" align="center"></el-table-column>
-        <el-table-column label="操作" width="120" align="center">
+        <el-table-column label="操作" width="120" align="center" fixed="right">
           <template slot-scope="scope">
 <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>-->
 <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>-->
-            <el-button type="text" icon="el-icon-delete" class="red" @click="handleCheck(scope.$index, scope.row)" v-if="right.del">查看</el-button>
+            <el-button type="text" icon="el-icon-view" class="" @click="handleCheck(scope.$index, scope.row)" v-if="right.del">查看</el-button>
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(3, scope.row.number)" v-if="scope.row.status ==2">受理</el-button>
+            <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleSome(9,scope.row.number)" v-if="scope.row.status ==2">拒绝</el-button>
+            <el-button type="text" icon="el-icon-sold-out" class="" @click="handleSome(4, scope.row.number)" v-if="scope.row.status ==3">发货</el-button>
+            <el-button type="text" icon="el-icon-truck" class="" @click="handleUpdateStatus(6, scope.row.number)" v-if="scope.row.status ==4">送达</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -122,6 +126,27 @@
       </div>
     </el-drawer>
 
+    <!--操作-->
+    <el-dialog :title="titleHandle" :visible.sync="editVisibleHandle" width="30%" :before-close="closeHandle">
+      <el-form ref="form" :model="formHandle" label-width="100px">
+        <el-form-item label="物流公司" v-if="status == 4" required>
+<!--          <el-input v-model="formHandle.logisticsIdent"></el-input>-->
+          <el-select v-model="formHandle.logisticsIdent" placeholder="选择">
+            <el-option :key="index" :label="item.courierName" :value="item.courierCode" v-for="(item,index) in courier"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="物流单号" v-if="status == 4" required>
+          <el-input v-model="formHandle.logisticsNumber"></el-input>
+        </el-form-item>
+        <el-form-item label="原因" v-if="status == 9" required>
+          <el-input type="textarea" v-model="formHandle.authReason"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisibleHandle = false">取 消</el-button>
+                <el-button type="primary" @click="submitHandle">确 定</el-button>
+            </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -158,6 +183,12 @@
                     del:false
                 },
                 formDisable:false,
+                titleHandle:"拒绝原因",
+                editVisibleHandle:false,
+                formHandle:{},
+                status:0,
+                number:'',
+                courier:[], // 物流公司
             };
         },
         mounted() {
@@ -174,6 +205,7 @@
             })
 
             this.getData();
+            this.getCourier();
         },
         methods: {
             // 获取数据
@@ -187,6 +219,16 @@
                         this.$massage.error(res.msg);
                     }
                     this.loading = false;
+                })
+            },
+            // 获取物流公司
+            getCourier() {
+                this.$axios.post("/courier-company/selectList",{}).then(res => {
+                    if(res.code == 200) {
+                        this.courier = res.data;
+                    }else{
+                        this.$massage.error(res.msg);
+                    }
                 })
             },
             getDetails(number){
@@ -252,6 +294,68 @@
                 this.formDisable = true;
                 this.editVisible = true;
             },
+            // 状态改变操作
+            handleUpdateStatus(status, number) {
+                let msg = "";
+                let url = "";
+                if(status == 3){
+                    msg = "确认接受订单";
+                    url = "/member-order/confirm";
+                }else if(status == 6){
+                    msg = "确认商品已送达";
+                    url = "/member-order/reached";
+                }
+                this.$confirm(msg+"吗？", '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.get(url+"?number="+number).then(res => {
+                        if (res.code == 200) {
+                            this.$message.success(msg+"成功！");
+                            this.getData();
+                        }
+                    })
+                }).catch(() => {});
+            },
+            submitHandle(){
+                let msg = "";
+                let url = "";
+                if(this.status == 9){
+                    if(!this.formHandle.authReason){
+                        this.$message.error("请填写拒绝原因！");
+                        return;
+                    }
+                    msg = "拒绝受理订单";
+                    url = "/member-order/rejected?number="+this.number+"&authReason="+this.formHandle.authReason;
+                }else if(this.status == 4){
+                    if(!this.formHandle.logisticsIdent){
+                        this.$message.error("请选择物流公司！");
+                        return;
+                    }
+                    if(!this.formHandle.logisticsNumber){
+                        this.$message.error("请填写物流单号！");
+                        return;
+                    }
+                    msg = "发货";
+                    url = "/member-order/deliver?number="+this.number+"&logisticsIdent="+this.formHandle.logisticsIdent+"&logisticsNumber="+this.formHandle.logisticsNumber;
+                }
+                this.$axios.get(url).then(res => {
+                    if (res.code == 200) {
+                        this.$message.success(msg+"成功！");
+                        this.editVisibleHandle = false;
+                        this.getData();
+                    }
+                })
+            },
+            handleSome(status,number){
+                this.editVisibleHandle = true;
+                this.number = number;
+                this.status = status;
+                if(status == 9){
+                    this.titleHandle = "填写拒绝原因";
+                }else if(status == 4){
+                    this.titleHandle = "填写发货物流";
+                }
+            },
             // 触发搜索按钮
             handleSearch() {
                 this.$set(this.query, 'pageNum', 1);
@@ -276,7 +380,6 @@
                 this.multipleSelection = val;
             },
             delAllSelection() { //批量删除
-                // 二次确认删除
                 this.$confirm('确定要删除吗？', '提示', {
                     type: 'warning'
                 }).then(() => {
@@ -311,6 +414,10 @@
                 this.editVisible = false;
                 this.subloading = false;
                 this.form = {};
+            },
+            closeHandle(){
+                this.editVisibleHandle = false;
+                this.formHandle = {};
             },
             refresh(){ // 刷新
                 this.getData();
