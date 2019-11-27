@@ -55,6 +55,11 @@ export default new Router({
                     meta: { title: '订单管理' }
                 },
                 {
+                    path: '/aftersalesService/index',
+                    component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/aftersalesService/index.vue'),
+                    meta: { title: '售后服务' }
+                },
+                {
                     path: '/customer/index',
                     component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/customer/index.vue'),
                     meta: { title: '经销商' }

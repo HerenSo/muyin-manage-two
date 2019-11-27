@@ -62,6 +62,7 @@ export default {
                     this.$set(this.param, 'dataType', 'form');
                     this.$axios.post("/login",this.param).then(res => {
                         if(res.code == 200) {
+                            this.getClassEnums();
                             this.$message.success('登录成功');
                             localStorage.setItem('ms_username', this.param.username);
                             localStorage.setItem('user_information', JSON.stringify(res.data));
@@ -78,6 +79,15 @@ export default {
                 }
             });
         },
+        getClassEnums(){
+            this.$axios.post("/api/user/selectClassEnums").then(res => {
+                if (res.code == 200) {
+                    localStorage.setItem('ClassEnums', JSON.stringify(res.data));
+                }else{
+                    this.$massage.error(res.msg);
+                }
+            })
+        }
     },
 };
 </script>

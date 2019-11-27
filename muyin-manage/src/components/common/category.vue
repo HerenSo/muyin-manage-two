@@ -1,26 +1,26 @@
 <template>
   <div class="">
     <div class="mt-20">
-      <el-popover placement="left" class="mr10 mb-5" trigger="hover" :open-delay="500"  v-for="(tag,index) in dynamicTags" :key="tag.code" :disabled="index==0">
+      <el-popover placement="top" class="mr10 mb-5" trigger="hover" :open-delay="500"  v-for="(tag,index) in dynamicTags" :key="tag.code" :disabled="index==0">
         <div style="text-align: right; margin: 0" >
           <el-button size="mini" type="primary"  @click="handleCategoryAdd(tag)">编辑</el-button>
-          <el-button type="info" size="mini" @click="handleCategoryDel(tag.code)">删除</el-button>
+          <el-button type="info" size="mini" @click="handleCategoryDel(tag.code)" v-if="apiType != 1">删除</el-button>
         </div>
         <el-button slot="reference" @click="handleCategory(index)" :class="tag.light == 1?'current mb-5':'mb-5'">{{tag.name}}</el-button>
 
       </el-popover>
-      <el-button  size="small" @click="handleCategoryAdd">+ 添加分类</el-button>
+      <el-button  size="small" @click="handleCategoryAdd" v-if="apiType != 1">+ 添加分类</el-button>
     </div>
     <div class="pt-10 mt-10 border-top">
       <el-popover placement="left" class="mr10" trigger="hover" :open-delay="500"  v-for="(tag,index) in subCategorys" :key="tag.code" >
         <div style="text-align: right; margin: 0" >
           <el-button size="mini" type="primary"  @click="handleCategoryAdd(tag)">编辑</el-button>
-          <el-button type="info" size="mini" @click="handleCategoryDel(tag.code)">删除</el-button>
+          <el-button type="info" size="mini" @click="handleCategoryDel(tag.code)" v-if="apiType != 1">删除</el-button>
         </div>
         <el-button slot="reference" @click="handlesubCategorys(index)" :class="tag.light == 1?'subcurrent mb-5':'mb-5'" size="mini">{{tag.name}}</el-button>
 
       </el-popover>
-      <el-button  size="mini" @click="handlesubCategorysAdd" v-if="subCategorys">+ 添加子分类</el-button>
+      <el-button  size="mini" @click="handlesubCategorysAdd" v-if="subCategorys && apiType != 1">+ 添加子分类</el-button>
     </div>
 
     <!-- 分类编辑弹出框 -->
@@ -350,6 +350,9 @@
 </script>
 
 <style lang="scss">
+  .el-popover{
+    min-width: auto;
+  }
   .current{
     background: $color-theme;
     color: #fff;

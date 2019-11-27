@@ -8,15 +8,17 @@
 <!--        <el-button type="primary" icon="el-icon-delete" class="handle-del" @click="delAllSelection" v-if="right.del">批量删除</el-button>-->
         <el-select v-model="query.type" placeholder="交易类型" class="handle-select mr10 ml-10" @change="refresh">
           <el-option key="" label="全部" value=""></el-option>
+          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>
         </el-select>
         <el-select v-model="query.paidType" placeholder="交易方式" class="handle-select mr10" @change="refresh">
           <el-option key="" label="全部" value=""></el-option>
+          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsPaidTypelist"></el-option>
         </el-select>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
       <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column prop="code" label="流水号"></el-table-column>
+        <el-table-column prop="code" label="流水号" min-width="120"></el-table-column>
         <el-table-column prop="orderNumber" label="交易关联订单号" min-width="130"></el-table-column>
         <el-table-column prop="thirdOrderNumber" label="第三方交易流水号" min-width="140"></el-table-column>
         <el-table-column prop="content" label="交易内容"></el-table-column>
@@ -28,10 +30,14 @@
         <el-table-column prop="pointCost" label="积分抵扣金额" min-width="120"></el-table-column>
         <el-table-column prop="walletCost" label="钱包抵扣金额" min-width="120"></el-table-column>
         <el-table-column prop="totalAmount" label="交易总金额" min-width="100"></el-table-column>
-        <el-table-column prop="type" label="交易类型" ></el-table-column>
-        <el-table-column label="方式" prop="paidType" align="center" width="80" >
+        <el-table-column prop="type" label="交易类型" >
           <template slot-scope="scope">
-            {{scope.row.paidType===0?'微信':(scope.row.paidType===1?'支付宝':(scope.row.paidType===2?'纯钱包余额':'其他'))}}
+          {{enums[scope.row.type]}}
+          </template>
+        </el-table-column>
+        <el-table-column label="方式" prop="paidType"  min-width="120" align="center">
+          <template slot-scope="scope">
+            {{enumsPaidType[scope.row.paidType]}}
           </template>
         </el-table-column>
         <el-table-column prop="status" label="流水状态" >
@@ -42,7 +48,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="platformCommission" label="平台抽成" width="80" align="center"></el-table-column>
-        <el-table-column prop="createTime" label="交易时期"></el-table-column>
+        <el-table-column prop="createTime" label="交易时期" width="160" align="center"></el-table-column>
 <!--        <el-table-column label="操作" width="120" align="center">-->
 <!--          <template slot-scope="scope">-->
 <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>-->
@@ -124,6 +130,10 @@
                     del:false
                 },
                 formDisable:false,
+                enumslist:[],
+                enumsPaidTypelist:[],
+                enums:{}, // 交易类型枚举
+                enumsPaidType:{} // 交易方式枚举
             };
         },
         mounted() {
@@ -137,6 +147,24 @@
                     case 'ROLE_ORDER_ADD':this.right.add = true;break;
                     default:break;
                 }
+            })
+
+            // 枚举
+            let enums = JSON.parse(localStorage.getItem("ClassEnums"));
+            let enumslist = enums.WalletBillTypeEnum; // 交易类型
+            let enumsPaidTypelist = enums.PaidTypeEnum;
+            for(let key in enumslist){
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums,item.code,item.name);
+            })
+
+            for(let key in enumsPaidTypelist){
+                this.enumsPaidTypelist.push(enumsPaidTypelist[key]);
+            }
+            this.enumsPaidTypelist.map(item => {
+                this.$set(this.enumsPaidType,item.code,item.name);
             })
 
             this.getData();

@@ -3,7 +3,7 @@
 <!--    <el-collapse v-model="activeName" class="statistics" @change="handleCollapse">-->
 <!--      <el-collapse-item  name="1" disabled>-->
 <!--        <template slot="title">-->
-      <div class="mb-20">
+    <div class="mb-20">
           <el-date-picker
                   v-model="queryTime"
                   align="right"
@@ -14,6 +14,9 @@
                   @change="getData"
                   :default-time="['00:00:00']">
           </el-date-picker>
+          <el-select v-model="query.customerCode" placeholder="经销商" @change="getData" class="ml-10">
+            <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
+          </el-select>
       </div>
 <!--        </template>-->
         <el-row :gutter="20" class="mgb20">
@@ -225,7 +228,8 @@
                 },
                 queryTime:[],
                 info:{},
-                query:{}
+                query:{},
+                customer:[] // 经销商
             }
         },
         components: {
@@ -241,6 +245,7 @@
             this.getData();
             this.handleListener();
             this.changeDate();
+            this.getCustomer();
         },
         activated(){
             this.handleListener();
@@ -264,6 +269,15 @@
                             };
                         }
 
+                    }else{
+                        this.$massage.error(res.msg);
+                    }
+                })
+            },
+            getCustomer(){// 获取供销商
+                this.$axios.post("/customer/selectList",{}).then(res => {
+                    if(res.code == 200){
+                        this.customer = res.data;
                     }else{
                         this.$massage.error(res.msg);
                     }

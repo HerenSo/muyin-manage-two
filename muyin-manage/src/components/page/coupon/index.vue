@@ -144,8 +144,7 @@
                                     layout="total, prev, pager, next, jumper"
                                     :current-page="queryCommodity.pageNum"
                                     :page-count="totalCommodity"
-                                    @current-change="handlePageChange"
-                                    @size-change="handleSizeChange"
+                                    @current-change="handleCommodityPageChange"
                             ></el-pagination>
                           </div>
                         </div>
@@ -448,6 +447,10 @@
             handlePageChange(val) {
                 this.$set(this.query, 'pageNum', val);
                 this.getData();
+            },
+            handleCommodityPageChange(val){
+                this.$set(this.queryCommodity, 'pageNum', val);
+                this.getCommodity();
             },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);

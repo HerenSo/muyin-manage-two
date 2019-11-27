@@ -32,7 +32,10 @@
                 </el-table-column>
                 <el-table-column prop="url" label="跳转地址"  >
                 </el-table-column>
-                <el-table-column prop="type" label="类型"  width="80" align="center">
+                <el-table-column prop="type" label="类型"   align="center">
+                  <template slot-scope="scope">
+                      {{enums[scope.row.type]}}
+                  </template>
                 </el-table-column>
                 <el-table-column prop="sort" label="排序"  width="80" align="center">
                 </el-table-column>
@@ -85,8 +88,7 @@
                     <el-form-item label="跳转参数"><el-input v-model="form.params" autocomplete="off"></el-input></el-form-item>
                     <el-form-item label="类型" required>
                         <el-select v-model="form.type" placeholder="请选择类型">
-                            <el-option key="0" label="banner图" value="banner"></el-option>
-                            <el-option key="1" label="栏目" value="navigation"></el-option>
+                            <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="主题颜色" required>
@@ -150,7 +152,9 @@
                 dialogVisible: false,
                 file:'',
                 croploading:false,
-                categoryParent:[]
+                categoryParent:[],
+                enumslist:[],
+                enums:{} // 枚举
             }
         },
         created() {
@@ -167,6 +171,16 @@
                     default:break;
                 }
             })
+            // 枚举
+            let enums = JSON.parse(localStorage.getItem("ClassEnums"));
+            let enumslist = enums.BannerTypeEnum;
+            for(let key in enumslist){
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums,item.code,item.name);
+            })
+
             //数据
             this.getData();
             this.getCategory();

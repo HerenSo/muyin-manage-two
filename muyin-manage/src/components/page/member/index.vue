@@ -32,12 +32,15 @@
         <el-table-column prop="wallet" label="余额" width="120" align="center"><template slot-scope="scope">{{scope.row.member.wallet}}</template></el-table-column>
         <el-table-column prop="point" label="积分" width="120" align="center"><template slot-scope="scope">{{scope.row.member.point}}</template></el-table-column>
         <el-table-column prop="createTime" label="注册时间" width="160" align="center"></el-table-column>
-        <el-table-column label="操作" width="120" align="center">
+        <el-table-column label="操作" width="150" align="center" fixed="right">
           <template slot-scope="scope">
 <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">充值</el-button>-->
             <el-button type="text" icon="el-icon-lx-calendar" class="" @click="handleSignRecord(scope.$index, scope.row)">签到记录</el-button>
-            <el-button type="text" icon="el-icon-lx-tag" class="" @click="handleResetPasswords(scope.$index, scope.row)">重置密码</el-button>
-            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">冻结</el-button>
+<!--            <el-button type="text" icon="el-icon-lx-tag" class="" @click="handleResetPasswords(scope.$index, scope.row)">重置密码</el-button>-->
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
+            <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleUpdateStatus(3, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
+            <el-button type="text" icon="el-icon-turn-off" class="red" @click="handleUpdateStatus(2, scope.row)" v-if="scope.row.status == 1">冻结</el-button>
+            <el-button type="text" icon="el-icon-open" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status == 2">解冻</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -284,6 +287,31 @@
             handleSearch() {
                 this.$set(this.query, 'pageNum', 1);
                 this.getData();
+            },
+            // 状态改变操作
+            handleUpdateStatus(status, row) {
+                let msg = "";
+                if(status == 0){
+                    msg = "待审核";
+                }else if(status == 1 && row.status == 0){
+                    msg = "审核通过";
+                }else if(status == 3){
+                    msg = "审核不通过";
+                }else if(status == 1 && row.status == 2){
+                    msg = "解冻";
+                }else if(status == 2){
+                    msg = "冻结";
+                }
+                this.$confirm("确定"+msg+"吗？", '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.post("user/freezeUser",{userId :row.userid,status:status,dataType:'form'}).then(res => {
+                        if (res.code == 200) {
+                            this.$message.success(msg+"成功！");
+                            this.getData();
+                        }
+                    })
+                }).catch(() => {});
             },
             // 删除操作
             handleDelete(index, row) {
