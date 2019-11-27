@@ -30,6 +30,10 @@
             <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>-->
             <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>-->
 <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleCheck(scope.$index, scope.row)" v-if="right.del">查看</el-button>-->
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
+            <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleUpdateStatus(9, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
+            <el-button type="text" icon="el-icon-sold-out" class="red" @click="handleUpdateStatus(6, scope.row)" v-if="scope.row.status ==1 && (scope.row.type ==0 || scope.row.type ==2)">确认收到退还货物</el-button>
+            <el-button type="text" icon="el-icon-sell" class="" @click="handleUpdateStatus(6, scope.row)" v-if="scope.row.status ==1 && scope.row.type===3">确认换货送达</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -56,8 +60,6 @@
         data() {
             return {
                 query: {
-                    createTime: '',
-                    title: '',
                     status:'',
                     pageNum: 1,
                     pageSize: 10
@@ -122,7 +124,29 @@
                     this.loading = false;
                 })
             },
-
+            // 状态改变操作
+            handleUpdateStatus(status, row) {
+                let msg = "";
+                if(status == 1){
+                    msg = "审核通过";
+                }else if(status == 9){
+                    msg = "审核不通过";
+                }else if(status == 6 && (scope.row.type ==0 || scope.row.type ==2)){
+                    msg = "收到退还货物";
+                }else if(status == 6 && scope.row.type ==3){
+                    msg = "换货送达";
+                }
+                this.$confirm("确定"+msg+"吗？", '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.post("/commodity/updateCommodityStatus",{code:row.code,status:status,dataType:'form'}).then(res => {
+                        if (res.code == 200) {
+                            this.$message.success(msg+"成功！");
+                            this.getData();
+                        }
+                    })
+                }).catch(() => {});
+            },
             // 触发搜索按钮
             handleSearch() {
                 this.$set(this.query, 'pageNum', 1);
