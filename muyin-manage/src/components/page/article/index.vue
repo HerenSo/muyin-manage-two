@@ -16,9 +16,10 @@
         </el-date-picker>
         <el-select v-model="query.status" placeholder="状态" class="handle-select mr10" @change="refresh">
           <el-option key="" label="全部" value=""></el-option>
-          <el-option key="0" label="草稿" value="0"></el-option>
-          <el-option key="1" label="上线" value="1"></el-option>
-          <el-option key="2" label="下线" value="2"></el-option>
+<!--          <el-option key="0" label="草稿" value="0"></el-option>-->
+<!--          <el-option key="1" label="上线" value="1"></el-option>-->
+<!--          <el-option key="2" label="下线" value="2"></el-option>-->
+          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>
         </el-select>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
@@ -34,7 +35,10 @@
         <el-table-column prop="categoryName" label="所属类型"></el-table-column>
         <el-table-column label="状态" align="center" width="80" >
           <template slot-scope="scope">
-            <el-tag :type="scope.row.status===0?'warning':(scope.row.status===1?'success':'danger')">{{scope.row.status===0?'草稿':(scope.row.status===1?'上线':'下线')}}</el-tag>
+            <el-tag :type="scope.row.status===0?'warning':(scope.row.status===1?'success':'danger')">
+<!--              {{scope.row.status===0?'草稿':(scope.row.status===1?'上线':'下线')}}-->
+              {{enums[scope.row.status]}}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="visitCount" label="预览量" width="80" align="center"></el-table-column>
@@ -60,7 +64,7 @@
     </div>
 
     <!-- 编辑弹出框 -->
-    <el-drawer :title="title" :visible.sync="editVisible" size="60%" direction="rtl" :before-close="handleClose">
+    <el-drawer :title="title" :visible.sync="editVisible" size="60%" direction="rtl" :before-close="handleClose" class="commodity_drawer">
       <div class="demo-drawer__content">
         <el-form ref="form" :model="form" label-width="70px">
           <el-form-item label="分类" required>
@@ -76,9 +80,10 @@
           </el-form-item>
           <el-form-item label="状态" required>
             <el-select v-model="form.status" placeholder="状态">
-              <el-option key="0" label="草稿" :value="0"></el-option>
-              <el-option key="1" label="上线" :value="1"></el-option>
-              <el-option key="2" label="下线" :value="2"></el-option>
+<!--              <el-option key="0" label="草稿" :value="0"></el-option>-->
+<!--              <el-option key="1" label="上线" :value="1"></el-option>-->
+<!--              <el-option key="2" label="下线" :value="2"></el-option>-->
+              <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="置顶">
@@ -133,7 +138,7 @@
                 form: {},
                 subloading:false,
                 editorOption: {
-                    placeholder: 'Hello World'
+                    placeholder: ''
                 },
                 typeValue:'',
                 apiType:'',
@@ -143,6 +148,8 @@
                     edit:false,
                     del:false
                 },
+                enumslist:[],
+                enums:{}, // 枚举
             };
         },
         mounted() {
@@ -157,6 +164,17 @@
                     default:break;
                 }
             })
+
+            // 枚举
+            let enums = JSON.parse(localStorage.getItem("ClassEnums"));
+            let enumslist = enums.ArticleStatusEnum;
+            for(let key in enumslist){
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums,item.code,item.name);
+            })
+
 
             this.typeValue = 1; // 0商品，1文章
             this.apiType = 0; // 区别接口，0文章/商品；1用户/经销商
@@ -175,7 +193,7 @@
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                     this.loading = false;
                 })
@@ -189,7 +207,7 @@
                     if(res.code == 200){
                         this.category = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
@@ -308,7 +326,13 @@
     };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+  .commodity_drawer .el-drawer__body{
+    overflow-y: auto;
+  }
+  .commodity_drawer .el-drawer__header{
+    margin-bottom: 10px;
+  }
   .handle-box {
     margin-bottom: 20px;
   }

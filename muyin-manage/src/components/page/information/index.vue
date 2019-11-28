@@ -41,7 +41,7 @@
                     if(res.code == 200) {
                         this.form = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },

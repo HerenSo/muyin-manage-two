@@ -11,9 +11,10 @@
                 </el-date-picker>
                 <el-select v-model="query.status" placeholder="状态" class="handle-select mr10" @change="refresh">
                     <el-option key="" label="全部" value=""></el-option>
-                    <el-option key="0" label="未审核" value="0"></el-option>
-                    <el-option key="1" label="审核通过" value="1"></el-option>
-                    <el-option key="2" label="审核不通过" value="2"></el-option>
+<!--                    <el-option key="0" label="未审核" value="0"></el-option>-->
+<!--                    <el-option key="1" label="审核通过" value="1"></el-option>-->
+<!--                    <el-option key="2" label="审核不通过" value="2"></el-option>-->
+                    <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>
                 </el-select>
                 <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
             </div>
@@ -31,20 +32,23 @@
                 </el-table-column>
                 <el-table-column  label="适用范围">
                     <template slot-scope="scope">
-                        {{scope.row.scope == "0" ? "无限制":(scope.row.scope == "1"?"部分商品可用":(scope.row.scope == "2"?"部分商品不可用":"限在线配送订单"))}}
+<!--                        {{scope.row.scope == "0" ? "无限制":(scope.row.scope == "1"?"部分商品可用":(scope.row.scope == "2"?"部分商品不可用":"限在线配送订单"))}}-->
+                      {{enumsScope[scope.row.status]}}
                     </template>
                 </el-table-column>
                 <el-table-column label="叠加类型" prop="superpositionRule" align="center" width="120" >
                     <template slot-scope="scope">
                         <el-tag :type="scope.row.superpositionRule===0?'warning':(scope.row.superpositionRule===1?'success':'')">
-                            {{scope.row.superpositionRule===0?'不可叠加':(scope.row.superpositionRule===1?'全部可叠加':'')}}
+<!--                            {{scope.row.superpositionRule===0?'不可叠加':(scope.row.superpositionRule===1?'全部可叠加':'')}}-->
+                          {{enumsSuperpositionRule[scope.row.status]}}
                         </el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="状态" prop="status" align="center" width="120" >
                     <template slot-scope="scope">
                         <el-tag :type="scope.row.status===0?'warning':(scope.row.status===1?'success':(scope.row.status===2?'danger':''))">
-                            {{scope.row.status===0?'未审核':(scope.row.status===1?'审核通过':(scope.row.status===2?'审核不通过':''))}}
+<!--                            {{scope.row.status===0?'未审核':(scope.row.status===1?'审核通过':(scope.row.status===2?'审核不通过':''))}}-->
+                          {{enums[scope.row.status]}}
                         </el-tag>
                     </template>
                 </el-table-column>
@@ -54,6 +58,8 @@
                     <template slot-scope="scope">
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>
+                      <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
+                      <el-button type="text" icon="el-icon-document-add" class="red" @click="handleUpdateStatus(3, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -96,10 +102,11 @@
                     </el-form-item>
                     <el-form-item label="适用范围" required>
                         <el-select v-model="form.scope" placeholder="适用范围" value-key="value">
-                            <el-option key="0" label="无限制" :value="0"></el-option>
-                            <el-option key="1" label="部分商品可用" :value="1"></el-option>
-                            <el-option key="2" label="部分商品不可用" :value="2"></el-option>
-                            <el-option key="3" label="限在线配送订单" :value="3"></el-option>
+<!--                            <el-option key="0" label="无限制" :value="0"></el-option>-->
+<!--                            <el-option key="1" label="部分商品可用" :value="1"></el-option>-->
+<!--                            <el-option key="2" label="部分商品不可用" :value="2"></el-option>-->
+<!--                            <el-option key="3" label="限在线配送订单" :value="3"></el-option>-->
+                          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsScopelist"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="选择商品" required v-if="form.scope == 1 || form.scope == 2">
@@ -170,8 +177,9 @@
                     </el-form-item>
                     <el-form-item label="叠加类型" required>
                         <el-select v-model="form.superpositionRule" placeholder="叠加类型">
-                            <el-option key="0" label="不可叠加" :value="0"></el-option>
-                            <el-option key="1" label="全部可叠加" :value="1"></el-option>
+<!--                            <el-option key="0" label="不可叠加" :value="0"></el-option>-->
+<!--                            <el-option key="1" label="全部可叠加" :value="1"></el-option>-->
+                          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsSuperpositionRulelist"></el-option>
                         </el-select>
                     </el-form-item>
                 </el-form>
@@ -207,9 +215,6 @@
                 title:'编辑',
                 form: {},
                 subloading:false,
-                editorOption: {
-                    placeholder: 'Hello World'
-                },
                 props: {
                     id:'code',
                     label: 'name',
@@ -233,6 +238,14 @@
                     del:false
                 },
                 formDisable:false,
+                enumslist:[],
+                enumsScopelist:[],
+                enumsTypelist:[],
+                enumsSuperpositionRulelist:[],
+                enums:{}, // 枚举
+                enumsScope:{},
+                enumsType:{},
+                enumsSuperpositionRule:{}
             };
         },
         mounted() {
@@ -248,6 +261,37 @@
                 }
             })
 
+            // 枚举
+            let enums = JSON.parse(localStorage.getItem("ClassEnums"));
+            let enumslist = enums.CouponStatusEnum; // 状态
+            let enumsScopelist = enums.CouponScopeEnum; // 范围
+            let enumsTypelist = enums.CouponTypeEnum; // 类型
+            let enumsSuperpositionRulelist = enums.CouponSuperpositionRuleEnum; // 是否可叠加
+            for(let key in enumslist){ //
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums,item.code,item.name);
+            })
+            for(let key in enumsScopelist){ //
+                this.enumsScopelist.push(enumsScopelist[key]);
+            }
+            this.enumsScopelist.map(item => {
+                this.$set(this.enumsScope,item.code,item.name);
+            })
+            for(let key in enumsTypelist){ //
+                this.enumsTypelist.push(enumsTypelist[key]);
+            }
+            this.enumsTypelist.map(item => {
+                this.$set(this.enumsType,item.code,item.name);
+            })
+            for(let key in enumsSuperpositionRulelist){ //
+                this.enumsSuperpositionRulelist.push(enumsSuperpositionRulelist[key]);
+            }
+            this.enumsSuperpositionRulelist.map(item => {
+                this.$set(this.enumsSuperpositionRule,item.code,item.name);
+            })
+
             this.getData();
             this.getCategory();
             this.getCommodity();
@@ -261,7 +305,7 @@
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                     this.loading = false;
                 })
@@ -275,7 +319,7 @@
                     if(res.code == 200){
                         this.category = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
@@ -302,7 +346,7 @@
                         })
 
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                     this.loadingCommodity = false;
                 })
@@ -312,7 +356,7 @@
                     if(res.code == 200) {
                         this.form = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
@@ -393,6 +437,25 @@
                     this.title = '新增';
                     this.form = {}
                 }
+            },
+            // 状态改变操作
+            handleUpdateStatus(status, row) {
+                let msg = "";
+                if(status == 1){
+                    msg = "审核通过";
+                }else if(status == 2){
+                    msg = "审核不通过";
+                }
+                this.$confirm("确定"+msg+"吗？", '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.post("/coupon/updateCouponStatus",{code:row.code,status:status,dataType:'form'}).then(res => {
+                        if (res.code == 200) {
+                            this.$message.success(msg+"成功！");
+                            this.getData();
+                        }
+                    })
+                }).catch(() => {});
             },
             handleCheck(index,row){
                 this.title = '订单详情';

@@ -23,8 +23,9 @@
         </el-table-column>
         <el-table-column prop="status" label="状态" width="120" align="center">
           <template slot-scope="scope">
-            <el-tag :type="scope.row.status=='0'?'warning':(scope.row.status=='1'?'success':(scope.row.status=='2'?'danger':(scope.row.status=='3'?'danger':'info')))">
-              {{scope.row.status=="0"?"待审核":(scope.row.status=="1"?"正常":(scope.row.status=="2"?"冻结":(scope.row.status=="3"?"审核失败":"注销")))}}
+            <el-tag :type="scope.row.status=='0'?'warning':(scope.row.status=='1'?'success':(scope.row.status=='2'?'danger':(scope.row.status=='3'?'danger':(scope.row.status=='9'?'info':''))))">
+<!--              {{scope.row.status=="0"?"待审核":(scope.row.status=="1"?"正常":(scope.row.status=="2"?"冻结":(scope.row.status=="3"?"审核失败":"注销")))}}-->
+              {{enums[scope.row.status]}}
             </el-tag>
           </template>
         </el-table-column>
@@ -34,6 +35,8 @@
           <template slot-scope="scope">
             <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>
             <el-button type="text" class="red" icon="el-icon-delete" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
+            <el-button type="text" icon="el-icon-document-add" class="red" @click="handleUpdateStatus(3, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -73,20 +76,22 @@
           </el-form-item>
           <el-form-item label="管理员类型">
             <el-select v-model="form.managerType" placeholder="请选择管理员类型">
-              <el-option key="0" label="无" :value="0"></el-option>
+              <!--<el-option key="0" label="无" :value="0"></el-option>
               <el-option key="1" label="经销商" :value="1"></el-option>
-              <el-option key="2" label="供货商" :value="2"></el-option>
+              <el-option key="2" label="供货商" :value="2"></el-option>-->
+              <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsManagerTypelist"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="状态" required>
-            <el-select v-model="form.status" placeholder="请选择状态">
-              <el-option key="0" label="待审核" :value="0"></el-option>
-              <el-option key="1" label="正常" :value="1"></el-option>
-              <el-option key="2" label="冻结" :value="2"></el-option>
-              <el-option key="3" label="审核失败" :value="3"></el-option>
-              <el-option key="9" label="注销" :value="9"></el-option>
-            </el-select>
-          </el-form-item>
+<!--          <el-form-item label="状态" required>-->
+<!--            <el-select v-model="form.status" placeholder="请选择状态">-->
+<!--              &lt;!&ndash;<el-option key="0" label="待审核" :value="0"></el-option>-->
+<!--              <el-option key="1" label="正常" :value="1"></el-option>-->
+<!--              <el-option key="2" label="冻结" :value="2"></el-option>-->
+<!--              <el-option key="3" label="审核失败" :value="3"></el-option>-->
+<!--              <el-option key="9" label="注销" :value="9"></el-option>&ndash;&gt;-->
+<!--              <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>-->
+<!--            </el-select>-->
+<!--          </el-form-item>-->
           <el-form-item label="是否为管理员">
             <el-select v-model="form.isAdmin" placeholder="">
               <el-option key="0" label="否" :value="0"></el-option>
@@ -138,6 +143,10 @@
                 cropImg: '',
                 dialogVisible: false,
                 file:'',
+                enumslist:[],
+                enumsManagerTypelist:[],
+                enums:{}, // 枚举
+                enumsManagerType:{},
             }
         },
         created() {
@@ -155,6 +164,25 @@
                     default:break;
                 }
             })
+
+
+            // 枚举
+            let enums = JSON.parse(localStorage.getItem("ClassEnums"));
+            let enumslist = enums.UserStatusEnum;
+            let enumsManagerTypelist = enums.ManagerTypeEnum
+            for(let key in enumslist){
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums,item.code,item.name);
+            })
+            for(let key in enumsManagerTypelist){
+                this.enumsManagerTypelist.push(enumsManagerTypelist[key]);
+            }
+            this.enumsManagerTypelist.map(item => {
+                this.$set(this.enumsManagerType,item.code,item.name);
+            })
+
             //数据
             this.getData();
             this.getRole();
@@ -254,6 +282,25 @@
                         isAdmin:0,
                     }
                 }
+            },
+            // 状态改变操作
+            handleUpdateStatus(status, row) {
+                let msg = "";
+                if(status == 1){
+                    msg = "审核通过";
+                }else if(status == 3){
+                    msg = "审核不通过";
+                }
+                this.$confirm("确定"+msg+"吗？", '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.post("/user/saveManagerUser",{userid:row.userid,status:status}).then(res => {
+                        if (res.code == 200) {
+                            this.$message.success(msg+"成功！");
+                            this.getData();
+                        }
+                    })
+                }).catch(() => {});
             },
             handleDelete(index, row) {
                 // 二次确认删除

@@ -203,7 +203,7 @@
                             }
                         })
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },

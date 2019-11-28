@@ -173,7 +173,7 @@
                         }
                         this.dynamicTags = dynamicTags;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
@@ -182,7 +182,7 @@
                     if(res.code == 200){
                         this.couponList = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
@@ -199,7 +199,7 @@
                         this.getCategory();
                         this.editVisibleCategory = false;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },

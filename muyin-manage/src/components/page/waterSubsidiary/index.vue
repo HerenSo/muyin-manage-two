@@ -119,9 +119,6 @@
                 title:'编辑',
                 form: {},
                 subloading:false,
-                editorOption: {
-                    placeholder: 'Hello World'
-                },
                 typeValue:'',
                 category:[],
                 right:{ // 权限
@@ -178,7 +175,7 @@
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                     this.loading = false;
                 })

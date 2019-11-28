@@ -7,13 +7,18 @@ export default new Router({
     routes: [
         {
             path: '/',
-            redirect: '/analyze/order'
+            redirect: '/home/index'
         },
         {
             path: '/',
             component: () => import(/* webpackChunkName: "home" */ '../components/common/Home.vue'),
             meta: { title: '自述文件' },
             children: [
+                {
+                    path: '/home/index',
+                    component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/home/index.vue'),
+                    meta: { title: '首页' }
+                },
                 {
                     path: '/analyze/user',
                     component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/analyze/user.vue'),

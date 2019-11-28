@@ -45,8 +45,8 @@ export default {
     data: function() {
         return {
             param: {
-                username: 'admin',
-                password: '123456',
+                username: '',
+                password: '',
             },
             rules: {
                 username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
@@ -61,6 +61,7 @@ export default {
                 if (valid) {
                     this.$set(this.param, 'dataType', 'form');
                     this.$axios.post("/login",this.param).then(res => {
+                        console.log(res)
                         if(res.code == 200) {
                             this.getClassEnums();
                             this.$message.success('登录成功');
@@ -68,7 +69,7 @@ export default {
                             localStorage.setItem('user_information', JSON.stringify(res.data));
                             this.$router.push('/');
                         }else{
-                            this.$massage.error(res.msg);
+                            this.$message.error(res.msg);
                         }
                     })
 
@@ -84,7 +85,7 @@ export default {
                 if (res.code == 200) {
                     localStorage.setItem('ClassEnums', JSON.stringify(res.data));
                 }else{
-                    this.$massage.error(res.msg);
+                    this.$message.error(res.msg);
                 }
             })
         }

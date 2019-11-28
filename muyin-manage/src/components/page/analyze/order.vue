@@ -14,7 +14,7 @@
                   @change="getData"
                   :default-time="['00:00:00']">
           </el-date-picker>
-          <el-select v-model="query.customerCode" placeholder="经销商" @change="getData" class="ml-10">
+          <el-select v-model="query.customerCode" placeholder="经销商" @change="getData" class="ml-10" v-if="managerType == 2">
             <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
           </el-select>
       </div>
@@ -229,7 +229,8 @@
                 queryTime:[],
                 info:{},
                 query:{},
-                customer:[] // 经销商
+                customer:[], // 经销商
+                managerType:"", // 管理员类型
             }
         },
         components: {
@@ -246,6 +247,12 @@
             this.handleListener();
             this.changeDate();
             this.getCustomer();
+            // 权限
+
+            let authorities = JSON.parse(localStorage.getItem("user_information"));
+            this.managerType = authorities.managerType;
+            console.log(this.managerType)
+
         },
         activated(){
             this.handleListener();
@@ -265,11 +272,11 @@
                             this.info = res.data;
                         }else{
                             this.info = {};
-                            this.$massage.error(res.msg);
+                            // this.$message.error(res.msg);
                         }
 
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
@@ -278,7 +285,7 @@
                     if(res.code == 200){
                         this.customer = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },

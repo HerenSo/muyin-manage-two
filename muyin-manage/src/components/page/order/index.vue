@@ -11,16 +11,17 @@
         </el-date-picker>
         <el-select v-model="query.status" placeholder="状态" class="handle-select mr10" @change="refresh">
           <el-option key="" label="全部" value=""></el-option>
-          <el-option key="0" label="创建订单" value="0"></el-option>
-          <el-option key="1" label="待支付" value="1"></el-option>
-          <el-option key="2" label="待商家确认" value="2"></el-option>
-          <el-option key="3" label="待发货" value="3"></el-option>
-          <el-option key="4" label="待收货" value="4"></el-option>
-          <el-option key="5" label="待上门自取" value="5"></el-option>
-          <el-option key="6" label="已收货待评价" value="6"></el-option>
-          <el-option key="7" label="完成" value="7"></el-option>
-          <el-option key="8" label="商家退单" value="8"></el-option>
-          <el-option key="9" label="取消" value="9"></el-option>
+<!--          <el-option key="0" label="创建订单" value="0"></el-option>-->
+<!--          <el-option key="1" label="待支付" value="1"></el-option>-->
+<!--          <el-option key="2" label="待商家确认" value="2"></el-option>-->
+<!--          <el-option key="3" label="待发货" value="3"></el-option>-->
+<!--          <el-option key="4" label="待收货" value="4"></el-option>-->
+<!--          <el-option key="5" label="待上门自取" value="5"></el-option>-->
+<!--          <el-option key="6" label="已收货待评价" value="6"></el-option>-->
+<!--          <el-option key="7" label="完成" value="7"></el-option>-->
+<!--          <el-option key="8" label="商家退单" value="8"></el-option>-->
+<!--          <el-option key="9" label="取消" value="9"></el-option>-->
+          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>
         </el-select>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
@@ -35,12 +36,12 @@
         <el-table-column prop="paidTime" label="支付时间"></el-table-column>
         <el-table-column prop="createTime" label="创建时间"></el-table-column>
         <el-table-column label="状态" prop="status" align="center" width="80" >
-<!--          <template slot-scope="scope">-->
+          <template slot-scope="scope">
 <!--            0-创建订单 1-待支付 2-待商家确认 3-待发货 4-待收货 5-待上门自取 6-已收货待评价 7-完成 8-商家退单 9-取消-->
-<!--            <el-tag :type="scope.row.status===0?'warning':(scope.row.status===1?'success':'danger')">-->
-<!--              {{scope.row.status===0?'草稿':(scope.row.status===1?'上线':'下线')}}-->
-<!--            </el-tag>-->
-<!--          </template>-->
+            <el-tag :type="scope.row.status===2?'warning':(scope.row.status===7?'success':(scope.row.status===9?'info':(scope.row.status===8?'danger':'')))">
+              {{enums[scope.row.status]}}
+            </el-tag>
+          </template>
         </el-table-column>
         <el-table-column prop="visitCount" label="预览量" width="80" align="center"></el-table-column>
         <el-table-column prop="createTime" label="创建时间" width="160" align="center"></el-table-column>
@@ -103,10 +104,11 @@
           <el-form-item label="支付方式" required>
 <!--            <el-input v-model="form.paidType" ></el-input>-->
             <el-select v-model="form.paidType" placeholder="支付方式" :disabled="formDisable">
-              <el-option key="0" label="微信APP" value="0"></el-option>
-              <el-option key="1" label="微信JSAPI" value="1"></el-option>
-              <el-option key="2" label="支付支付" value="2"></el-option>
-              <el-option key="3" label="其他" value="3"></el-option>
+<!--              <el-option key="0" label="微信APP" value="0"></el-option>-->
+<!--              <el-option key="1" label="微信JSAPI" value="1"></el-option>-->
+<!--              <el-option key="2" label="支付支付" value="2"></el-option>-->
+<!--              <el-option key="3" label="其他" value="3"></el-option>-->
+              <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsPaidTypelist"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="购买时间" required>
@@ -172,9 +174,6 @@
                 title:'编辑',
                 form: {},
                 subloading:false,
-                editorOption: {
-                    placeholder: 'Hello World'
-                },
                 typeValue:'',
                 category:[],
                 right:{ // 权限
@@ -189,6 +188,10 @@
                 status:0,
                 number:'',
                 courier:[], // 物流公司
+                enumslist:[],
+                enums:{}, // 枚举
+                enumsPaidTypelist:[],
+                enumsPaidType:{}, // 枚举
             };
         },
         mounted() {
@@ -204,6 +207,23 @@
                 }
             })
 
+            // 枚举
+            let enums = JSON.parse(localStorage.getItem("ClassEnums"));
+            let enumslist = enums.MemberOrderStatusEnum;
+            let enumsPaidTypelist = enums.OrderPaidTypeEnum;
+            for(let key in enumslist){
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums,item.code,item.name);
+            })
+            for(let key in enumsPaidTypelist){
+                this.enumsPaidTypelist.push(enumsPaidTypelist[key]);
+            }
+            this.enumsPaidTypelist.map(item => {
+                this.$set(this.enumsPaidType,item.code,item.name);
+            })
+
             this.getData();
             this.getCourier();
         },
@@ -216,7 +236,7 @@
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                     this.loading = false;
                 })
@@ -227,7 +247,7 @@
                     if(res.code == 200) {
                         this.courier = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
@@ -236,7 +256,7 @@
                     if(res.code == 200) {
                         this.form = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },

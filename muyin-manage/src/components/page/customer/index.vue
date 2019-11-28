@@ -40,19 +40,20 @@
         <el-table-column label="状态" align="center" width="100" >
           <template slot-scope="scope">
             <el-tag :type="scope.row.status===0?'warning':(scope.row.status===1?'success':(scope.row.status===2?'danger':(scope.row.status===3?'info':'')))">
-              {{scope.row.status===0?'待审核':(scope.row.status===1?'审核成功':(scope.row.status===2?'审核失败':(scope.row.status===9?'注销':'正常')))}}
+<!--              {{scope.row.status===0?'待审核':(scope.row.status===1?'审核成功':(scope.row.status===2?'审核失败':(scope.row.status===9?'注销':'正常')))}}-->
+              {{enums[scope.row.status]}}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="注册时间" width="160" align="center"></el-table-column>
         <el-table-column label="操作" width="120" align="center" fixed="right">
           <template slot-scope="scope">
-            <el-button type="text" icon="el-icon-delete" @click="handleCheck(scope.$index, scope.row)">查看</el-button>
+<!--            <el-button type="text" icon="el-icon-delete" @click="handleCheck(scope.$index, scope.row)">查看</el-button>-->
             <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>
-            <el-button type="text" icon="el-icon-delete" @click="handleAccount(scope.$index, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2">资金流水</el-button>
-            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(9, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2 ">注销</el-button>
-            <el-button type="text" icon="el-icon-delete" class="" @click="handleDelete(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
-            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(2, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
+            <el-button type="text" icon="el-icon-turn-off" class="red" @click="handleDelete(9, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2 ">注销</el-button>
+            <el-button type="text" icon="el-icon-tickets" @click="handleAccount(scope.$index, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2">资金流水</el-button>
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleDelete(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
+            <el-button type="text" icon="el-icon-document-add" class="red" @click="handleDelete(2, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -171,12 +172,14 @@
         <el-table-column prop="createTime" label="交易时期" width="150" align="center"></el-table-column>
         <el-table-column label="交易类型" align="center" width="100" >
           <template slot-scope="scope">
-            {{scope.row.type===0?'购物':(scope.row.type===1?'经销商提现':(scope.row.type===2?'分销提成':(scope.row.type===3?'充值赠送':(scope.row.type===4?'积分赠送':''))))}}
+            <!--{{scope.row.type===0?'购物':(scope.row.type===1?'经销商提现':(scope.row.type===2?'分销提成':(scope.row.type===3?'充值赠送':(scope.row.type===4?'积分赠送':''))))}}-->
+            {{enumsWalletBillType[scope.row.status]}}
           </template>
         </el-table-column>
         <el-table-column prop="paidType" label="方式" width="80" align="center">
           <template slot-scope="scope">
-            {{scope.row.paidType == 0?"微信":(scope.row.paidType == 1?"支付宝":(scope.row.paidType == 2?"纯钱包余额":(scope.row.paidType == 9?"其他":"")))}}
+            <!--{{scope.row.paidType == 0?"微信":(scope.row.paidType == 1?"支付宝":(scope.row.paidType == 2?"纯钱包余额":(scope.row.paidType == 9?"其他":"")))}}-->
+            {{enumsPaidType[scope.row.status]}}
           </template>
         </el-table-column>
         <el-table-column prop="point" label="积分消耗" width="80" align="center"></el-table-column>
@@ -186,7 +189,8 @@
         <el-table-column label="状态" align="center" width="100" >
           <template slot-scope="scope">
             <el-tag :type="scope.row.status===0?'warning':(scope.row.status===1?'success':(scope.row.status===2?'danger':''))">
-              {{scope.row.status===0?'交易中':(scope.row.status===1?'已入账':(scope.row.status===2?'已取消':""))}}
+              <!--{{scope.row.status===0?'交易中':(scope.row.status===1?'已入账':(scope.row.status===2?'已取消':""))}}-->
+              {{enumsWalletBill[scope.row.status]}}
             </el-tag>
           </template>
         </el-table-column>
@@ -239,9 +243,6 @@
                 title:'编辑',
                 form: {},
                 subloading:false,
-                editorOption: {
-                    placeholder: 'Hello World'
-                },
                 typeValue:'',
                 apiType:"",
                 category:[],
@@ -265,7 +266,15 @@
                 dialogCropVisible: false,
                 file:'',
                 fileList:[],
-                attachmentsList:[]
+                attachmentsList:[],
+                enumslist:[],
+                enumsWalletBilllist:[],
+                enumsPaidTypelist:[],
+                enumsWalletBillTypelist:[],
+                enums:{}, // 枚举
+                enumsWalletBill:{},
+                enumsPaidType:{},
+                enumsWalletBillType:{},
             };
         },
         mounted() {
@@ -279,6 +288,37 @@
                     case 'ROLE_CUSTOMER_ADD':this.right.add = true;break;
                     default:break;
                 }
+            })
+
+            // 枚举
+            let enums = JSON.parse(localStorage.getItem("ClassEnums"));
+            let enumslist = enums.CustomerStatusEnum;
+            let enumsWalletBilllist = enums.WalletBillStatusEnum;
+            let enumsPaidTypelist = enums.PaidTypeEnum;
+            let enumsWalletBillTypelist = enums.WalletBillTypeEnum;
+            for(let key in enumslist){
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums,item.code,item.name);
+            })
+            for(let key in enumsWalletBilllist){
+                this.enumsWalletBilllist.push(enumsWalletBilllist[key]);
+            }
+            this.enumsWalletBilllist.map(item => {
+                this.$set(this.enumsWalletBill,item.code,item.name);
+            })
+            for(let key in enumsPaidTypelist){
+                this.enumsPaidTypelist.push(enumsPaidTypelist[key]);
+            }
+            this.enumsPaidTypelist.map(item => {
+                this.$set(this.enumsPaidType,item.code,item.name);
+            })
+            for(let key in enumsWalletBillTypelist){
+                this.enumsWalletBillTypelist.push(enumsWalletBillTypelist[key]);
+            }
+            this.enumsWalletBillTypelist.map(item => {
+                this.$set(this.enumsWalletBillType,item.code,item.name);
             })
 
             this.typeValue = 1; // 0用户级别，1经销商级别
@@ -298,7 +338,7 @@
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                     this.loading = false;
                 })
@@ -309,7 +349,7 @@
                         this.tableAccount = res.data.records;
                         this.totalAccount = res.data.pages;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                     this.loading = false;
                 })
@@ -319,7 +359,7 @@
                     if(res.code == 200) {
                         this.form = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
@@ -332,7 +372,7 @@
                     if(res.code == 200){
                         this.category = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },

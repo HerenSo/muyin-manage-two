@@ -16,11 +16,12 @@
         </el-date-picker>
         <el-select v-model="query.status" placeholder="状态" class="handle-select mr10" @change="refresh">
           <el-option key="" label="全部" value=""></el-option>
-          <el-option key="0" label="待审核" value="0"></el-option>
-          <el-option key="1" label="审核通过" value="1"></el-option>
-          <el-option key="2" label="审核不通过" value="2"></el-option>
-          <el-option key="3" label="下架" value="3"></el-option>
-          <el-option key="4" label="上架" value="4"></el-option>
+<!--          <el-option key="0" label="待审核" value="0"></el-option>-->
+<!--          <el-option key="1" label="审核通过" value="1"></el-option>-->
+<!--          <el-option key="2" label="审核不通过" value="2"></el-option>-->
+<!--          <el-option key="3" label="下架" value="3"></el-option>-->
+<!--          <el-option key="4" label="上架" value="4"></el-option>-->
+          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>
         </el-select>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
@@ -50,7 +51,8 @@
         <el-table-column label="状态" align="center" width="80" >
           <template slot-scope="scope">
             <el-tag :type="scope.row.status===0?'warning':(scope.row.status===1?'success':(scope.row.status===2?'danger':(scope.row.status===3?'info':(scope.row.status===4?'':''))))">
-              {{scope.row.status===0?'待审核':(scope.row.status===1?'审核通过':(scope.row.status===2?'审核不通过':(scope.row.status===3?'下架':(scope.row.status===4?'上架':''))))}}
+<!--              {{scope.row.status===0?'待审核':(scope.row.status===1?'审核通过':(scope.row.status===2?'审核不通过':(scope.row.status===3?'下架':(scope.row.status===4?'上架':''))))}}-->
+              {{enums[scope.row.status]}}
             </el-tag>
           </template>
         </el-table-column>
@@ -89,11 +91,12 @@
                     </el-form-item>
                     <el-form-item label="商品分类" required>
                         <el-select v-model="form.type" placeholder="">
-                            <el-option key="0" label="普通[默认]" :value="0"></el-option>
-                            <el-option key="1" label="会员" :value="1"></el-option>
-                            <el-option key="2" label="寄卖" :value="2"></el-option>
-                            <el-option key="3" label="0元购" :value="3"></el-option>
-                            <el-option key="4" label="新人礼" :value="4"></el-option>
+<!--                            <el-option key="0" label="普通[默认]" :value="0"></el-option>-->
+<!--                            <el-option key="1" label="会员" :value="1"></el-option>-->
+<!--                            <el-option key="2" label="寄卖" :value="2"></el-option>-->
+<!--                            <el-option key="3" label="0元购" :value="3"></el-option>-->
+<!--                            <el-option key="4" label="新人礼" :value="4"></el-option>-->
+                          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsTypelist"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="商品所属类型" required>
@@ -336,7 +339,7 @@
                 form: {},
                 subloading:false,
                 editorOption: {
-                    placeholder: 'Hello World',
+                    placeholder: '',
                     modules: {
                         toolbar: {
                             container: toolbarOptions,  // 工具栏
@@ -375,7 +378,11 @@
                 cropImg: '',
                 dialogVisible: false,
                 file:'',
-                fileList:[]
+                fileList:[],
+                enumslist:[],
+                enumsTypelist:[],
+                enumsType:{},
+                enums:{} // 枚举
             };
         },
         mounted() {
@@ -389,6 +396,23 @@
                     case 'ROLE_COMMODITY_ADD':this.right.add = true;break;
                     default:break;
                 }
+            })
+
+            // 枚举
+            let enums = JSON.parse(localStorage.getItem("ClassEnums"));
+            let enumslist = enums.CommodityStatusEnum;
+            let enumsTypelist = enums.CommodityTypeEnum;
+            for(let key in enumslist){
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums,item.code,item.name);
+            })
+            for(let key in enumsTypelist){
+                this.enumsTypelist.push(enumsTypelist[key]);
+            }
+            this.enumsTypelist.map(item => {
+                this.$set(this.enumsType,item.code,item.name);
             })
 
             this.typeValue = 0; // 0商品，1文章
@@ -410,7 +434,7 @@
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                     this.loading = false;
                 })
@@ -426,7 +450,7 @@
                         this.commodityDetails =  res.data.commodityDetails;
                         this.commodityAttrs =  res.data.commodityAttrs;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
@@ -450,7 +474,7 @@
                             }
                         })
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
@@ -459,7 +483,7 @@
                     if(res.code == 200){
                         this.customer = res.data;
                     }else{
-                        this.$massage.error(res.msg);
+                        this.$message.error(res.msg);
                     }
                 })
             },
