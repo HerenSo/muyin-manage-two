@@ -6,7 +6,7 @@ $color-border: #EBEEF5 !default;
 
 
 /*
-* 方案一
+* 方案
 */
 //主题颜色- 按钮 文字
 $color-theme: #faa54b !default;
@@ -14,15 +14,39 @@ $color-one:#fef3e8 !default;
 $color-two: #f58f20 !default;
 $color-three: #eb5505 !default;
 //框架颜色
-$color-sys:#74cae2 !default;
+//$color-sys:#74cae2 !default;
+$color-sys:#2b303b !default;
+$color-footer:#f7f8fa !default;
+$color-header:#2b303b !default;
 $color-sys-two: #00a4ff !default;
 $color-sys-three: #e8f6ff !default;
 //登录背景
 $color-login-shadow:#74cae2 !default;
 @mixin login-bg{
-  background: url(../../assets/img/bg9.jpg) no-repeat center bottom;
-  background-size:auto 100%;
+  background: url(../../assets/img/login_bg.png) no-repeat 90% center;
+  background-size:670px auto;
 }
+
+/*
+* 方案一
+*/
+//主题颜色- 按钮 文字
+//$color-theme: #faa54b !default;
+//$color-one:#fef3e8 !default;
+//$color-two: #f58f20 !default;
+//$color-three: #eb5505 !default;
+////框架颜色
+//$color-sys:#74cae2 !default;
+//$color-footer:#f7f8fa !default;
+//$color-header:#74cae2 !default;
+//$color-sys-two: #00a4ff !default;
+//$color-sys-three: #e8f6ff !default;
+////登录背景
+//$color-login-shadow:#74cae2 !default;
+//@mixin login-bg{
+//  background: url(../../assets/img/bg9.jpg) no-repeat center bottom;
+//  background-size:auto 100%;
+//}
 
 
 /*
@@ -35,6 +59,8 @@ $color-login-shadow:#74cae2 !default;
 //$color-three: #00a4ff !default;
 ////框架颜色
 //$color-sys:#faa54b !default;
+//$color-footer:#f7f8fa !default;
+//$color-header:#faa54b !default;
 //$color-sys-two: #f58f20 !default;
 //$color-sys-three: #fef3e8 !default;
 ////登录背景
@@ -54,6 +80,8 @@ $color-login-shadow:#74cae2 !default;
 //$color-three: #3676b6 !default;
 ////框架颜色
 //$color-sys:#ef4a51 !default;
+//$color-footer:#f7f8fa !default;
+//$color-header:#ef4a51 !default;
 //$color-sys-two: #f11924 !default;
 //$color-sys-three: #fdebed !default;
 ////登录背景
@@ -73,6 +101,8 @@ $color-login-shadow:#74cae2 !default;
 //$color-three: #409EFF !default;
 ////框架颜色
 //$color-sys:#1873a2 !default;
+//$color-footer:#f7f8fa !default;
+//$color-header:#1873a2 !default;
 //$color-sys-two: #3676b6 !default;
 //$color-sys-three: #e8f6ff !default;
 ////登录背景
@@ -92,6 +122,8 @@ $color-login-shadow:#74cae2 !default;
 //$color-three: #eb5505 !default;
 ////框架颜色
 //$color-sys:#178a2b !default;
+//$color-footer:#f7f8fa !default;
+//$color-header:#178a2b !default;
 //$color-sys-two: #eb5505 !default;
 //$color-sys-three: #e8f6ff !default;
 ////登录背景

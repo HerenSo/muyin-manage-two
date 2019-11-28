@@ -446,6 +446,7 @@
                         let categoryCode = this.form.categoryCode;
                         this.form.categoryCode = [];
                         this.form.categoryCode.push(categoryCode);
+                        console.log("categoryCode--",this.form.categoryCode)
                         this.fileList =  res.data.attachmentsList;
                         this.commodityDetails =  res.data.commodityDetails;
                         this.commodityAttrs =  res.data.commodityAttrs;
@@ -469,6 +470,18 @@
                                 item.subCategorys.map(i => {
                                     if(i.subCategorys.length == 0){
                                         delete i.subCategorys;
+                                    }else{
+                                        i.subCategorys.map(a => {
+                                            if(a.subCategorys.length == 0){
+                                                delete a.subCategorys;
+                                            }else{
+                                                a.subCategorys.map(b => {
+                                                    if(b.subCategorys.length == 0){
+                                                        delete b.subCategorys;
+                                                    }
+                                                })
+                                            }
+                                        })
                                     }
                                 })
                             }

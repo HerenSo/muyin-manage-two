@@ -3,13 +3,13 @@
       <div class="header">
         <div class="logo"><img src="../../assets/img/logo_ico.png" height="70" />万博园管理平台</div>
       </div>
-        <div class="login_info">
-          <div><i>1</i><span>母婴一站式供应链</span></div>
-          <div><i>2</i><span>行业最大储备配货中心</span></div>
-          <div><i>3</i><span>批发式会员制门店</span></div>
-          <div><i>4</i><span>直击产业供应链</span></div>
-          <div><i>5</i><span>一体化营销管理体系</span></div>
-        </div>
+<!--        <div class="login_info">-->
+<!--          <div><i>1</i><span>母婴一站式供应链</span></div>-->
+<!--          <div><i>2</i><span>行业最大储备配货中心</span></div>-->
+<!--          <div><i>3</i><span>批发式会员制门店</span></div>-->
+<!--          <div><i>4</i><span>直击产业供应链</span></div>-->
+<!--          <div><i>5</i><span>一体化营销管理体系</span></div>-->
+<!--        </div>-->
         <div class="ms-login">
             <div class="ms-title"><img src="../../assets/img/login_bg02.png" />万博园管理平台</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
@@ -37,6 +37,9 @@
                 </div>
             </el-form>
         </div>
+      <div class="footer">
+        <div class="text-center">Copyright  2019-2020 Aize Technology. All Rights Reserved. 艾泽科技 版权所有</div>
+      </div>
     </div>
 </template>
 
@@ -102,8 +105,20 @@ export default {
     font-size: 22px;
     color: #fff;
     /*background: #74cae2;*/
-    background: none;
+    background: $color-header;
     border-bottom: 1px solid $color-one;
+  }
+  .footer{
+    position: fixed;
+    bottom: 0;
+    box-sizing: border-box;
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    font-size: 14px;
+    color: #999;
+    background: $color-footer;
+    text-align: center;
   }
   .header .logo{
     float: left;

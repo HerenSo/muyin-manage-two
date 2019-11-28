@@ -17,9 +17,8 @@
                     ref="multipleTable"
                     @selection-change="handleSelectionChange"
                     v-loading="loading"
-                    row-key="id"
-                    default-expand-all
-                    :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+                    row-key="code"
+                    :tree-props="{children: 'subCategorys'}">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="name" label="分类名称" >
                 </el-table-column>
@@ -55,6 +54,7 @@
                     </template>
                 </el-table-column>
             </el-table>
+
             <div class="pagination">
                 <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next" :page-count="total">
                 </el-pagination>
@@ -69,7 +69,7 @@
                         <el-cascader
                                 v-model="form.parentCode"
                                 :options="category"
-                                :props="{ expandTrigger: 'hover',value:'code',label:'name',children:'subCategorys' }"></el-cascader>
+                                :props="{ checkStrictly: true,value:'code',label:'name',children:'subCategorys' }"></el-cascader>
                     </el-form-item>
                     <el-form-item label="分类名称" label-width="100px" required><el-input v-model="form.name" autocomplete="off"></el-input></el-form-item>
                     <el-form-item label="缩略图" label-width="100px">
@@ -119,7 +119,7 @@
                 },
                 query: {
                     pageNum: 1,
-                    pageSize: 10
+                    pageSize: 6
                 },
                 idx: -1,
                 total: 1, // 分页数
@@ -147,10 +147,12 @@
                     default:break;
                 }
             })
+
+        },
+        mounted(){
             //数据
             this.getCategory();
             this.getData();
-
         },
         methods: {
             // 分页导航
@@ -161,23 +163,10 @@
             // 获取 列表数据
             getData() {
                 this.$set(this.query, 'type', 0);
-                this.$axios.post('/category/selectPageList?pageSize=10&pageNum='+this.query.pageNum,this.query).then((res) => {
+                this.$axios.post('/category/selectPageList?pageSize='+this.query.pageSize+'&pageNum='+this.query.pageNum,this.query).then((res) => {
                     if(res.code == 200){
                         this.tableData = res.data.records;
                         this.total = res.data.pages;
-                        this.tableData.map((item,index) => {
-                            // let parentCode = item.parentCode;
-                            // item.parentCode = [];
-                            // item.parentCode.push(parentCode);
-                            // item.parentCode = JSON.parse(item.parentCode);
-                            if(item.subCategorys.length >0){
-                                item.hasChildren = true;
-                                item.children = item.subCategorys;
-                            }
-                            item.id=index;
-                        })
-                        this.$forceUpdate();
-                        console.log(this.tableData)
                     }else{
                         this.$message.error(res.msg);
                     }
@@ -198,6 +187,18 @@
                                 item.subCategorys.map(i => {
                                     if(i.subCategorys.length == 0){
                                         delete i.subCategorys;
+                                    }else{
+                                        i.subCategorys.map(a => {
+                                            if(a.subCategorys.length == 0){
+                                                delete a.subCategorys;
+                                            }else{
+                                                a.subCategorys.map(b => {
+                                                    if(b.subCategorys.length == 0){
+                                                        delete b.subCategorys;
+                                                    }
+                                                })
+                                            }
+                                        })
                                     }
                                 })
                             }
@@ -216,7 +217,7 @@
                     this.$message.error("请输入分类名称！");
                     return;
                 }
-                this.form.parentCode = JSON.stringify(this.form.parentCode)
+                this.form.parentCode = this.form.parentCode[this.form.parentCode.length -1]
                 if(!this.form.iconUrl && this.form.parentCode){
                     this.$message.error("请上传缩略图！");
                     return;
@@ -238,9 +239,11 @@
                     this.form.code = row.code;
                     this.form.name = row.name;
                     this.form.iconUrl = row.iconUrl;
+                    // this.form.parentCode = row.parentCode;
+                    let parentCode = row.parentCode
                     this.form.parentCode = [];
-                    this.form.parentCode.push(row.parentCode);
-                    this.$forceUpdate();
+                    this.form.parentCode.push(parentCode);
+                    console.log("parentCode--",this.form.parentCode)
                     this.title = '编辑';
                 }else{
                     this.title = '新增';
