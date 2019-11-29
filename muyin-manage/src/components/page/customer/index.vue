@@ -378,24 +378,24 @@
             },
             // 保存编辑
             saveEdit() {
-                if(!this.form.categoryCode){
-                    this.$message.error("请选择分类！");
-                    return;
-                }
-                if(!this.form.title){
-                    this.$message.error("请输入标题！");
-                    return;
-                }
-                if(!this.form.content){
-                    this.$message.error("请输入内容！");
-                    return;
-                }
+                // if(!this.form.categoryCode){
+                //     this.$message.error("请选择分类！");
+                //     return;
+                // }
+                // if(!this.form.title){
+                //     this.$message.error("请输入标题！");
+                //     return;
+                // }
+                // if(!this.form.content){
+                //     this.$message.error("请输入内容！");
+                //     return;
+                // }
                 this.subloading = true;
                 this.fileList.map(item => {
                     this.attachmentsList.push(item.response.data.id)
                 })
                 this.form.attachmentsList = this.attachmentsList;
-                this.$axios.post("/commodity/insertOrUpdate",this.form).then(res => {
+                this.$axios.post("/customer/insertOrUpdate",this.form).then(res => {
                     if(res.code == 200){
                         this.$message.success(this.title+"成功！");
                         this.editVisible = false;
@@ -413,12 +413,7 @@
                     this.title = '编辑';
                 }else{
                     this.title = '新增';
-                    this.form = {
-                        categoryCode:this.query.categoryCode,
-                        topside:1,
-                        status:1,
-                        sortId:0,
-                    }
+                    this.form = {}
                 }
             },
             handleAccount(index,row){ // 流水

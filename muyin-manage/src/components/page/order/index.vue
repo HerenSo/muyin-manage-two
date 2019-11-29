@@ -27,14 +27,14 @@
       </div>
       <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column prop="number" label="订单编号"></el-table-column>
+        <el-table-column prop="number" label="订单编号" width="150"></el-table-column>
         <el-table-column prop="consigneeName" label="收件人"></el-table-column>
         <el-table-column prop="consigneePhone" label="联系方式" width="120" align="center"></el-table-column>
-        <el-table-column prop="addressDetail" label="收货地址"></el-table-column>
+        <el-table-column prop="addressDetail" label="收货地址" width="150"></el-table-column>
         <el-table-column prop="totalPrice" label="合计价格"></el-table-column>
         <el-table-column prop="paidAmount" label="实际支付"></el-table-column>
-        <el-table-column prop="paidTime" label="支付时间"></el-table-column>
-        <el-table-column prop="createTime" label="创建时间"></el-table-column>
+        <el-table-column prop="paidTime" label="支付时间" width="150"></el-table-column>
+<!--        <el-table-column prop="createTime" label="创建时间"></el-table-column>-->
         <el-table-column label="状态" prop="status" align="center" width="80" >
           <template slot-scope="scope">
 <!--            0-创建订单 1-待支付 2-待商家确认 3-待发货 4-待收货 5-待上门自取 6-已收货待评价 7-完成 8-商家退单 9-取消-->
@@ -43,9 +43,9 @@
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="visitCount" label="预览量" width="80" align="center"></el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="160" align="center"></el-table-column>
-        <el-table-column label="操作" width="120" align="center" fixed="right">
+<!--        <el-table-column prop="visitCount" label="预览量" width="80" align="center"></el-table-column>-->
+        <el-table-column prop="createTime" label="创建时间" width="150" align="center"></el-table-column>
+        <el-table-column label="操作" width="180" align="center" fixed="right">
           <template slot-scope="scope">
 <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>-->
 <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>-->
