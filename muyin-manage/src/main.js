@@ -27,7 +27,6 @@ Vue.prototype.$axios = axios;
 
 // 生产环境
 Vue.prototype.baseUrl = 'http://120.79.56.120:8080';
-// Vue.prototype.baseUrl = 'http://47.102.150.252:8083';
 // Vue.prototype.baseUrl = 'https://www.geeso.cn/';
 
 //使用钩子函数对路由进行权限跳转
