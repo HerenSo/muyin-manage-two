@@ -33,14 +33,14 @@
                 <el-table-column  label="适用范围">
                     <template slot-scope="scope">
 <!--                        {{scope.row.scope == "0" ? "无限制":(scope.row.scope == "1"?"部分商品可用":(scope.row.scope == "2"?"部分商品不可用":"限在线配送订单"))}}-->
-                      {{enumsScope[scope.row.status]}}
+                      {{enumsScope[scope.row.scope]}}
                     </template>
                 </el-table-column>
                 <el-table-column label="叠加类型" prop="superpositionRule" align="center" width="120" >
                     <template slot-scope="scope">
                         <el-tag :type="scope.row.superpositionRule===0?'warning':(scope.row.superpositionRule===1?'success':'')">
 <!--                            {{scope.row.superpositionRule===0?'不可叠加':(scope.row.superpositionRule===1?'全部可叠加':'')}}-->
-                          {{enumsSuperpositionRule[scope.row.status]}}
+                          {{enumsSuperpositionRule[scope.row.superpositionRule]}}
                         </el-tag>
                     </template>
                 </el-table-column>

@@ -12,6 +12,7 @@
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
                   @change="getData"
+                  value-format="yyyy-MM-dd HH:mm:ss"
                   :default-time="['00:00:00']">
           </el-date-picker>
           <el-select v-model="query.customerCode" placeholder="经销商" @change="getData" class="ml-10" v-if="managerType == 2">
