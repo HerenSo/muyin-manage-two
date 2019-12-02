@@ -14,13 +14,13 @@
             <div class="ms-title"><img src="../../assets/img/login_bg02.png" />万博园管理平台</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
-                    <el-input v-model="param.username" placeholder="username" size="large" prefix-icon="el-icon-lx-people">
+                    <el-input v-model="param.username" placeholder="用户名" size="large" prefix-icon="el-icon-lx-people">
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="password">
                     <el-input
                         type="password"
-                        placeholder="password"
+                        placeholder="密码"
                         v-model="param.password"
                         @keyup.enter.native="submitForm()"
                         prefix-icon="el-icon-lx-lock"
@@ -30,16 +30,46 @@
                 </el-form-item>
                 <el-row type="flex" justify="space-between" class="pb-20">
                   <el-col :span="3"><el-checkbox v-model="rememberPassword">记住密码</el-checkbox></el-col>
-                  <el-col :span="5" class="forgetPassword"><router-link to="/" >忘记密码</router-link></el-col>
+                  <el-col :span="5" class="forgetPassword"><a href="javascript:;" @click="forgetPassword" >忘记密码</a></el-col>
                 </el-row>
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm()">登录</el-button>
                 </div>
             </el-form>
         </div>
-      <div class="footer">
-        <div class="text-center">Copyright  2019-2020 Aize Technology. All Rights Reserved. 艾泽科技 版权所有</div>
-      </div>
+<!--      <div class="footer">-->
+<!--        <div class="text-center">Copyright  2019-2020 Aize Technology. All Rights Reserved. 艾泽科技 版权所有</div>-->
+<!--      </div>-->
+      <!--操作-->
+      <el-dialog title="找回密码" :visible.sync="editVisible" width="420px" :before-close="closeHandle">
+        <el-form :model="forget" :rules="rulesForget" ref="loginphone" label-width="0px" class="login_form">
+          <el-form-item prop="userPhone">
+            <el-input v-model="forget.userPhone" placeholder="手机号码" size="large" prefix-icon="el-icon-mobile-phone">
+            </el-input>
+          </el-form-item>
+          <el-form-item prop="vercode">
+            <el-input
+                    type="password"
+                    placeholder="验证码"
+                    v-model="forget.vercode"
+                    @keyup.enter.native="submitForm()"
+                    prefix-icon="el-icon-lx-lock"
+                    size="large"
+                    class="width260"
+            >
+            </el-input>
+            <el-button size="large" class="ml-5 getcode" @click="getcode" >{{ytext}}</el-button>
+          </el-form-item>
+          <el-form-item prop="newPassword">
+            <el-input v-model="forget.newPassword " placeholder="新密码" size="large" prefix-icon="el-icon-lx-lock">
+            </el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="submitHandle">确 定</el-button>
+            </span>
+      </el-dialog>
     </div>
 </template>
 
@@ -55,7 +85,18 @@ export default {
                 username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
                 password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
             },
-            rememberPassword:true
+            rulesForget: {
+                userPhone: [{ required: true, message: '请输入手机号码', trigger: 'blur' }],
+                vercode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+                newPassword: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
+            },
+            rememberPassword:true,
+            ytext:"获取验证码",
+            resetSend:true,
+            forget:{},
+            editVisible:false,
+            formHandle:{},
+            phone:{}
         };
     },
     methods: {
@@ -91,7 +132,58 @@ export default {
                     this.$message.error(res.msg);
                 }
             })
-        }
+        },
+        getcode(){
+            if(this.resetSend){
+                this.resetSend = false;
+                let second = 60;
+                let phone = this.phone.username;
+                if(this.forget.userPhone){
+                    phone = this.forget.userPhone
+                }
+                this.$axios.post("/api/sendMessage/sendLoginPhoneVerCode?phone="+phone,{}).then(res => {
+                    if(res.code == 200) {
+                        this.$message.success('发送验证码成功');
+                        let i = setInterval(e =>{
+                            second--;
+                            this.ytext = second+"秒后重新发送";
+                            if(second == 0){
+                                clearInterval(i);
+                                this.ytext ="获取验证码";
+                                this.resetSend = true;
+                            }
+                        },1000)
+                    }else{
+                        this.$message.error(res.msg);
+                        this.resetSend = true;
+                    }
+                })
+            }
+
+        },
+        submitHandle(){
+            // newPassword: "123456"
+            // userPhone: "18273298098"
+            // vercode: "6780"
+            this.$axios.post("/user/resetPwd?newPassword="+this.forget.newPassword+"&userPhone="+this.forget.userPhone+"&vercode="+this.forget.vercode,{}).then(res => {
+                if (res.code == 200) {
+                    this.$message.success("找回密码成功！");
+                    this.editVisible = false;
+                    this.getData();
+                }else{
+                    this.$message.error(res.msg);
+                }
+            })
+        },
+        forgetPassword(){
+            this.editVisible = true;
+            this.ytext ="获取验证码";
+            this.resetSend = true;
+        },
+        closeHandle(){
+            this.editVisible = false;
+            this.forget = {};
+        },
     },
 };
 </script>
@@ -234,6 +326,11 @@ export default {
 
   }
 
+  .getcode{
+    width: 112px;
+    padding: 12px 0;
+    text-align: center;
+  }
   .forgetPassword{
     a{
       font-size: 14px;

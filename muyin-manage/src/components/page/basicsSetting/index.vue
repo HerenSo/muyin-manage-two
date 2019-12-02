@@ -66,10 +66,19 @@
           <el-form-item label="抢购时间间隔(分钟)"  >
             <el-input v-model="form.commodity_to_snap_up_interval" placeholder="" class="width260"></el-input>
           </el-form-item>
+          <el-form-item label="推广背景图" >
+            <div class="backgroundImgUrl" v-loading="croploading"><i class="el-icon-picture"></i>
+              <div class="crop-demo">
+                <img :src="form.wechat_promote_background_url" class="pre-img">
+              </div>
+              <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
+            </div>
+            <span class="color-999">&nbsp;&nbsp;(建议尺寸:750*1132)</span>
+          </el-form-item>
           <el-form-item label=""  >
             <div class="handle-row">
               <el-button type="primary" @click="submit">保存</el-button>
-              <el-button @click="back" class="mgb20">取消</el-button>
+<!--              <el-button @click="back" class="mgb20">取消</el-button>-->
             </div>
           </el-form-item>
         </el-form>
@@ -81,7 +90,13 @@
         name: 'index',
         data(){
             return{
-                form:{}
+                form:{},
+                defaultSrc: require('../../../assets/img/img.jpg'),
+                imgSrc: '',
+                cropImg: '',
+                dialogVisible: false,
+                file:'',
+                croploading:false,
             }
         },
         mounted(){
@@ -128,10 +143,96 @@
                     }
                 })
             },
+            sureCrop(){
+                let params = {
+                    file:this.file,
+                    type:1,
+                    isInsert:false,
+                    dataType:"multipart"
+                }
+                this.croploading = true;
+                this.$axios.post("/api/attachments/insertUploadFile",params).then(res => {
+                    if(res.code == 200){
+                        this.$message.success("上传成功！");
+                        this.$set(this.form, 'wechat_promote_background_url', res.data.url);
+                        this.dialogVisible = false;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                    this.croploading = false;
+                })
+            },
+            setImage(e){ // 选择图
+                this.file = e.target.files[0];
+                if (!this.file.type.includes('image/')) {
+                    this.$message.error("请上传png/jpg格式文件！");
+                    return;
+                }
+                this.sureCrop();
+            },
         }
     };
 </script>
 
-<style scoped>
-
+<style lang="scss" scoped>
+  .backgroundImgUrl{
+    border-radius: 4px;
+    border:1px solid #ededed;
+    width: 188px;
+    height: 284px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .backgroundImgUrl i{
+    font-size: 80px;
+    color: #ddd;
+  }
+  .cropDialog{
+    z-index: 9999 !important;
+  .el-dialog{
+    z-index: 9999 !important;
+  }
+  }
+  .pre-img{
+    width: 188px;
+    /*height: 138px;*/
+    /*background: #f8f8f8;*/
+    /*border: 1px solid #eee;*/
+    border-radius: 5px;
+    border:none;
+  }
+  .crop-demo{
+    position: absolute;
+    width: 188px;
+    height: auto;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: flex-end;
+    border:none;
+  }
+  .crop-demo-btn{
+    position: relative;
+    width: 100px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 20px;
+    margin-left: 30px;
+    background-color: #409eff;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  .crop-input{
+    position: absolute;
+    width: 188px;
+    height: 284px;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .el-color-picker__color{border:none;}
 </style>

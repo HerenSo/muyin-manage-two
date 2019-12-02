@@ -15,6 +15,16 @@
       </div>
       <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
+        <el-table-column prop="commodityName" label="商品名称"></el-table-column>
+        <el-table-column prop="commodityIconUrl" label="缩略图" width="120" align="center">
+          <template slot-scope="scope">
+            <el-image :src="scope.row.commodityIconUrl" style="width: 50px; height: 50px" fit="cover">
+              <div slot="error" class="image-slot">
+                <i class="el-icon-picture f50 color-border"></i>
+              </div>
+            </el-image>
+          </template>
+        </el-table-column>
         <el-table-column prop="number" label="订单编号"></el-table-column>
         <el-table-column prop="commodityCode" label="售后商品编码"></el-table-column>
         <el-table-column prop="outRefundId" label="第三方支付平台退款单号" ></el-table-column>

@@ -77,15 +77,15 @@
           <el-form-item label="商户名称" :required="!ischeck" >
             <el-input v-model="form.name" placeholder="" :readonly="ischeck"></el-input>
           </el-form-item>
-          <el-form-item label="管理员用户" :required="!ischeck" >
-            <el-input v-model="form.adminUserName" placeholder=""  :readonly="ischeck"></el-input>
-          </el-form-item>
-          <el-form-item label="等级名" >
-            <el-input v-model="form.levelName" placeholder=""  :readonly="ischeck"></el-input>
-          </el-form-item>
-          <el-form-item label="订单量" >
-            <el-input v-model="form.orderCount" placeholder="" :readonly="ischeck"></el-input>
-          </el-form-item>
+<!--          <el-form-item label="管理员用户" :required="!ischeck" >-->
+<!--            <el-input v-model="form.adminUserName" placeholder=""  :readonly="ischeck"></el-input>-->
+<!--          </el-form-item>-->
+<!--          <el-form-item label="等级名" >-->
+<!--            <el-input v-model="form.levelName" placeholder=""  :readonly="ischeck"></el-input>-->
+<!--          </el-form-item>-->
+<!--          <el-form-item label="订单量" >-->
+<!--            <el-input v-model="form.orderCount" placeholder="" :readonly="ischeck"></el-input>-->
+<!--          </el-form-item>-->
           <el-form-item label="商户LOGO" >
               <div class="headIconUrl">
                   <i class="el-icon-plus"></i>
@@ -132,15 +132,15 @@
                   <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
               </el-upload>
           </el-form-item>
-          <el-form-item label="商户注册时间" >
-            <el-input v-model="form.createTime" placeholder="" :readonly="ischeck"></el-input>
-          </el-form-item>
-          <el-form-item label="单笔订单销售提成" >
-            <el-input v-model="form.commission" placeholder="" :readonly="ischeck"></el-input>
-          </el-form-item>
-          <el-form-item label="热度" >
-            <el-input v-model="form.hot" placeholder="" :readonly="ischeck"></el-input>
-          </el-form-item>
+<!--          <el-form-item label="商户注册时间" >-->
+<!--            <el-input v-model="form.createTime" placeholder="" :readonly="ischeck"></el-input>-->
+<!--          </el-form-item>-->
+<!--          <el-form-item label="单笔订单销售提成" >-->
+<!--            <el-input v-model="form.commission" placeholder="" :readonly="ischeck"></el-input>-->
+<!--          </el-form-item>-->
+<!--          <el-form-item label="热度" >-->
+<!--            <el-input v-model="form.hot" placeholder="" :readonly="ischeck"></el-input>-->
+<!--          </el-form-item>-->
           <el-form-item label="经度" >
             <el-input v-model="form.longitude" placeholder="" :readonly="ischeck"></el-input>
           </el-form-item>

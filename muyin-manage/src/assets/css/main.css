@@ -117,12 +117,15 @@ a {
     width: 200px;
 }
 .width260{
-    width: 260px;
+    width: 260px !important;
 }
 .width260 input{
     width: 260px;
 }
 .width300{
+    width: 300px;
+}
+.width300 input{
     width: 300px;
 }
 
@@ -165,8 +168,8 @@ a {
 .mb-15{margin-bottom: 15px;}
 .mb-20{margin-bottom: 20px;}
 .mb-30{margin-bottom: 30px;}
-.ml-5{margin-left: 5px;}
-.ml-10{margin-left: 10px;}
+.ml-5{margin-left: 5px !important;}
+.ml-10{margin-left: 10px !important;}
 .ml-15{margin-left: 15px;}
 .ml-20{margin-left: 20px;}
 .ml-30{margin-left: 30px;}

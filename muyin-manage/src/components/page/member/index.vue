@@ -11,7 +11,7 @@
         <el-button type="primary" icon="el-icon-refresh" class="handle-del " @click="refresh">刷新</el-button>
         <el-button type="primary" icon="el-icon-lx-add" class="handle-del " @click="handleEdit" v-if="right.add">新增</el-button>
 <!--        <el-button type="primary" icon="el-icon-delete" class="handle-del" @click="delAllSelection" v-if="right.del">批量删除</el-button>-->
-        <el-input v-model="query.phone" placeholder="请输入手机号码查找" class="handle-input mr10 ml-10"></el-input>
+        <el-input v-model="query.userphone" placeholder="请输入手机号码查找" class="handle-input mr10 ml-10"></el-input>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
       <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
@@ -69,7 +69,7 @@
             <el-input v-model="form.title"></el-input>
           </el-form-item>
           <el-form-item label="内容" required>
-            <quill-editor ref="myTextEditor" v-model="form.content" :options="editorOption"></quill-editor>
+            <quill-editor ref="myTextEditor" v-model="form.content"></quill-editor>
           </el-form-item>
           <el-form-item label="状态" required>
             <el-select v-model="form.status" placeholder="状态">
@@ -135,7 +135,7 @@
                 categoryId:'',
                 formCategory:{},
                 query: {
-                    phone:'',
+                    userphone:'',
                     managerType:0,
                     pageNum: 1,
                     pageSize: 10
@@ -155,6 +155,7 @@
                 signRecord:[],// 签到记录
                 visibleSignRecord:false, // 控制签到记录弹窗
                 username:'',
+                userid:"",
                 querySignRecord: {
                     pageNum: 1,
                     pageSize: 10
@@ -207,7 +208,7 @@
                 })
             },
             getSignRecord() { // 获取签到记录
-                this.$axios.post("/user-sign-record/selectPageList?pageNum="+this.querySignRecord.pageNum+"&pageSize="+this.querySignRecord.pageSize,{}).then(res => {
+                this.$axios.post("/user-sign-record/selectPageList?pageNum="+this.querySignRecord.pageNum+"&pageSize="+this.querySignRecord.pageSize,{userid:this.userid}).then(res => {
                     if(res.code == 200) {
                         this.signRecord = res.data.records;
                         this.signRecord.map(item => {
@@ -328,6 +329,7 @@
                 this.visibleSignRecord = true;
                 this.signRecord = [];
                 this.username = row.username;
+                this.userid = row.userid;
                 this.getSignRecord();
             },
             handleResetPasswords(index, row) {

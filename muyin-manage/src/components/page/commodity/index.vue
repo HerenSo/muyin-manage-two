@@ -12,8 +12,8 @@
         <el-button type="primary" icon="el-icon-lx-add" class="handle-del " @click="handleEdit" v-if="right.add">新增</el-button>
         <el-button type="primary" icon="el-icon-delete" class="handle-del" @click="delAllSelection" v-if="right.del">批量删除</el-button>
         <el-input v-model="query.name" placeholder="请输入商品名称" class="handle-input mr10 ml-10"></el-input>
-        <el-date-picker v-model="query.saleTime" type="date" placeholder="请选择销售时间" class="mr10">
-        </el-date-picker>
+<!--        <el-date-picker v-model="query.saleTime" type="date" placeholder="请选择销售时间" class="mr10">-->
+<!--        </el-date-picker>-->
         <el-select v-model="query.status" placeholder="状态" class="handle-select mr10" @change="refresh">
           <el-option key="" label="全部" value=""></el-option>
 <!--          <el-option key="0" label="待审核" value="0"></el-option>-->
