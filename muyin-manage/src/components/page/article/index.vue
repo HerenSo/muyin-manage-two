@@ -183,6 +183,8 @@
                 this.getData();
             });
             // this.getData();
+
+            this.getCategory();
         },
         methods: {
             // 获取数据

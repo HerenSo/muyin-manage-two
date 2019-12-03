@@ -1,463 +1,485 @@
 <template>
-  <div class="p-20 bg-fff" >
-<!--    <el-collapse v-model="activeName" class="statistics" @change="handleCollapse">-->
-<!--      <el-collapse-item  name="1" disabled>-->
-<!--        <template slot="title">-->
-    <div class="mb-20">
-          <el-date-picker
-                  v-model="queryTime"
-                  align="right"
-                  type="datetimerange"
-                  range-separator="至"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  @change="getData"
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  :default-time="['00:00:00']">
-          </el-date-picker>
-          <el-select v-model="query.customerCode" placeholder="经销商" @change="getData" class="ml-10" v-if="managerType == 2">
-            <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
-          </el-select>
-      </div>
-<!--        </template>-->
-        <el-row :gutter="20" class="mgb20">
-          <el-col :span="8">
-            <el-card shadow="hover" :body-style="{padding: '0px'}">
-              <div class="grid-content grid-con-1">
-                <i class="el-icon-lx-goods grid-con-icon"></i>
-                <div class="grid-cont-right">
-                  <div class="grid-num">{{info.orderCount || 0}}</div>
-                  <div>订单量</div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="8">
-            <el-card shadow="hover" :body-style="{padding: '0px'}">
-              <div class="grid-content grid-con-2">
-                <i class="el-icon-lx-recharge grid-con-icon"></i>
-                <div class="grid-cont-right">
-                  <div class="grid-num">{{(info.paidAmount + info.walletCost) || 0}}</div>
-                  <div>订单总金额</div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-          <el-col :span="8">
-            <el-card shadow="hover" :body-style="{padding: '0px'}">
-              <div class="grid-content grid-con-3">
-                <i class="el-icon-lx-redpacket grid-con-icon"></i>
-                <div class="grid-cont-right">
-                  <div class="grid-num">{{info.supplyPrice || 0}}</div>
-                  <div>成本</div>
-                </div>
-              </div>
-            </el-card>
-          </el-col>
-        </el-row>
-<!--      </el-collapse-item>-->
-<!--      <el-collapse-item title="7日核心指标" name="3">-->
-<!--        <template slot="title">-->
-<!--          7日核心指标<i class="header-icon el-icon-info"></i>-->
-<!--        </template>-->
-<!--        <el-card shadow="hover">-->
-<!--          <el-table :data="todoList"  style="width: 100%;font-size:14px;">-->
-<!--            <el-table-column label="时间" prop="date">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column label="新注册数" prop="newCount">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column label="日访问" prop="dayVisit">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column label="累计注册" prop="count">-->
-<!--            </el-table-column>-->
-<!--          </el-table>-->
-<!--          <schart ref="bar" class="schart" canvasId="bar" :data="data" type="bar" :options="options"></schart>-->
-<!--        </el-card>-->
-<!--      </el-collapse-item>-->
-<!--      <el-collapse-item title="30日核心指标" name="4">-->
-<!--        <el-card shadow="hover">-->
-<!--          <el-table :data="todoList"  style="width: 100%;font-size:14px;">-->
-<!--            <el-table-column label="时间" prop="date">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column label="新注册数" prop="newCount">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column label="日访问" prop="dayVisit">-->
-<!--            </el-table-column>-->
-<!--            <el-table-column label="累计注册" prop="count">-->
-<!--            </el-table-column>-->
-<!--          </el-table>-->
-<!--          <schart ref="line2" class="schart" canvasId="line2" :data="data" type="line" :options="options2"></schart>-->
-<!--        </el-card>-->
-<!--      </el-collapse-item>-->
-<!--    </el-collapse>-->
+  <div>
+    <div class="container">
 
+      <div class="handle-box">
+        <el-button type="primary" icon="el-icon-refresh" class="handle-del " @click="refresh">刷新</el-button>
+        <!--        <el-button type="primary" icon="el-icon-lx-add" class="handle-del " @click="handleEdit" v-if="right.add">新增</el-button>-->
+        <el-button type="primary" icon="el-icon-delete" class="handle-del" @click="delAllSelection" v-if="right.del">批量删除</el-button>
+        <el-input v-model="query.number" placeholder="请输入订单编号" class="handle-input mr10 ml-10"></el-input>
+        <!--        <el-date-picker v-model="query.createTime" type="date" placeholder="选择起始时间" class="mr10">-->
+        <!--        </el-date-picker>-->
+        <el-select v-model="query.status" placeholder="状态" class="handle-select mr10" @change="refresh">
+          <el-option key="" label="全部" value=""></el-option>
+          <!--          <el-option key="0" label="创建订单" value="0"></el-option>-->
+          <!--          <el-option key="1" label="待支付" value="1"></el-option>-->
+          <!--          <el-option key="2" label="待商家确认" value="2"></el-option>-->
+          <!--          <el-option key="3" label="待发货" value="3"></el-option>-->
+          <!--          <el-option key="4" label="待收货" value="4"></el-option>-->
+          <!--          <el-option key="5" label="待上门自取" value="5"></el-option>-->
+          <!--          <el-option key="6" label="已收货待评价" value="6"></el-option>-->
+          <!--          <el-option key="7" label="完成" value="7"></el-option>-->
+          <!--          <el-option key="8" label="商家退单" value="8"></el-option>-->
+          <!--          <el-option key="9" label="取消" value="9"></el-option>-->
+          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>
+        </el-select>
+        <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
+      </div>
+      <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
+        <el-table-column type="selection" width="55" align="center"></el-table-column>
+        <el-table-column prop="number" label="订单编号"  min-width="150"></el-table-column>
+        <el-table-column prop="consigneeName" label="收件人"></el-table-column>
+        <el-table-column prop="consigneePhone" label="联系方式" width="120" align="center"></el-table-column>
+        <el-table-column prop="addressDetail" label="收货地址" min-width="150"></el-table-column>
+        <el-table-column prop="totalPrice" label="合计价格"></el-table-column>
+        <el-table-column prop="paidAmount" label="实际支付"></el-table-column>
+        <el-table-column prop="paidTime" label="支付时间" width="150"></el-table-column>
+        <el-table-column label="状态" prop="status" align="center" width="140" >
+          <template slot-scope="scope">
+            <!--            0-创建订单 1-待支付 2-待商家确认 3-待发货 4-待收货 5-待上门自取 6-已收货待评价 7-完成 8-商家退单 9-取消-->
+            <el-tag :type="scope.row.status===2?'warning':(scope.row.status===7?'success':(scope.row.status===9?'info':(scope.row.status===8?'danger':'')))">
+              {{enums[scope.row.status]}}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" width="150"></el-table-column>
+        <el-table-column label="操作" width="180" align="center" fixed="right">
+          <template slot-scope="scope">
+            <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>-->
+            <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>-->
+            <el-button type="text" icon="el-icon-view" class="" @click="handleCheck(scope.$index, scope.row)" v-if="right.del">查看</el-button>
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(3, scope.row.number)" v-if="scope.row.status ==2">受理</el-button>
+            <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleSome(9,scope.row.number)" v-if="scope.row.status ==2">拒绝</el-button>
+            <el-button type="text" icon="el-icon-sold-out" class="" @click="handleSome(4, scope.row.number)" v-if="scope.row.status ==3">发货</el-button>
+            <el-button type="text" icon="el-icon-truck" class="" @click="handleUpdateStatus(6, scope.row.number)" v-if="scope.row.status ==4">送达</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="pagination">
+        <el-pagination
+                background
+                layout="total, sizes, prev, pager, next, jumper"
+                :current-page="query.pageNum"
+                :page-size="query.pageSize"
+                :page-count="total"
+                @current-change="handlePageChange"
+                @size-change="handleSizeChange"
+        ></el-pagination>
+      </div>
+    </div>
+
+    <!-- 编辑弹出框 -->
+    <el-drawer :title="title" :visible.sync="editVisible" size="50%" direction="rtl" :before-close="handleClose" class="commodity_drawer">
+      <div class="demo-drawer__content">
+        <el-form ref="form" :model="form" label-width="120px">
+          <el-form-item label="订单号" required>
+            <el-input v-model="form.number" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="收货人姓名" required>
+            <el-input v-model="form.consigneeName" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="收货人电话" required>
+            <el-input v-model="form.consigneePhone" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="收货人地址" required>
+            <el-input v-model="form.addressDetail" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <!--          <el-form-item label="商品名称" required>-->
+          <!--            <el-input v-model="form.title" :disabled="formDisable"></el-input>-->
+          <!--          </el-form-item>-->
+          <el-form-item label="实际支付金额" required>
+            <el-input v-model="form.paidAmount" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="余额支付金额" required>
+            <el-input v-model="form.walletCost" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="优惠券支付金额" required>
+            <el-input v-model="form.couponAmountCost" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="积分支付金额" required>
+            <el-input v-model="form.pointCost" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="支付方式" required>
+            <!--            <el-input v-model="form.paidType" ></el-input>-->
+            <el-select v-model="form.paidType" placeholder="支付方式" :disabled="formDisable">
+              <!--              <el-option key="0" label="微信APP" value="0"></el-option>-->
+              <!--              <el-option key="1" label="微信JSAPI" value="1"></el-option>-->
+              <!--              <el-option key="2" label="支付支付" value="2"></el-option>-->
+              <!--              <el-option key="3" label="其他" value="3"></el-option>-->
+              <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsPaidTypelist"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="购买时间" required>
+            <el-input v-model="form.createTime" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="支付时间" required>
+            <el-input v-model="form.paidTime" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="支付信息" required>
+            <el-input v-model="form.title" :disabled="formDisable"></el-input>
+          </el-form-item>
+        </el-form>
+        <el-table :data="form.memberOrderItemList" border class="table" ref="table" :loading="loading" header-cell-class-name="table-header" >
+          <el-table-column prop="commodityName" label="商品名称" width="260"></el-table-column>
+          <el-table-column prop="commodityIconUrl" label="缩略图" width="120" align="center">
+            <template slot-scope="scope">
+              <el-image :src="scope.row.commodityIconUrl" style="width: 50px; height: 50px" fit="cover">
+                <div slot="error" class="image-slot">
+                  <i class="el-icon-picture f50 color-border"></i>
+                </div>
+              </el-image>
+            </template>
+          </el-table-column>
+          <el-table-column prop="salePrice" label="单价"  align="center"></el-table-column>
+          <el-table-column prop="couponCost" label="优惠金额"  align="center"></el-table-column>
+          <el-table-column prop="commodityCount" label="商品数量" align="center"></el-table-column>
+        </el-table>
+        <!--        <span slot="footer" class="dialog-footer demo-drawer__footer">-->
+        <!--            <el-button @click="editVisible = false">取 消</el-button>-->
+        <!--            <el-button type="primary" @click="saveEdit" :loading="subloading">{{ subloading ? '提交中 ...' : '确 定' }}</el-button>-->
+        <!--        </span>-->
+      </div>
+    </el-drawer>
+
+    <!--操作-->
+    <el-dialog :title="titleHandle" :visible.sync="editVisibleHandle" width="30%" :before-close="closeHandle">
+      <el-form ref="form" :model="formHandle" label-width="100px">
+        <el-form-item label="物流公司" v-if="status == 4" required>
+          <!--          <el-input v-model="formHandle.logisticsIdent"></el-input>-->
+          <el-select v-model="formHandle.logisticsIdent" placeholder="选择">
+            <el-option :key="index" :label="item.courierName" :value="item.courierCode" v-for="(item,index) in courier"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="物流单号" v-if="status == 4" required>
+          <el-input v-model="formHandle.logisticsNumber"></el-input>
+        </el-form-item>
+        <el-form-item label="原因" v-if="status == 9" required>
+          <el-input type="textarea" v-model="formHandle.authReason"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisibleHandle = false">取 消</el-button>
+                <el-button type="primary" @click="submitHandle">确 定</el-button>
+            </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-    import Schart from 'vue-schart';
     import bus from '../../common/bus';
     export default {
-        name: 'user',
+        name: 'index',
         data() {
             return {
-                name: localStorage.getItem('ms_username'),
-                activeName:['1','2','3','4'],
-                todoList: [
-                    {
-                    date:'2019-10-18',
-                    newCount:3,
-                    dayVisit:99,
-                    count:125,
-                    status: false,
-                    },
-                    {
-                        date:'2019-10-18',
-                        newCount:3,
-                        dayVisit:99,
-                        count:125,
-                        status: false,
-                    },
-                    {
-                        date:'2019-10-18',
-                        newCount:3,
-                        dayVisit:99,
-                        count:125,
-                        status: false,
-                    }, {
-                        date:'2019-10-18',
-                        newCount:3,
-                        dayVisit:99,
-                        count:125,
-                        status: false,
-                    },
-                    {
-                        date:'2019-10-18',
-                        newCount:3,
-                        dayVisit:99,
-                        count:125,
-                        status: false,
-                    },
-                    {
-                        date:'2019-10-18',
-                        newCount:3,
-                        dayVisit:99,
-                        count:125,
-                        status: false,
-                    }
-                ],
-                data: [
-                    {
-                    name: '2018/09/04',
-                    value: 1083
-                },
-                    {
-                        name: '2018/09/05',
-                        value: 941
-                    },
-                    {
-                        name: '2018/09/06',
-                        value: 1139
-                    },
-                    {
-                        name: '2018/09/07',
-                        value: 816
-                    },
-                    {
-                        name: '2018/09/08',
-                        value: 327
-                    },
-                    {
-                        name: '2018/09/09',
-                        value: 228
-                    },
-                    {
-                        name: '2018/09/10',
-                        value: 1065
-                    }
-                ],
-                options: {
+                query: {
+                    createTime: '',
                     title: '',
-                    showValue: false,
-                    fillColor: '#faa54b',
-                    bottomPadding: 30,
-                    topPadding: 30
+                    status:'',
+                    pageNum: 1,
+                    pageSize: 10
                 },
-                options2: {
-                    title: '',
-                    fillColor: '#faa54b',
-                    axisColor: '#74cae2',
-                    contentColor: '#EEEEEE',
-                    bgColor: '#fff',
-                    bottomPadding: 30,
-                    topPadding: 30
+                tableData: [],
+                loading:false,
+                multipleSelection: [],
+                delList: [],
+                editVisible: false,
+                total: 0,
+                title:'编辑',
+                form: {},
+                subloading:false,
+                typeValue:'',
+                category:[],
+                right:{ // 权限
+                    add:false,
+                    edit:false,
+                    del:false
                 },
-                pickerOptions: {
-                    shortcuts: [{
-                        text: '昨天',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 1);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    },{
-                        text: '最近一周',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近一个月',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }, {
-                        text: '最近三个月',
-                        onClick(picker) {
-                            const end = new Date();
-                            const start = new Date();
-                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-                            picker.$emit('pick', [start, end]);
-                        }
-                    }]
-                },
-                queryTime:[],
-                info:{},
-                query:{},
-                customer:[], // 经销商
-                managerType:"", // 管理员类型
-            }
+                formDisable:false,
+                titleHandle:"拒绝原因",
+                editVisibleHandle:false,
+                formHandle:{},
+                status:0,
+                number:'',
+                courier:[], // 物流公司
+                enumslist:[],
+                enums:{}, // 枚举
+                enumsPaidTypelist:[],
+                enumsPaidType:{}, // 枚举
+            };
         },
-        components: {
-            Schart
-        },
-        computed: {
-            role() {
-                return this.name === 'admin' ? '超级管理员' : '普通用户';
-            }
-        },
-        created(){
-            this.yestodayHandle();
-            this.getData();
-            this.handleListener();
-            this.changeDate();
-            this.getCustomer();
+        mounted() {
             // 权限
 
             let authorities = JSON.parse(localStorage.getItem("user_information"));
-            this.managerType = authorities.managerType;
-            console.log(this.managerType)
+            authorities.authorities.map((item) => {
+                switch (item.authority) {
+                    case 'ROLE_ORDER_EDIT':this.right.edit = true;break;
+                    case 'ROLE_ORDER_DEL':this.right.del = true;break;
+                    case 'ROLE_ORDER_ADD':this.right.add = true;break;
+                    default:break;
+                }
+            })
 
-        },
-        activated(){
-            this.handleListener();
-        },
-        deactivated(){
-            window.removeEventListener('resize', this.renderChart);
-            bus.$off('collapse', this.handleBus);
+            // 枚举
+            let enums = JSON.parse(localStorage.getItem("ClassEnums"));
+            let enumslist = enums.MemberOrderStatusEnum;
+            let enumsPaidTypelist = enums.OrderPaidTypeEnum;
+            for(let key in enumslist){
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums,item.code,item.name);
+            })
+            for(let key in enumsPaidTypelist){
+                this.enumsPaidTypelist.push(enumsPaidTypelist[key]);
+            }
+            this.enumsPaidTypelist.map(item => {
+                this.$set(this.enumsPaidType,item.code,item.name);
+            })
+
+            this.getData();
+            this.getCourier();
         },
         methods: {
             // 获取数据
             getData() {
-                this.$set(this.query,"queryStartTime",this.queryTime[0]);
-                this.$set(this.query,"queryEndTime",this.queryTime[1]);
-                this.$axios.post("/statistical-order/selectStatisticalOrder",this.query).then(res => {
+                this.loading = true;
+                this.$axios.post("/member-order/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,this.query).then(res => {
                     if(res.code == 200) {
-                        if(res.data){
-                            this.info = res.data;
-                        }else{
-                            this.info = {};
-                            // this.$message.error(res.msg);
-                        }
-
+                        this.tableData = res.data.records;
+                        this.total = res.data.pages;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                    this.loading = false;
+                })
+            },
+            // 获取物流公司
+            getCourier() {
+                this.$axios.post("/courier-company/selectList",{}).then(res => {
+                    if(res.code == 200) {
+                        this.courier = res.data;
                     }else{
                         this.$message.error(res.msg);
                     }
                 })
             },
-            getCustomer(){// 获取供销商
-                this.$axios.post("/customer/selectList",{}).then(res => {
+            getDetails(number){
+                this.$axios.get("/member-order/selectByPrimaryKey?number="+number).then(res => {
+                    if(res.code == 200) {
+                        this.form = res.data;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                })
+            },
+            // 保存编辑
+            saveEdit() {
+                if(!this.form.categoryCode){
+                    this.$message.error("请选择分类！");
+                    return;
+                }
+                if(!this.form.title){
+                    this.$message.error("请输入标题！");
+                    return;
+                }
+                if(!this.form.content){
+                    this.$message.error("请输入内容！");
+                    return;
+                }
+                this.subloading = true;
+                this.$axios.post("/member-order/insertOrUpdate",this.form).then(res => {
                     if(res.code == 200){
-                        this.customer = res.data;
-                    }else{
-                        this.$message.error(res.msg);
+                        this.$message.success(this.title+"成功！");
+                        this.editVisible = false;
+                        this.getData();
+                    }
+                    this.subloading = false;
+                })
+            },
+            // 编,辑操作
+            handleEdit(index, row) {
+                this.editVisible = true;
+                if(row ){
+                    this.form = {
+                        number:row.number,
+                        categoryCode:row.categoryCode,
+                        title:row.title,
+                        content:row.content,
+                        topside:row.topside,
+                        status:row.status,
+                        sortId:row.sortId,
+                    }
+                    this.title = '编辑';
+                }else{
+                    this.title = '新增';
+                    this.form = {
+                        categoryCode:this.query.categoryCode,
+                        topside:1,
+                        status:1,
+                        sortId:0,
+                    }
+                }
+            },
+            handleCheck(index,row){
+                this.title = '订单详情';
+                this.getDetails(row.number);
+                this.formDisable = true;
+                this.editVisible = true;
+            },
+            // 状态改变操作
+            handleUpdateStatus(status, number) {
+                let msg = "";
+                let url = "";
+                if(status == 3){
+                    msg = "确认接受订单";
+                    url = "/member-order/confirm";
+                }else if(status == 6){
+                    msg = "确认商品已送达";
+                    url = "/member-order/reached";
+                }
+                this.$confirm(msg+"吗？", '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.get(url+"?number="+number).then(res => {
+                        if (res.code == 200) {
+                            this.$message.success(msg+"成功！");
+                            this.getData();
+                        }
+                    })
+                }).catch(() => {});
+            },
+            submitHandle(){
+                let msg = "";
+                let url = "";
+                if(this.status == 9){
+                    if(!this.formHandle.authReason){
+                        this.$message.error("请填写拒绝原因！");
+                        return;
+                    }
+                    msg = "拒绝受理订单";
+                    url = "/member-order/rejected?number="+this.number+"&authReason="+this.formHandle.authReason;
+                }else if(this.status == 4){
+                    if(!this.formHandle.logisticsIdent){
+                        this.$message.error("请选择物流公司！");
+                        return;
+                    }
+                    if(!this.formHandle.logisticsNumber){
+                        this.$message.error("请填写物流单号！");
+                        return;
+                    }
+                    msg = "发货";
+                    url = "/member-order/deliver?number="+this.number+"&logisticsIdent="+this.formHandle.logisticsIdent+"&logisticsNumber="+this.formHandle.logisticsNumber;
+                }
+                this.$axios.get(url).then(res => {
+                    if (res.code == 200) {
+                        this.$message.success(msg+"成功！");
+                        this.editVisibleHandle = false;
+                        this.getData();
                     }
                 })
             },
-            yestodayHandle(){
-                //昨天的时间
-                var day1 = new Date();
-                day1.setTime(day1.getTime()-24*60*60*1000);
-                var s1 = day1.getFullYear()+"-" + (day1.getMonth()+1) + "-" + day1.getDate();
-                //今天的时间
-                var day2 = new Date();
-                day2.setTime(day2.getTime());
-                var s2 = day2.getFullYear()+"-" + (day2.getMonth()+1) + "-" + day2.getDate();
-                this.queryTime = [s1+" 00:00:00",s2+" 00:00:00"]
+            handleSome(status,number){
+                this.editVisibleHandle = true;
+                this.number = number;
+                this.status = status;
+                if(status == 9){
+                    this.titleHandle = "填写拒绝原因";
+                }else if(status == 4){
+                    this.titleHandle = "填写发货物流";
+                }
             },
-            changeDate(){
-                const now = new Date().getTime();
-                this.data.forEach((item, index) => {
-                    const date = new Date(now - (6 - index) * 86400000);
-                    item.name = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
-                })
+            // 触发搜索按钮
+            handleSearch() {
+                this.$set(this.query, 'pageNum', 1);
+                this.getData();
             },
-            handleListener(){
-                bus.$on('collapse', this.handleBus);
-                // 调用renderChart方法对图表进行重新渲染
-                window.addEventListener('resize', this.renderChart)
+            // 删除操作
+            handleDelete(index, row) {
+                // 二次确认删除
+                this.$confirm('确定要删除吗？', '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.delete("/member-order/delete?number=" + row.number).then(res => {
+                        if (res.code == 200) {
+                            this.$message.success("删除成功！");
+                            this.getData();
+                        }
+                    })
+                }).catch(() => {});
             },
-            handleCollapse(val){
-                setTimeout(() => {
-                    this.renderChart()
-                }, 300);
+            // 多选操作
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
             },
-            handleBus(msg){
-                setTimeout(() => {
-                    this.renderChart()
-                }, 300);
+            delAllSelection() { //批量删除
+                this.$confirm('确定要删除吗？', '提示', {
+                    type: 'warning'
+                }).then(() => {
+                    let ids = [];
+                    this.multipleSelection.map(item => {
+                        ids.push(item.number);
+                    })
+                    this.$axios.post("/member-order/deleteBatch",ids).then(res => {
+                        if (res.code == 200) {
+                            this.$message.success("批量删除成功！");
+                            this.getData();
+                            this.multipleSelection = [];
+                        }
+                    })
+                }).catch(() => {});
             },
-            renderChart(){
-                this.$refs.bar.renderChart();
-                this.$refs.line.renderChart();
-                this.$refs.line2.renderChart();
+            handleStatusChange(){
+                this.getData();
+            },
+            // 分页导航
+            handlePageChange(val) {
+                this.$set(this.query, 'pageNum', val);
+                this.getData();
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+                this.$set(this.query, 'pageNum', 1);
+                this.$set(this.query, 'pageSize', val);
+                this.getData();
+            },
+            handleClose(){
+                this.editVisible = false;
+                this.subloading = false;
+                this.form = {};
+            },
+            closeHandle(){
+                this.editVisibleHandle = false;
+                this.formHandle = {};
+            },
+            refresh(){ // 刷新
+                this.getData();
             }
-        },
-    }
-
+        }
+    };
 </script>
 
-
-<style lang="scss">
-  .el-row {
+<style lang="scss" scoped>
+  .handle-box {
     margin-bottom: 20px;
   }
 
-  .grid-content {
-    display: flex;
-    align-items: center;
-    height: 100px;
-  }
-
-  .grid-cont-right {
-    flex: 1;
-    text-align: center;
-    font-size: 14px;
-    color: #999;
-  }
-
-  .grid-num {
-    font-size: 30px;
-    font-weight: bold;
-  }
-
-  .grid-con-icon {
-    font-size: 50px;
-    width: 100px;
-    height: 100px;
-    text-align: center;
-    line-height: 100px;
-    color: #fff;
-  }
-
-  .grid-con-1 .grid-con-icon {
-    background: rgba(170, 220, 221, .1);
-    color: #aadcdd;
-  }
-
-  .grid-con-1 .grid-num {
-    color: #aadcdd;
-  }
-
-  .grid-con-2 .grid-con-icon {
-    background: rgba(182, 221, 170, .1);
-    color: #b6ddaa;
-  }
-
-  .grid-con-2 .grid-num {
-    color: #b6ddaa;
-  }
-
-  .grid-con-3 .grid-con-icon {
-    background:rgba(240, 154, 189, .1);
-    color: #f09abd;
-  }
-
-  .grid-con-3 .grid-num {
-    color: #f09abd;
-  }
-
-
-  .user-info {
-    display: flex;
-    align-items: center;
-    padding-bottom: 20px;
-    border-bottom: 2px solid #ccc;
-    margin-bottom: 20px;
-  }
-
-  .user-avator {
+  .handle-select {
     width: 120px;
-    /*height: 120px;*/
-    border-radius: 50%;
   }
 
-  .user-info-cont {
-    padding-left: 50px;
-    flex: 1;
-    font-size: 14px;
-    color: #999;
+  .handle-input {
+    width: 300px;
+    display: inline-block;
   }
-
-  .user-info-cont div:first-child {
-    font-size: 30px;
-    color: #222;
-  }
-
-  .user-info-list {
-    font-size: 14px;
-    color: #999;
-    line-height: 25px;
-  }
-
-  .user-info-list span {
-    margin-left: 70px;
-  }
-
-  .mgb20 {
-    margin-bottom: 20px;
-  }
-
-  .todo-item {
-    font-size: 14px;
-  }
-
-  .todo-item-del {
-    text-decoration: line-through;
-    color: #999;
-  }
-
-  .schart {
+  .table {
     width: 100%;
-    height: 300px;
+    font-size: 14px;
   }
-  .el-collapse.statistics{
-    border-bottom: none;
+  .table-td-thumb {
+    display: block;
+    margin: auto;
+    width: 40px;
+    height: 40px;
   }
-  .el-collapse.statistics .el-collapse-item__header{
-    background: $color-border;
-    margin-bottom: 20px;
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-  .el-collapse.statistics  .el-table__body{
-    width: 100% !important;
-  }
-
 </style>

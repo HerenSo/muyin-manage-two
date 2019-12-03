@@ -21,10 +21,15 @@
         </el-table-column>
         <el-table-column prop="userphone" label="手机号" width="120" align="center">
         </el-table-column>
+        <el-table-column prop="managerType" label="管理员类型" width="120" align="center">
+          <template slot-scope="scope">
+            {{enumsManagerType[scope.row.managerType]}}
+          </template>
+        </el-table-column>
         <el-table-column prop="status" label="状态" width="120" align="center">
           <template slot-scope="scope">
             <el-tag :type="scope.row.status=='0'?'warning':(scope.row.status=='1'?'success':(scope.row.status=='2'?'danger':(scope.row.status=='3'?'danger':(scope.row.status=='9'?'info':''))))">
-<!--              {{scope.row.status=="0"?"待审核":(scope.row.status=="1"?"正常":(scope.row.status=="2"?"冻结":(scope.row.status=="3"?"审核失败":"注销")))}}-->
+              <!--              {{scope.row.status=="0"?"待审核":(scope.row.status=="1"?"正常":(scope.row.status=="2"?"冻结":(scope.row.status=="3"?"审核失败":"注销")))}}-->
               {{enums[scope.row.status]}}
             </el-tag>
           </template>
@@ -51,20 +56,20 @@
       <div class="demo-drawer__content">
         <el-form ref="form" :model="form" label-width="100px">
           <el-form-item label="头像" label-width="100px">
-              <div class="headIconUrl">
-                  <i class="el-icon-s-custom"></i>
-                  <div class="crop-demo">
-                      <img :src="form.headiconUrl" class="pre-img">
-                  </div>
-                  <input ref="file" id="file" class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
+            <div class="headIconUrl">
+              <i class="el-icon-s-custom"></i>
+              <div class="crop-demo">
+                <img :src="form.headiconUrl" class="pre-img">
               </div>
-              <el-dialog class="cropDialog" title="裁剪图片" :visible.sync="dialogVisible" width="30%">
-                  <vue-cropper ref='cropper' :src="imgSrc" :ready="cropImage" :zoom="cropImage" :cropmove="cropImage" style="width:100%;height:300px;"></vue-cropper>
-                  <span slot="footer" class="dialog-footer">
+              <input ref="file" id="file" class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
+            </div>
+            <el-dialog class="cropDialog" title="裁剪图片" :visible.sync="dialogVisible" width="30%">
+              <vue-cropper ref='cropper' :src="imgSrc" :ready="cropImage" :zoom="cropImage" :cropmove="cropImage" style="width:100%;height:300px;"></vue-cropper>
+              <span slot="footer" class="dialog-footer">
                                 <el-button @click="cancelCrop">取 消</el-button>
                                 <el-button type="primary" @click="sureCrop">确 定</el-button>
                             </span>
-              </el-dialog>
+            </el-dialog>
           </el-form-item>
           <el-form-item label="用户名" label-width="100px" required><el-input v-model="form.username" autocomplete="off"></el-input></el-form-item>
           <el-form-item label="手机号码" label-width="100px" required><el-input v-model="form.userphone" autocomplete="off"></el-input></el-form-item>
@@ -82,16 +87,16 @@
               <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsManagerTypelist"></el-option>
             </el-select>
           </el-form-item>
-<!--          <el-form-item label="状态" required>-->
-<!--            <el-select v-model="form.status" placeholder="请选择状态">-->
-<!--              &lt;!&ndash;<el-option key="0" label="待审核" :value="0"></el-option>-->
-<!--              <el-option key="1" label="正常" :value="1"></el-option>-->
-<!--              <el-option key="2" label="冻结" :value="2"></el-option>-->
-<!--              <el-option key="3" label="审核失败" :value="3"></el-option>-->
-<!--              <el-option key="9" label="注销" :value="9"></el-option>&ndash;&gt;-->
-<!--              <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>-->
-<!--            </el-select>-->
-<!--          </el-form-item>-->
+          <!--          <el-form-item label="状态" required>-->
+          <!--            <el-select v-model="form.status" placeholder="请选择状态">-->
+          <!--              &lt;!&ndash;<el-option key="0" label="待审核" :value="0"></el-option>-->
+          <!--              <el-option key="1" label="正常" :value="1"></el-option>-->
+          <!--              <el-option key="2" label="冻结" :value="2"></el-option>-->
+          <!--              <el-option key="3" label="审核失败" :value="3"></el-option>-->
+          <!--              <el-option key="9" label="注销" :value="9"></el-option>&ndash;&gt;-->
+          <!--              <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>-->
+          <!--            </el-select>-->
+          <!--          </el-form-item>-->
           <el-form-item label="是否为管理员">
             <el-select v-model="form.isAdmin" placeholder="">
               <el-option key="0" label="否" :value="0"></el-option>
@@ -417,8 +422,8 @@
                 this.editVisible = false;
                 this.subloading = false;
                 this.psw='',
-                this.form = {
-                };
+                    this.form = {
+                    };
             },
         },
         watch:{
@@ -467,52 +472,52 @@
     color: #ddd;
   }
   .input-new-tag{
-      width:140px;
-      padding-right: 10px;
-      margin-left: 0;
+    width:140px;
+    padding-right: 10px;
+    margin-left: 0;
   }
   .border{
-      border:1px solid $color-one;
-      border-radius: 4px;
-      padding: 10px;
+    border:1px solid $color-one;
+    border-radius: 4px;
+    padding: 10px;
   }
 
   .pre-img{
-      width: 120px;
-      height: 120px;
-      /*background: #f8f8f8;*/
-      /*border: 1px solid #eee;*/
-      border-radius: 5px;
+    width: 120px;
+    height: 120px;
+    /*background: #f8f8f8;*/
+    /*border: 1px solid #eee;*/
+    border-radius: 5px;
   }
   .crop-demo{
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      left: 0;
-      top: 0;
-      display: flex;
-      align-items: flex-end;
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: flex-end;
   }
   .crop-demo-btn{
-      position: relative;
-      width: 100px;
-      height: 40px;
-      line-height: 40px;
-      padding: 0 20px;
-      margin-left: 30px;
-      background-color: #409eff;
-      color: #fff;
-      font-size: 14px;
-      border-radius: 4px;
-      box-sizing: border-box;
+    position: relative;
+    width: 100px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 20px;
+    margin-left: 30px;
+    background-color: #409eff;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 4px;
+    box-sizing: border-box;
   }
   .crop-input{
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      left: 0;
-      top: 0;
-      opacity: 0;
-      cursor: pointer;
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    cursor: pointer;
   }
 </style>

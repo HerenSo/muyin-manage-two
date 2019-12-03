@@ -105,11 +105,11 @@
                                 :options="category"
                                 :props="{ expandTrigger: 'hover',value:'code',label:'name',children:'subCategorys' }"></el-cascader>
                     </el-form-item>
-                    <el-form-item label="商品展示售价" required>
-                        <el-input v-model="form.saleShowPrice" placeholder="请输入商品展示的原售价格"></el-input>
+                    <el-form-item label="商品展示原价" required>
+                      <el-input v-model="form.saleShowPrice" placeholder="请输入商品展示的原售价格"></el-input>
                     </el-form-item>
-                    <el-form-item label="商品实际售价" required>
-                        <el-input v-model="form.salePrice" placeholder="请输入商品实际售价"></el-input>
+                    <el-form-item label="商品展示售价" required>
+                      <el-input v-model="form.salePrice" placeholder="请输入商品实际售价"></el-input>
                     </el-form-item>
                     <el-form-item label="商品积分售价" required>
                         <el-input v-model="form.pointPrice" placeholder="请输入商品积分售价"></el-input>

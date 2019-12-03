@@ -5,7 +5,7 @@
       <div class="handle-box">
         <el-button type="primary" icon="el-icon-refresh" class="handle-del " @click="refresh">刷新</el-button>
         <!--        <el-button type="primary" icon="el-icon-lx-add" class="handle-del " @click="handleEdit" v-if="right.add">新增</el-button>-->
-<!--        <el-button type="primary" icon="el-icon-delete" class="handle-del" @click="delAllSelection" v-if="right.del">批量删除</el-button>-->
+        <!--        <el-button type="primary" icon="el-icon-delete" class="handle-del" @click="delAllSelection" v-if="right.del">批量删除</el-button>-->
         <el-input v-model="query.orderNumber" placeholder="请输入订单编号" class="handle-input mr10 ml-10"></el-input>
         <el-select v-model="query.status" placeholder="状态" class="handle-select mr10" @change="refresh">
           <el-option key="" label="全部" value=""></el-option>
@@ -15,6 +15,7 @@
       </div>
       <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
+        <el-table-column prop="orderNumber" label="订单编号"></el-table-column>
         <el-table-column prop="commodityName" label="商品名称"></el-table-column>
         <el-table-column prop="commodityIconUrl" label="缩略图" width="120" align="center">
           <template slot-scope="scope">
@@ -25,23 +26,26 @@
             </el-image>
           </template>
         </el-table-column>
-        <el-table-column prop="number" label="订单编号"></el-table-column>
-        <el-table-column prop="commodityCode" label="售后商品编码"></el-table-column>
-        <el-table-column prop="outRefundId" label="第三方支付平台退款单号" ></el-table-column>
-        <el-table-column label="状态" prop="status" align="center" width="80" >
-              <template slot-scope="scope">
-                <el-tag :type="scope.row.status===0?'warning':(scope.row.status===6?'success':(scope.row.status===8?'info':(scope.row.status===9?'danger':'')))">
-                  {{enums[scope.row.status]}}
-                </el-tag>
-              </template>
+        <el-table-column prop="outRefundId" label="第三方支付平台退款单号" width="180" ></el-table-column>
+        <el-table-column prop="reason" label="申请理由" ></el-table-column>
+        <el-table-column prop="remark" label="审核原因" ></el-table-column>
+        <el-table-column prop="backAmount" label="退还金额" align="center" ></el-table-column>
+        <el-table-column prop="backWallet" label="退还钱包金额" align="center"  width="110"></el-table-column>
+        <el-table-column label="状态" prop="status" align="center" width="120" >
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.status===0?'warning':(scope.row.status===6?'success':(scope.row.status===8?'info':(scope.row.status===9?'danger':'')))">
+              {{enums[scope.row.status]}}
+            </el-tag>
+          </template>
         </el-table-column>
-        <el-table-column label="操作" width="120" align="center">
+        <el-table-column prop="createTime" label="申请时间" align="center"  width="160"></el-table-column>
+        <el-table-column label="操作" width="120" align="center" fixed="right">
           <template slot-scope="scope">
             <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>-->
             <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>-->
-<!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleCheck(scope.$index, scope.row)" v-if="right.del">查看</el-button>-->
-            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
-            <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleUpdateStatus(9, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
+            <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleCheck(scope.$index, scope.row)" v-if="right.del">查看</el-button>-->
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleAudit(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
+            <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleAudit(9, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
             <el-button type="text" icon="el-icon-sold-out" class="red" @click="handleUpdateStatus(6, scope.row)" v-if="scope.row.status ==1 && (scope.row.type ==0 || scope.row.type ==2)">确认收到退还货物</el-button>
             <el-button type="text" icon="el-icon-sell" class="" @click="handleUpdateStatus(6, scope.row)" v-if="scope.row.status ==1 && scope.row.type===3">确认换货送达</el-button>
           </template>
@@ -59,7 +63,18 @@
         ></el-pagination>
       </div>
     </div>
-
+    <!--操作-->
+    <el-dialog :title="titleHandle" :visible.sync="editVisible" width="30%" :before-close="closeHandle">
+      <el-form ref="form" :model="form" label-width="60px">
+        <el-form-item label="备注" >
+          <el-input type="textarea" v-model="form.remark"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="submitHandle">确 定</el-button>
+            </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -79,8 +94,8 @@
                 multipleSelection: [],
                 delList: [],
                 editVisible: false,
+                titleHandle:"确定审核通过",
                 total: 0,
-                title:'编辑',
                 form: {},
                 subloading:false,
                 typeValue:'',
@@ -131,30 +146,53 @@
                     this.loading = false;
                 })
             },
+            handleAudit(status, row){
+                this.status = status;
+                this.orderNumber = row.code;
+                if(status == 1){
+                    this.titleHandle = "确定审核通过";
+                }else if(status == 9){
+                    this.titleHandle = "确定审核不通过";
+                }
+                this.editVisible = true;
+            },
+            submitHandle(){
+                let url = '/member-order/confirmOrderService';
+                // if(this.status == 1){
+                //     url = "/member-order/confirmOrderService";
+                // }else if(this.status == 9){
+                //     url = "/member-order/refuseRefund";
+                // }
+                this.$axios.get(url+"?orderServiceCode="+this.orderNumber+"&remark="+this.form.remark+"&status="+this.status).then(res => {
+                    if (res.code == 200) {
+                        this.$message.success(this.titleHandle+"成功！");
+                        this.getData();
+                        this.editVisible = false;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                })
+            },
             // 状态改变操作
             handleUpdateStatus(status, row) {
                 let msg = "";
                 let url = "";
-                if(status == 1){
-                    msg = "审核通过";
-                    url = "/member-order/confirmOrderService";
-                }else if(status == 9){
-                    msg = "审核不通过";
-                    url = "/member-order/refuseRefund";
-                }else if(status == 6 && (scope.row.type ==0 || scope.row.type ==2)){
+                if(status == 6 && (row.type ==0 || row.type ==2)){
                     msg = "收到退还货物";
-                    url = "/member-order/confirmRefund";
-                }else if(status == 6 && scope.row.type ==3){
+                    url = "/member-order/confirmRefund?number="+row.orderNumber;
+                }else if(status == 6 && row.type ==3){
                     msg = "换货送达";
-                    url = "/member-order/confirmOrderServiceReceived";
+                    url = "/member-order/confirmOrderServiceReceived?orderServiceCode="+row.code;
                 }
                 this.$confirm("确定"+msg+"吗？", '提示', {
                     type: 'warning'
                 }).then(() => {
-                    this.$axios.get(url+"?number="+row.orderNumber).then(res => {
+                    this.$axios.get(url).then(res => {
                         if (res.code == 200) {
                             this.$message.success(msg+"成功！");
                             this.getData();
+                        }else{
+                            this.$message.error(res.msg);
                         }
                     })
                 }).catch(() => {});
@@ -175,6 +213,10 @@
                 this.$set(this.query, 'pageNum', 1);
                 this.$set(this.query, 'pageSize', val);
                 this.getData();
+            },
+            closeHandle(){
+                this.editVisible = false;
+                this.form = {};
             },
             refresh(){ // 刷新
                 this.getData();

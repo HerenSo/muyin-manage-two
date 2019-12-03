@@ -35,10 +35,10 @@
             </el-table-column>
             <el-table-column prop="parentName" label="上级菜单">
             </el-table-column>
-            <el-table-column fixed="right" label="" width="60">
+            <el-table-column fixed="right" label="" width="120">
               <template slot-scope="scope">
-                <el-link @click="handleEdit(scope.row)" type="primary" size="small" v-if="right.edit"><i class="el-icon-edit"></i></el-link>
-                <el-link @click="handleDelete(scope.row)" type="danger" size="small" v-if="right.edit"><i class="el-icon-delete"></i></el-link>
+                <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.row)"  size="small" v-if="right.edit">修改</el-button>
+                <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.row)"  size="small" v-if="right.edit">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
