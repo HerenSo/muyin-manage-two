@@ -56,11 +56,11 @@
           </el-form-item>
           <el-form-item label="抢购开始时间"  >
 <!--            <el-input v-model="form.commodity_to_snap_up_start_time" placeholder=""></el-input>-->
-            <el-time-select placeholder="起始时间" v-model="form.commodity_to_snap_up_start_time" :picker-options="{start: '08:30',step: '00:15',end: '18:30'}"></el-time-select>
+            <el-time-select placeholder="起始时间" v-model="form.commodity_to_snap_up_start_time" :picker-options="{start: '00:00',step: '00:15',end: '24:00'}"></el-time-select>
           </el-form-item>
           <el-form-item label="抢购结束时间"  >
 <!--            <el-input v-model="form.commodity_to_snap_up_end_time" placeholder=""></el-input>-->
-            <el-time-select placeholder="结束时间" v-model="form.commodity_to_snap_up_end_time" :picker-options="{ start: '08:30', step: '00:15', end: '18:30', minTime: form.commodity_to_snap_up_start_time }">
+            <el-time-select placeholder="结束时间" v-model="form.commodity_to_snap_up_end_time" :picker-options="{ start: '00:00', step: '00:15', end: '24:00', minTime: form.commodity_to_snap_up_start_time }">
             </el-time-select>
           </el-form-item>
           <el-form-item label="抢购时间间隔(分钟)"  >
@@ -196,6 +196,7 @@
   }
   .pre-img{
     width: 188px;
+    height: 284px;
     /*height: 138px;*/
     /*background: #f8f8f8;*/
     /*border: 1px solid #eee;*/

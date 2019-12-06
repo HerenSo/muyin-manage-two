@@ -115,7 +115,12 @@
             <el-input v-model="form.contractNumber" placeholder="" :readonly="ischeck"></el-input>
           </el-form-item>
           <el-form-item label="合同合作到期时间"  :required="!ischeck">
-            <el-input v-model="form.cooperationTime" placeholder="" :readonly="ischeck"></el-input>
+<!--            <el-input v-model="form.cooperationTime" placeholder="" :readonly="ischeck"></el-input>-->
+            <el-date-picker
+                    v-model="form.cooperationTime"
+                    type="date"
+                    placeholder="选择日期" :readonly="ischeck">
+            </el-date-picker>
           </el-form-item>
           <el-form-item label="商户合同">
 <!--              <div class="backgroundImgUrl" ><i class="el-icon-picture"></i></div>-->
@@ -141,12 +146,12 @@
 <!--          <el-form-item label="热度" >-->
 <!--            <el-input v-model="form.hot" placeholder="" :readonly="ischeck"></el-input>-->
 <!--          </el-form-item>-->
-          <el-form-item label="经度" >
-            <el-input v-model="form.longitude" placeholder="" :readonly="ischeck"></el-input>
-          </el-form-item>
-          <el-form-item label="纬度" >
-            <el-input v-model="form.latitude" placeholder="" :readonly="ischeck"></el-input>
-          </el-form-item>
+<!--          <el-form-item label="经度" >-->
+<!--            <el-input v-model="form.longitude" placeholder="" :readonly="ischeck"></el-input>-->
+<!--          </el-form-item>-->
+<!--          <el-form-item label="纬度" >-->
+<!--            <el-input v-model="form.latitude" placeholder="" :readonly="ischeck"></el-input>-->
+<!--          </el-form-item>-->
           <el-form-item label="" >
           </el-form-item>
         </el-form>

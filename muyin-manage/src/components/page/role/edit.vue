@@ -93,7 +93,9 @@
                 })
                 return item;
             })
-            this.queryByManagerId();
+            if(this.form.roleid) {
+                this.queryByManagerId();
+            }
         },
         methods: {
             queryByManagerId(){ // 根据角色查询权限
@@ -152,6 +154,8 @@
                         }else {
                             this.$message.success('新增成功！');
                         }
+                        this.form = {};
+                        bus.$emit('visible', false);
                     }else{
                         this.$message.error(res.msg);
                     }
@@ -167,6 +171,7 @@
                 }
             },
             back(){
+                this.form = {};
                 bus.$emit('visible', false);
             },
         },

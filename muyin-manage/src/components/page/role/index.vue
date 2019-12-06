@@ -81,6 +81,7 @@
             })
             bus.$on('visible', (msg) => {
                 this.visible = msg;
+                this.role = {};
                 this.getData();
             });
         },
@@ -107,6 +108,7 @@
             handleAdd(){
                 // tab=-1 时，不加载tab
                 this.visible = true;
+                this.role = {};
             },
             handleEdit(index, row) {
                 // tab=-1 时，不加载tab

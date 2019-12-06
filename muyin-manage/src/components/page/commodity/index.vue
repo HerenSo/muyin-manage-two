@@ -114,7 +114,7 @@
                     <el-form-item label="商品积分售价" required>
                         <el-input v-model="form.pointPrice" placeholder="请输入商品积分售价"></el-input>
                     </el-form-item>
-                    <el-form-item label="所属经销商" required>
+                    <el-form-item label="所属供货商" required>
                         <el-select v-model="form.customerCode" placeholder="请选择">
                             <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
                         </el-select>
@@ -518,7 +518,12 @@
                     this.$message.error("请上传轮播图！");
                     return;
                 }
+                if(isNaN(this.commodityDetails.expirationDate) && this.commodityDetails.expirationDate){
+                    this.$message.error("保质期需输入数字！或为空");
+                    return;
+                }
                 console.log(this.fileList)
+                this.attachmentsList =[];
                 this.fileList.map(item => {
                     if(item.id) {
                         this.attachmentsList.push(item.id);
@@ -536,6 +541,7 @@
                     if(res.code == 200){
                         this.$message.success(this.title+"成功！");
                         this.editVisible = false;
+                        this.handleClose();
                         this.getData();
                     }else{
                         this.$message.error(res.msg);
@@ -672,7 +678,7 @@
                 }).catch(() => {});
             },
             handleChange(file, fileList) { // 轮播图上传
-                this.fileList = fileList.slice(-3);
+                this.fileList = fileList.slice(-10);
 
             },
             handleEditorFileChange(response, file, fileList){ // 商品详情 图片上传
@@ -692,7 +698,13 @@
             handleRemove(file, fileList) {// 轮播图删除
                 this.fileList = fileList.slice(-3);
                 console.log(file, fileList);
-                this.$axios.post("/api/attachments/deleteFile",{url:file.response.data.url,dataType:"form"}).then(res => {
+                let url;
+                if(file.id){
+                    url = file.url;
+                }else{
+                    url = file.response.data.url;
+                }
+                this.$axios.post("/api/attachments/deleteFile",{url:url,dataType:"form"}).then(res => {
                     if(res.code == 200){
                     }else{
                         this.$message.error(res.msg);
