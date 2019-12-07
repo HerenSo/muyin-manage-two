@@ -75,6 +75,21 @@
             </div>
             <span class="color-999">&nbsp;&nbsp;(建议尺寸:750*1132)</span>
           </el-form-item>
+
+            <el-form-item label="用户权益" >
+                <div class="backgroundImgUrl" v-loading="cropUserloading"><i class="el-icon-picture"></i>
+                    <div class="crop-demo">
+                        <img :src="form.the_user_member_rights_url" class="pre-img">
+                    </div>
+                    <input class="crop-input" type="file" name="image" accept="image/*" @change="setUserImage"/>
+                </div>
+                <span class="color-999">&nbsp;&nbsp;(建议尺寸:750*1132)</span>
+            </el-form-item>
+
+            <el-form-item label="用户协议" required>
+                <quill-editor ref="myTextEditor" v-model="form.user_member_agreement" :options="editorOption"></quill-editor>
+            </el-form-item>
+
           <el-form-item label=""  >
             <div class="handle-row">
               <el-button type="primary" @click="submit">保存</el-button>
@@ -82,12 +97,50 @@
             </div>
           </el-form-item>
         </el-form>
+      <!--富文本编辑框 图片上传-->
+      <el-upload
+              class="upload-demo"
+              :action="baseUrl+'/api/attachments/insertUploadFile'"
+              multiple
+              style="display: none;"
+              :on-success="handleEditorFileChange"
+              :data="{isInsert:false,type:1}"
+              :file-list="editorFileList">
+          <el-button size="small" type="primary" id="setImageEditor" class="setImageEditor">点击上传</el-button>
+      </el-upload>
   </div>
 </template>
 
 <script>
+    import 'quill/dist/quill.core.css';
+    import 'quill/dist/quill.snow.css';
+    import 'quill/dist/quill.bubble.css';
+    import { quillEditor } from 'vue-quill-editor';
+    // 工具栏配置
+    const toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        ['blockquote', 'code-block'],
+
+        [{'header': 1}, {'header': 2}],               // custom button values
+        [{'list': 'ordered'}, {'list': 'bullet'}],
+        [{'script': 'sub'}, {'script': 'super'}],      // superscript/subscript
+        [{'indent': '-1'}, {'indent': '+1'}],          // outdent/indent
+        [{'direction': 'rtl'}],                         // text direction
+
+        [{'size': ['small', false, 'large', 'huge']}],  // custom dropdown
+        [{'header': [1, 2, 3, 4, 5, 6, false]}],
+
+        [{'color': []}, {'background': []}],          // dropdown with defaults from theme
+        [{'font': []}],
+        [{'align': []}],
+        ['link', 'image', 'video'],
+        ['clean']                                         // remove formatting button
+    ]
     export default {
         name: 'index',
+        components: {
+            quillEditor
+        },
         data(){
             return{
                 form:{},
@@ -97,6 +150,26 @@
                 dialogVisible: false,
                 file:'',
                 croploading:false,
+                cropUserloading:false,
+                editorFileList:[],
+                editorOption: {
+                    placeholder: '',
+                    modules: {
+                        toolbar: {
+                            container: toolbarOptions,  // 工具栏
+                            handlers: {
+                                'image': function (value) {
+                                    if (value) {
+                                        console.log('自定义图片');
+                                        document.querySelector('.setImageEditor').click()
+                                    } else {
+                                        this.quill.format('image', false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         mounted(){
@@ -143,6 +216,20 @@
                     }
                 })
             },
+            handleEditorFileChange(response, file, fileList){ // 商品详情 图片上传
+                // this.editorFileList = fileList.slice(-3);
+                let quill = this.$refs.myTextEditor.quill
+                // 获取光标所在位置
+                let length = quill.getSelection().index;
+                // 插入图片，res为服务器返回的图片链接地址
+                console.log(response)
+                quill.insertEmbed(length, 'image', response.data.url);
+                // this.editorFileList.map(item => {
+                //     quill.insertEmbed(length, 'image', item.response.data.url);
+                // })
+                // 调整光标到最后
+                quill.setSelection(length + 1);
+            },
             sureCrop(){
                 let params = {
                     file:this.file,
@@ -169,6 +256,33 @@
                     return;
                 }
                 this.sureCrop();
+            },
+            setUserImage(e){ // 选择图
+                this.file = e.target.files[0];
+                if (!this.file.type.includes('image/')) {
+                    this.$message.error("请上传png/jpg格式文件！");
+                    return;
+                }
+                this.sureCropUser();
+            },
+            sureCropUser(){
+                let params = {
+                    file:this.file,
+                    type:1,
+                    isInsert:false,
+                    dataType:"multipart"
+                }
+                this.cropUserloading = true;
+                this.$axios.post("/api/attachments/insertUploadFile",params).then(res => {
+                    if(res.code == 200){
+                        this.$message.success("上传成功！");
+                        this.$set(this.form, 'THE_USER_MEMBER_RIGHTS_URL', res.data.url);
+                        this.dialogVisible = false;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                    this.cropUserloading = false;
+                })
             },
         }
     };
