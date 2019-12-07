@@ -86,7 +86,7 @@
                 <span class="color-999">&nbsp;&nbsp;(建议尺寸:750*1132)</span>
             </el-form-item>
 
-            <el-form-item label="用户协议" required>
+            <el-form-item label="用户协议">
                 <quill-editor ref="myTextEditor" v-model="form.user_member_agreement" :options="editorOption"></quill-editor>
             </el-form-item>
 
