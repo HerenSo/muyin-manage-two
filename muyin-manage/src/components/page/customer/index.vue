@@ -332,7 +332,7 @@
                 this.query.categoryCode = msg;
                 this.getData();
             });
-            // this.getData();
+            this.getData();
         },
         methods: {
             // 获取数据
