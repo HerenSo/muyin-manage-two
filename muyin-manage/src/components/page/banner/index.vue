@@ -284,7 +284,7 @@
                     file:this.file,
                     type:1,
                     isInsert:false,
-                    pickUpColor:true,
+                    pickUpColor: "1",
                     dataType:"multipart"
                 }
                 this.croploading = true;

@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="container mb-20 pt-20">
-      <h4 class="color-666">经销商等级</h4>
-      <hr>
-      <v-category :typeValue="typeValue" :apiType="apiType"></v-category>
-    </div>
+    <!--<div class="container mb-20 pt-20">-->
+      <!--<h4 class="color-666">经销商等级</h4>-->
+      <!--<hr>-->
+      <!--<v-category :typeValue="typeValue" :apiType="apiType"></v-category>-->
+    <!--</div>-->
     <div class="container">
 
       <div class="handle-box">
@@ -29,11 +29,11 @@
         <el-table-column prop="name" label="名称"></el-table-column>
         <el-table-column prop="adminUserName" label="管理员用户" width="120" align="center"></el-table-column>
         <el-table-column prop="wallet" label="钱包余额" width="80" align="center"></el-table-column>
-        <el-table-column prop="levelCode" label="等级" width="80" align="center">
-          <template slot-scope="scope">
-            {{scope.row.levelCode == 1?"一级":(scope.row.levelCode == 2?"二级":(scope.row.levelCode == 3?"三级":(scope.row.levelCode == 4?"四级":(scope.row.levelCode == 5?"五级":""))))}}
-          </template>
-        </el-table-column>
+        <!--<el-table-column prop="levelCode" label="等级" width="80" align="center">-->
+          <!--<template slot-scope="scope">-->
+            <!--{{scope.row.levelCode == 1?"一级":(scope.row.levelCode == 2?"二级":(scope.row.levelCode == 3?"三级":(scope.row.levelCode == 4?"四级":(scope.row.levelCode == 5?"五级":""))))}}-->
+          <!--</template>-->
+        <!--</el-table-column>-->
         <el-table-column prop="phone" label="手机号码" width="110" align="center"></el-table-column>
         <el-table-column prop="saleOverTime" label="总补单量" width="100" align="center"></el-table-column>
         <el-table-column prop="orderCount" label="总订单量" width="100" align="center"></el-table-column>

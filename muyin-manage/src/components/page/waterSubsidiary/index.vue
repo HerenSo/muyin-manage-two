@@ -24,6 +24,7 @@
         <el-table-column prop="thirdOrderNumber" label="第三方交易流水号" min-width="140"></el-table-column>
         <el-table-column prop="content" label="交易内容"></el-table-column>
         <el-table-column prop="amount" label="实际入账金额" min-width="120"></el-table-column>
+        <el-table-column prop="supplyCustomerCode" label="供货商" min-width="120"></el-table-column>
         <!--        <el-table-column prop="cardCost" label="会员卡交易面额" min-width="130"></el-table-column>-->
         <!--        <el-table-column prop="cardNumber" label="会员卡号"></el-table-column>-->
         <el-table-column prop="couponAmount" label="优惠券优惠金额" min-width="130"></el-table-column>

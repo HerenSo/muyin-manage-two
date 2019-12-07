@@ -38,11 +38,42 @@
                         <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item  command="changepassword">修改密码</el-dropdown-item>
                         <el-dropdown-item  command="loginout">退出登录</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </div>
         </div>
+        <!--弹窗-->
+        <el-dialog title="修改密码" :visible.sync="editVisible" width="420px" :before-close="closeHandle">
+            <el-form :model="forget" :rules="rulesForget" ref="loginphone" label-width="0px" class="login_form">
+                <el-form-item prop="userPhone">
+                    <el-input v-model="forget.userPhone" placeholder="手机号码" size="large" prefix-icon="el-icon-mobile-phone">
+                    </el-input>
+                </el-form-item>
+                <el-form-item prop="vercode">
+                    <el-input
+                            type="password"
+                            placeholder="验证码"
+                            v-model="forget.vercode"
+                            @keyup.enter.native="submitForm()"
+                            prefix-icon="el-icon-lx-lock"
+                            size="large"
+                            class="width260"
+                    >
+                    </el-input>
+                    <el-button size="large" class="ml-5 getcode" @click="getcode" >{{ytext}}</el-button>
+                </el-form-item>
+                <el-form-item prop="newPassword">
+                    <el-input v-model="forget.newPassword " placeholder="新密码" size="large" prefix-icon="el-icon-lx-lock">
+                    </el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button type="primary" @click="submitHandle">确 定</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 <script>
@@ -54,7 +85,22 @@ export default {
             fullscreen: false,
             name: '未登录',
             message: 2,
-            userlogo:require('../../assets/img/img.jpg')
+            userlogo:require('../../assets/img/img.jpg'),
+            ytext:"获取验证码",
+            forget:{},
+            rulesPhone: {
+                phone: [{ required: true, message: '请输入手机号码', trigger: 'blur' }],
+                password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+            },
+            rulesForget: {
+                userPhone: [{ required: true, message: '请输入手机号码', trigger: 'blur' }],
+                vercode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+                newPassword: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
+            },
+            editVisible:false,
+            resetSend:true,
+            activeName:"first",
+            phone:{}
         };
     },
     computed: {
@@ -68,6 +114,42 @@ export default {
         }
     },
     methods: {
+        submitForm() {
+            let el,params;
+            if(this.activeName == "first"){
+                el = this.$refs.login;
+                this.$set(this.param, 'dataType', 'form');
+                params = this.param;
+            }else{
+                el = this.$refs.loginphone;
+                this.$set(this.phone, 'dataType', 'form');
+                params = this.phone;
+            }
+            el.validate(valid => {
+                if (valid) {
+                    this.$axios.post("/login",params).then(res => {
+                        console.log(res)
+                        if(res.code == 200) {
+                            this.getClassEnums();
+                            this.$message.success('登录成功');
+                            localStorage.setItem('ms_username', res.data.username);
+                            localStorage.setItem('user_information', JSON.stringify(res.data));
+
+                            this.$router.push('/');
+                        }else{
+                            this.$message.error(res.msg);
+                            this.ytext ="获取验证码";
+                            this.resetSend = true;
+                        }
+                    })
+
+                } else {
+                    this.$message.error('请输入账号和密码');
+                    console.log('error submit!!');
+                    return false;
+                }
+            });
+        },
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
@@ -76,6 +158,10 @@ export default {
                     localStorage.removeItem('ms_username');
                     localStorage.removeItem('user_information');
                 })
+            }else if(command == "changepassword"){
+                this.editVisible = true;
+                this.ytext ="获取验证码";
+                this.resetSend = true;
             }
         },
         // 侧边栏折叠
@@ -109,6 +195,54 @@ export default {
                 }
             }
             this.fullscreen = !this.fullscreen;
+        },
+        getcode(){
+            if(this.resetSend){
+                this.resetSend = false;
+                let second = 60;
+                let phone = this.phone.username;
+                if(this.forget.userPhone){
+                    phone = this.forget.userPhone
+                }
+                this.$axios.post("/api/sendMessage/sendLoginPhoneVerCode?phone="+phone,{}).then(res => {
+                    if(res.code == 200) {
+                        this.$message.success('发送验证码成功');
+                        let i = setInterval(e =>{
+                            second--;
+                            this.ytext = second+"秒后重新发送";
+                            if(second == 0){
+                                clearInterval(i);
+                                this.ytext ="获取验证码";
+                                this.resetSend = true;
+                            }
+                        },1000)
+                    }else{
+                        this.$message.error(res.msg);
+                        this.resetSend = true;
+                    }
+                })
+            }
+
+        },
+        submitHandle(){
+            this.$axios.post("/user/resetPwd?newPassword="+this.forget.newPassword+"&userPhone="+this.forget.userPhone+"&vercode="+this.forget.vercode,{}).then(res => {
+                if (res.code == 200) {
+                    this.$message.success("修改密码成功！");
+                    this.editVisible = false;
+                    this.getData();
+                }else{
+                    this.$message.error(res.msg);
+                }
+            })
+        },
+        forgetPassword(){
+            this.editVisible = true;
+            this.ytext ="获取验证码";
+            this.resetSend = true;
+        },
+        closeHandle(){
+            this.editVisible = false;
+            this.forget = {};
         }
     },
     mounted() {

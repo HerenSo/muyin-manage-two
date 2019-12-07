@@ -83,10 +83,10 @@
     <!-- 编辑弹出框 -->
     <el-drawer :title="title" :visible.sync="editVisible" size="60%" direction="rtl" :before-close="handleClose" class="commodity_drawer">
       <div class="demo-drawer__content">
-        <el-form ref="form" :model="form" label-width="140px">
+        <el-form ref="form" :model="form" label-width="140px" :rules="rules">
             <el-tabs v-model="activeName">
                 <el-tab-pane label="基本信息" name="first">
-                    <el-form-item label="商品名称" required>
+                    <el-form-item label="商品名称" required prop="name">
                         <el-input v-model="form.name" placeholder="请输入商品名称"></el-input>
                     </el-form-item>
                     <el-form-item label="商品分类" required>
@@ -105,10 +105,10 @@
                                 :options="category"
                                 :props="{ expandTrigger: 'hover',value:'code',label:'name',children:'subCategorys' }"></el-cascader>
                     </el-form-item>
-                    <el-form-item label="商品展示原价" required>
+                    <el-form-item label="商品展示原价" required prop="saleShowPrice">
                       <el-input v-model="form.saleShowPrice" placeholder="请输入商品展示的原售价格"></el-input>
                     </el-form-item>
-                    <el-form-item label="商品展示售价" required>
+                    <el-form-item label="商品展示售价" required prop="salePrice">
                       <el-input v-model="form.salePrice" placeholder="请输入商品实际售价"></el-input>
                     </el-form-item>
                     <el-form-item label="商品积分售价" required>
@@ -119,7 +119,7 @@
                             <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="商品供货价" required>
+                    <el-form-item label="商品供货价" required prop="supplyPrice">
                         <el-input v-model="form.supplyPrice" placeholder="请输入供货商商品供货价"></el-input>
                     </el-form-item>
                     <el-form-item label="开始销售时间" required>
@@ -240,19 +240,19 @@
                     </el-form-item>
                 </el-tab-pane>
                 <el-tab-pane label="详情信息" name="third">
-                    <el-form-item label="商品条形码编号" required>
+                    <el-form-item label="商品条形码编号">
                         <el-input v-model="commodityDetails.barNumber" placeholder="请输入商品条形码编号"></el-input>
                     </el-form-item>
-                    <el-form-item label="保质期（天）" required>
+                    <el-form-item label="保质期（天）">
                         <el-input v-model="commodityDetails.expirationDate" placeholder="请输入保质期"></el-input>
                     </el-form-item>
-                    <el-form-item label="原产地" required>
+                    <el-form-item label="原产地">
                         <el-input v-model="commodityDetails.origin" placeholder="请输入原产地"></el-input>
                     </el-form-item>
 <!--                    <el-form-item label="规格" required>-->
 <!--                        <el-input v-model="commodityDetails.specification" placeholder="请输入规格"></el-input>-->
 <!--                    </el-form-item>-->
-                    <el-form-item label="商品描述" required>
+                    <el-form-item label="商品描述">
                         <el-input v-model="commodityDetails.deatils" placeholder="请输入商品描述"></el-input>
                     </el-form-item>
                     <el-form-item label="商品详情" required>
@@ -337,6 +337,20 @@
                 title:'编辑',
                 activeName: 'first',
                 form: {},
+                rules: { // 表单验证规则
+                    name: [
+                        { required: true, message: '请输入商品名称', trigger: 'blur' }
+                    ],
+                    saleShowPrice: [
+                        { required: true, message: '请输入商品展示的原售价格', trigger: 'blur' }
+                    ],
+                    salePrice: [
+                        { required: true, message: '请输入商品实际售价', trigger: 'blur' }
+                    ],
+                    supplyPrice: [
+                        { required: true, message: '请输入供货价', trigger: 'blur' }
+                    ]
+                },
                 subloading:false,
                 editorOption: {
                     placeholder: '',
@@ -502,52 +516,59 @@
             },
             // 保存编辑
             saveEdit() {
-                // if(!this.form.categoryCode){
-                //     this.$message.error("请选择分类！");
-                //     return;
-                // }
-                // if(!this.form.title){
-                //     this.$message.error("请输入标题！");
-                //     return;
-                // }
-                // if(!this.form.content){
-                //     this.$message.error("请输入内容！");
-                //     return;
-                // }
-                if(this.fileList.length == 0){
-                    this.$message.error("请上传轮播图！");
-                    return;
-                }
-                if(isNaN(this.commodityDetails.expirationDate) && this.commodityDetails.expirationDate){
-                    this.$message.error("保质期需输入数字！或为空");
-                    return;
-                }
-                console.log(this.fileList)
-                this.attachmentsList =[];
-                this.fileList.map(item => {
-                    if(item.id) {
-                        this.attachmentsList.push(item.id);
-                    }else{
-                        this.attachmentsList.push(item.response.data.id);
+                this.$refs['form'].validate((valid) => {
+                    if (valid) {
+                        // if(!this.form.categoryCode){
+                        //     this.$message.error("请选择分类！");
+                        //     return;
+                        // }
+                        if(!this.form.name){
+                            this.$message.error("请输入商品名称");
+                            return;
+                        }
+                        if(!this.form.supplyPrice){
+                            this.$message.error("请输入供货价！");
+                            return;
+                        }
+                        if(this.fileList.length == 0){
+                            this.$message.error("请上传轮播图！");
+                            return;
+                        }
+                        if(isNaN(this.commodityDetails.expirationDate) && this.commodityDetails.expirationDate){
+                            this.$message.error("保质期需输入数字！或为空");
+                            return;
+                        }
+                        console.log(this.fileList)
+                        this.attachmentsList =[];
+                        this.fileList.map(item => {
+                            if(item.id) {
+                                this.attachmentsList.push(item.id);
+                            }else{
+                                this.attachmentsList.push(item.response.data.id);
+                            }
+                        })
+                        this.form.attachmentsList = this.attachmentsList;
+                        console.log("fileList",this.form.attachmentsList);
+                        this.form.commodityDetails = this.commodityDetails;
+                        this.form.commodityAttrs = this.commodityAttrs;
+                        this.form.categoryCode = this.form.categoryCode[this.form.categoryCode.length -1];
+                        this.subloading = true;
+                        this.$axios.post("/commodity/insertOrUpdate",this.form).then(res => {
+                            if(res.code == 200){
+                                this.$message.success(this.title+"成功！");
+                                this.editVisible = false;
+                                this.handleClose();
+                                this.getData();
+                            }else{
+                                this.$message.error(res.msg);
+                            }
+                            this.subloading = false;
+                        })
+                    } else {
+                        return false;
                     }
-                })
-                this.form.attachmentsList = this.attachmentsList;
-                console.log("fileList",this.form.attachmentsList);
-                this.form.commodityDetails = this.commodityDetails;
-                this.form.commodityAttrs = this.commodityAttrs;
-                this.form.categoryCode = this.form.categoryCode[this.form.categoryCode.length -1];
-                this.subloading = true;
-                this.$axios.post("/commodity/insertOrUpdate",this.form).then(res => {
-                    if(res.code == 200){
-                        this.$message.success(this.title+"成功！");
-                        this.editVisible = false;
-                        this.handleClose();
-                        this.getData();
-                    }else{
-                        this.$message.error(res.msg);
-                    }
-                    this.subloading = false;
-                })
+                });
+
             },
             // 编,辑操作
             handleEdit(index, row) {
