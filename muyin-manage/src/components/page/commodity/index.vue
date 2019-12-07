@@ -99,7 +99,7 @@
                           <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsTypelist"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="商品所属类型" required>
+                    <el-form-item label="商品所属类型">
                         <el-cascader
                                 v-model="form.categoryCode"
                                 :options="category"
@@ -689,6 +689,10 @@
                     this.multipleSelection.map(item => {
                         ids.push(item.code);
                     })
+                    if(ids.length === 0){
+                        this.$message.error("请选择要删除数据！");
+                        return ;
+                    }
                     this.$axios.post("/commodity/deleteBatch",ids).then(res => {
                         if (res.code == 200) {
                             this.$message.success("批量删除成功！");

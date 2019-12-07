@@ -140,6 +140,10 @@
                     this.multipleSelection.map(item => {
                         ids.push(item.roleid);
                     })
+                    if(ids.length === 0){
+                      this.$message.error("请选择要删除数据！");
+                      return ;
+                    }
                     this.$axios.post("/role/deleteBatch",ids).then(res => {
                         if (res.code == 200) {
                             this.$message.success("批量删除成功！");

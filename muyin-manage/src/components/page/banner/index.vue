@@ -80,12 +80,17 @@
                         </div>
                     </el-form-item>
                     <el-form-item label="所属一级分类" >
-                        <el-select v-model="form.categoryCode" placeholder="请选择类型">
+                        <el-select v-model="form.categoryCode" placeholder="请选择分类">
                             <el-option  :label="item.name" :value="item.code" v-for="(item,index) in categoryParent" :key="index"></el-option>
                         </el-select>
                     </el-form-item>
                     <el-form-item label="跳转地址" ><el-input v-model="form.url" autocomplete="off"></el-input></el-form-item>
-                    <el-form-item label="跳转参数"><el-input v-model="form.params" autocomplete="off"></el-input></el-form-item>
+                    <!--<el-form-item label="跳转参数"><el-input v-model="form.params" autocomplete="off"></el-input></el-form-item>-->
+                    <el-form-item label="跳转链接类型" required>
+                        <el-select v-model="form.linkType" placeholder="请选择跳转链接类型">
+                            <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in linkTypeList"></el-option>
+                        </el-select>
+                    </el-form-item>
                     <el-form-item label="类型" required>
                         <el-select v-model="form.type" placeholder="请选择类型">
                             <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumslist"></el-option>
@@ -154,6 +159,8 @@
                 croploading:false,
                 categoryParent:[],
                 enumslist:[],
+                linkTypeList:[],
+                linkType:{},
                 enums:{} // 枚举
             }
         },
@@ -179,6 +186,15 @@
             }
             this.enumslist.map(item => {
                 this.$set(this.enums,item.code,item.name);
+            })
+
+            // 跳转链接
+            let linkTypeEnum = enums.BannerLinkTypeEnum;
+            for(let key in linkTypeEnum){
+                this.linkTypeList.push(linkTypeEnum[key]);
+            }
+            this.linkTypeList.map(item => {
+                this.$set(this.linkType, item.code, item.name);
             })
 
             //数据
@@ -267,7 +283,11 @@
                     let ids = [];
                     this.multipleSelection.map(item => {
                         ids.push(item.id);
-                    })
+                    });
+                    if(ids.length === 0){
+                        this.$message.error("请选择要删除数据！");
+                        return ;
+                    }
                     this.$axios.post("/banner/deleteBatch",ids).then(res => {
                         if (res.code == 200) {
                             this.$message.success("批量删除成功！");

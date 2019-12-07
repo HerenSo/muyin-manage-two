@@ -35,7 +35,7 @@
         <el-table-column label="操作" width="150" align="center" fixed="right">
           <template slot-scope="scope">
 <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">充值</el-button>-->
-            <el-button type="text" icon="el-icon-lx-calendar" class="" @click="handleSignRecord(scope.$index, scope.row)">签到记录</el-button>
+            <!--<el-button type="text" icon="el-icon-lx-calendar" class="" @click="handleSignRecord(scope.$index, scope.row)">签到记录</el-button>-->
 <!--            <el-button type="text" icon="el-icon-lx-tag" class="" @click="handleResetPasswords(scope.$index, scope.row)">重置密码</el-button>-->
             <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
             <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleUpdateStatus(3, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
@@ -357,6 +357,10 @@
                     this.multipleSelection.map(item => {
                         ids.push(item.id);
                     })
+                    if(ids.length === 0){
+                      this.$message.error("请选择要删除数据！");
+                      return ;
+                    }
                     this.$axios.post("/article/deleteBatch",ids).then(res => {
                         if (res.code == 200) {
                             this.$message.success("批量删除成功！");

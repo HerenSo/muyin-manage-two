@@ -15,7 +15,7 @@
               value-format="yyyy-MM-dd HH:mm:ss"
               :default-time="['00:00:00']">
       </el-date-picker>
-      <el-select v-model="query.customerCode" placeholder="经销商" @change="getData" class="ml-10" v-if="managerType == 2">
+      <el-select v-model="query.customerCode" placeholder="供应商" @change="getData" class="ml-10" v-if="managerType == 2">
         <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
       </el-select>
     </div>

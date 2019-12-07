@@ -11,7 +11,7 @@
         <el-button type="primary" icon="el-icon-refresh" class="handle-del " @click="refresh">刷新</el-button>
         <el-button type="primary" icon="el-icon-lx-add" class="handle-del " @click="handleEdit" v-if="right.add">新增</el-button>
 <!--        <el-button type="primary" icon="el-icon-delete" class="handle-del" @click="delAllSelection" v-if="right.del">批量删除</el-button>-->
-        <el-input v-model="query.phone" placeholder="请输入经销商商户手机号查找" class="handle-input mr10 ml-10"></el-input>
+        <el-input v-model="query.phone" placeholder="请输入供应商商户手机号查找" class="handle-input mr10 ml-10"></el-input>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
       <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
@@ -28,14 +28,14 @@
         </el-table-column>
         <el-table-column prop="name" label="名称"></el-table-column>
         <el-table-column prop="adminUserName" label="管理员用户" width="120" align="center"></el-table-column>
-        <el-table-column prop="wallet" label="钱包余额" width="80" align="center"></el-table-column>
+        <!--<el-table-column prop="wallet" label="钱包余额" width="80" align="center"></el-table-column>-->
         <!--<el-table-column prop="levelCode" label="等级" width="80" align="center">-->
           <!--<template slot-scope="scope">-->
             <!--{{scope.row.levelCode == 1?"一级":(scope.row.levelCode == 2?"二级":(scope.row.levelCode == 3?"三级":(scope.row.levelCode == 4?"四级":(scope.row.levelCode == 5?"五级":""))))}}-->
           <!--</template>-->
         <!--</el-table-column>-->
         <el-table-column prop="phone" label="手机号码" width="110" align="center"></el-table-column>
-        <el-table-column prop="saleOverTime" label="总补单量" width="100" align="center"></el-table-column>
+        <!--<el-table-column prop="saleOverTime" label="总补单量" width="100" align="center"></el-table-column>-->
         <el-table-column prop="orderCount" label="总订单量" width="100" align="center"></el-table-column>
         <el-table-column label="状态" align="center" width="100" >
           <template slot-scope="scope">
@@ -423,7 +423,7 @@
             },
             handleAccount(index,row){ // 流水
               this.dialogVisible = true;
-                this.$set(this.account, 'code', row.code);
+                this.$set(this.account, 'customerCode', row.code);
                 this.getAccount();
             },
             handleCheck(index,row){ // 查看
@@ -471,6 +471,10 @@
                     this.multipleSelection.map(item => {
                         ids.push(item.code);
                     })
+                    if(ids.length === 0){
+                        this.$message.error("请选择要删除数据！");
+                        return ;
+                    }
                     this.$axios.post("/customer/deleteBatch",ids).then(res => {
                         if (res.code == 200) {
                             this.$message.success("批量删除成功！");

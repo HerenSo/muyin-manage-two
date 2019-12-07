@@ -120,7 +120,25 @@
           <el-form-item label="支付信息" required>
             <el-input v-model="form.title" :disabled="formDisable"></el-input>
           </el-form-item>
+            <el-form-item label="会员备注" required>
+                <el-input v-model="form.remarks" :disabled="formDisable"></el-input>
+            </el-form-item>
         </el-form>
+          <el-table :data="form.memberOrderItemList" border class="table" ref="table" :loading="loading" header-cell-class-name="table-header" >
+              <el-table-column prop="commodityName" label="商品名称" width="260"></el-table-column>
+              <el-table-column prop="commodityIconUrl" label="缩略图" width="120" align="center">
+                  <template slot-scope="scope">
+                      <el-image :src="scope.row.commodityIconUrl" style="width: 50px; height: 50px" fit="cover">
+                          <div slot="error" class="image-slot">
+                              <i class="el-icon-picture f50 color-border"></i>
+                          </div>
+                      </el-image>
+                  </template>
+              </el-table-column>
+              <el-table-column prop="salePrice" label="单价"  align="center"></el-table-column>
+              <el-table-column prop="commodityAttrItemDesc" label="规格"  align="center"></el-table-column>
+              <el-table-column prop="commodityCount" label="商品数量" align="center"></el-table-column>
+          </el-table>
 <!--        <span slot="footer" class="dialog-footer demo-drawer__footer">-->
 <!--            <el-button @click="editVisible = false">取 消</el-button>-->
 <!--            <el-button type="primary" @click="saveEdit" :loading="subloading">{{ subloading ? '提交中 ...' : '确 定' }}</el-button>-->
@@ -407,6 +425,10 @@
                     this.multipleSelection.map(item => {
                         ids.push(item.number);
                     })
+                    if(ids.length === 0){
+                        this.$message.error("请选择要删除数据！");
+                        return ;
+                    }
                     this.$axios.post("/member-order/deleteBatch",ids).then(res => {
                         if (res.code == 200) {
                             this.$message.success("批量删除成功！");
