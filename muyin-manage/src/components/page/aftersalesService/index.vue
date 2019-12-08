@@ -179,7 +179,7 @@
                 let url = "";
                 if(status == 6 && (row.type ==0 || row.type ==2)){
                     msg = "收到退还货物";
-                    url = "/member-order/confirmRefund?number="+row.orderNumber;
+                    url = "/member-order/confirmOrderServiceReceived?orderServiceCode ="+row.code;
                 }else if(status == 6 && row.type ==3){
                     msg = "换货送达";
                     url = "/member-order/confirmOrderServiceReceived?orderServiceCode="+row.code;

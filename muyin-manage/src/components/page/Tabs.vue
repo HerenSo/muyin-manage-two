@@ -152,9 +152,10 @@
                 }
             },
             handleRead(row) {
-                this.$axios.post("/system-message/updateMessageStatus",{code:row.code}).then(res => {
+                this.$axios.post("/system-message/updateMessageStatus?code="+row.code).then(res => {
                     if(res.code == 200) {
                         this.getData();
+                        this.getData2();
                     }else{
                         this.$message.error(res.msg);
                     }

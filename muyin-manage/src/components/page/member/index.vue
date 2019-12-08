@@ -189,7 +189,7 @@
             this.typeValue = 0; // 0用户级别，1经销商级别
             this.apiType = 1; // 区别接口，0文章/商品；1用户/经销商
             bus.$on('categoryCode', msg => {
-                this.query.categoryCode = msg;
+                this.query.levelCode = msg;
                 this.getData();
             });
             this.getCategory(); // 获取分类
