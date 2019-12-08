@@ -29,6 +29,20 @@ Vue.prototype.$axios = axios;
 Vue.prototype.baseUrl = 'http://120.79.56.120:8080';
 // Vue.prototype.baseUrl = 'https://www.geeso.cn/';
 
+
+// 消息
+import VueSocketIO from 'vue-socket.io';
+import SocketIO from 'socket.io-client';
+let information = JSON.parse(localStorage.getItem('user_information'))
+let customerCode ="";
+if(information){
+    customerCode = information.customerCode || "";
+}
+Vue.use(new VueSocketIO({
+    debug: true,
+    connection: SocketIO('http://120.79.56.120:8084?customerCode='+customerCode) //xxx填后台给的socket地址，
+}))
+
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
     document.title = `${to.meta.title} | manage-system`;

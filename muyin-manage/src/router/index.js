@@ -134,11 +134,11 @@ export default new Router({
                 //     component: () => import(/* webpackChunkName: "table" */ '../components/page/BaseTable.vue'),
                 //     meta: { title: '基础表格' }
                 // },
-                // {
-                //     path: '/tabs',
-                //     component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Tabs.vue'),
-                //     meta: { title: 'tab选项卡' }
-                // },
+                {
+                    path: '/tabs',
+                    component: () => import(/* webpackChunkName: "tabs" */ '../components/page/Tabs.vue'),
+                    meta: { title: '消息中心' }
+                },
                 // {
                 //     path: '/form',
                 //     component: () => import(/* webpackChunkName: "form" */ '../components/page/BaseForm.vue'),

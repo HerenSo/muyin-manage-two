@@ -84,6 +84,15 @@
                             <el-option  :label="item.name" :value="item.code" v-for="(item,index) in categoryParent" :key="index"></el-option>
                         </el-select>
                     </el-form-item>
+                  <el-form-item label="所属商品" required>
+                    <el-select v-model="form.commodityCode" filterable
+                               remote
+                               reserve-keyword
+                               :remote-method="remoteMethod"
+                               placeholder="搜索商品">
+                      <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in restaurants"></el-option>
+                    </el-select>
+                  </el-form-item>
                     <el-form-item label="跳转地址" ><el-input v-model="form.url" autocomplete="off"></el-input></el-form-item>
                     <!--<el-form-item label="跳转参数"><el-input v-model="form.params" autocomplete="off"></el-input></el-form-item>-->
                     <el-form-item label="跳转链接类型" required>
@@ -158,6 +167,9 @@
                 file:'',
                 croploading:false,
                 categoryParent:[],
+                restaurants: [], // 商品
+                state: '',
+                timeout:  null,
                 enumslist:[],
                 linkTypeList:[],
                 linkType:{},
@@ -218,6 +230,16 @@
                 this.$axios.post("/category/selectCategoryParent",{status:0,type:0,level:0}).then((res) => {
                     if(res.code == 200){
                         this.categoryParent = res.data;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                })
+            },
+            // 获取 商品列表
+            getGoods(name) {
+                this.$axios.post("/commodity/selectPageList?pageNum=1&pageSize=9999",{name:name}).then((res) => {
+                    if(res.code == 200){
+                        this.restaurants = res.data.records;
                     }else{
                         this.$message.error(res.msg);
                     }
@@ -327,6 +349,9 @@
                     return;
                 }
                 this.sureCrop();
+            },
+            remoteMethod(queryString) {
+                this.getGoods(queryString)
             },
             // 触发搜索按钮
             handleSearch() {

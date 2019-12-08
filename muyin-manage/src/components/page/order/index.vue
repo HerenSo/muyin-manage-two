@@ -32,10 +32,11 @@
         <el-table-column prop="consigneePhone" label="联系方式" width="120" align="center"></el-table-column>
         <el-table-column prop="addressDetail" label="收货地址" width="150"></el-table-column>
         <el-table-column prop="totalPrice" label="合计价格"></el-table-column>
+        <el-table-column prop="postage" label="配送费"></el-table-column>
         <el-table-column prop="paidAmount" label="实际支付"></el-table-column>
         <el-table-column prop="paidTime" label="支付时间" width="150"></el-table-column>
 <!--        <el-table-column prop="createTime" label="创建时间"></el-table-column>-->
-        <el-table-column label="状态" prop="status" align="center" width="80" >
+        <el-table-column label="状态" prop="status" align="center" width="120" >
           <template slot-scope="scope">
 <!--            0-创建订单 1-待支付 2-待商家确认 3-待发货 4-待收货 5-待上门自取 6-已收货待评价 7-完成 8-商家退单 9-取消-->
             <el-tag :type="scope.row.status===2?'warning':(scope.row.status===7?'success':(scope.row.status===9?'info':(scope.row.status===8?'danger':'')))">
@@ -50,10 +51,13 @@
 <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>-->
 <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>-->
             <el-button type="text" icon="el-icon-view" class="" @click="handleCheck(scope.$index, scope.row)" v-if="right.del">查看</el-button>
-            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(3, scope.row.number)" v-if="scope.row.status ==2">受理</el-button>
-            <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleSome(9,scope.row.number)" v-if="scope.row.status ==2">拒绝</el-button>
-            <el-button type="text" icon="el-icon-sold-out" class="" @click="handleSome(4, scope.row.number)" v-if="scope.row.status ==3">发货</el-button>
-            <el-button type="text" icon="el-icon-truck" class="" @click="handleUpdateStatus(6, scope.row.number)" v-if="scope.row.status ==4">送达</el-button>
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(3, scope.row.number)" v-if="scope.row.status ==2 && customerCode == scope.row.customerCode">受理</el-button>
+            <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleSome(9,scope.row.number)" v-if="scope.row.status ==2 && customerCode == scope.row.customerCode">拒绝</el-button>
+            <el-button type="text" icon="el-icon-sold-out" class="" @click="handleSome(4, scope.row.number)" v-if="scope.row.status ==3 && customerCode == scope.row.customerCode">发货</el-button>
+            <el-button type="text" icon="el-icon-truck" class="" @click="handleUpdateStatus(6, scope.row.number)" v-if="scope.row.status ==4 && customerCode == scope.row.customerCode">送达</el-button>
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(11, scope.row.number)" v-if="scope.row.status ==10 && customerCode == scope.row.customerCode">受理退款</el-button>
+            <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleSome(12, scope.row.number)" v-if="scope.row.status ==10 && customerCode == scope.row.customerCode" >拒绝退款</el-button>
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(13, scope.row.number)" v-if="scope.row.status ==11 && customerCode == scope.row.customerCode">确认退款</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -71,7 +75,7 @@
     </div>
 
     <!-- 编辑弹出框 -->
-    <el-drawer :title="title" :visible.sync="editVisible" size="40%" direction="rtl" :before-close="handleClose">
+    <el-drawer :title="title" :visible.sync="editVisible" size="40%" direction="rtl" :before-close="handleClose" class="commodity_drawer">
       <div class="demo-drawer__content">
         <el-form ref="form" :model="form" label-width="120px">
           <el-form-item label="订单号" required>
@@ -89,9 +93,6 @@
 <!--          <el-form-item label="商品名称" required>-->
 <!--            <el-input v-model="form.title" :disabled="formDisable"></el-input>-->
 <!--          </el-form-item>-->
-          <el-form-item label="实际支付金额" required>
-            <el-input v-model="form.paidAmount" :disabled="formDisable"></el-input>
-          </el-form-item>
           <el-form-item label="余额支付金额" required>
             <el-input v-model="form.walletCost" :disabled="formDisable"></el-input>
           </el-form-item>
@@ -100,6 +101,12 @@
           </el-form-item>
           <el-form-item label="积分支付金额" required>
             <el-input v-model="form.pointCost" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="配送费" required>
+            <el-input v-model="form.postage" :disabled="formDisable"></el-input>
+          </el-form-item>
+          <el-form-item label="实际支付金额" required>
+            <el-input v-model="form.paidAmount" :disabled="formDisable"></el-input>
           </el-form-item>
           <el-form-item label="支付方式" required>
 <!--            <el-input v-model="form.paidType" ></el-input>-->
@@ -210,12 +217,14 @@
                 enums:{}, // 枚举
                 enumsPaidTypelist:[],
                 enumsPaidType:{}, // 枚举
+                customerCode:'',
             };
         },
         mounted() {
             // 权限
 
             let authorities = JSON.parse(localStorage.getItem("user_information"));
+            this.customerCode = authorities.customerCode;
             authorities.authorities.map((item) => {
                 switch (item.authority) {
                     case 'ROLE_ORDER_EDIT':this.right.edit = true;break;
@@ -342,6 +351,12 @@
                 }else if(status == 6){
                     msg = "确认商品已送达";
                     url = "/member-order/reached";
+                }else if(status == 11){
+                    msg = "确认受理退款";
+                    url = "/member-order/acceptRefund";
+                }else if(status == 13){
+                    msg = "确认收到退回货物并退款";
+                    url = "/member-order/confirmRefund";
                 }
                 this.$confirm(msg+"吗？", '提示', {
                     type: 'warning'
@@ -375,6 +390,13 @@
                     }
                     msg = "发货";
                     url = "/member-order/deliver?number="+this.number+"&logisticsIdent="+this.formHandle.logisticsIdent+"&logisticsNumber="+this.formHandle.logisticsNumber;
+                }else if(this.status == 12){
+                    if(!this.formHandle.authReason){
+                        this.$message.error("请填写拒绝原因！");
+                        return;
+                    }
+                    msg = "拒绝受理订单";
+                    url = "/member-order/refuseRefund?number="+this.number+"&authReason="+this.formHandle.authReason;
                 }
                 this.$axios.get(url).then(res => {
                     if (res.code == 200) {
@@ -392,6 +414,8 @@
                     this.titleHandle = "填写拒绝原因";
                 }else if(status == 4){
                     this.titleHandle = "填写发货物流";
+                }else if(status == 12){
+                    this.titleHandle = "填写拒绝原因";
                 }
             },
             // 触发搜索按钮
@@ -468,7 +492,13 @@
     };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
+  .commodity_drawer .el-drawer__body{
+    overflow-y: auto;
+  }
+  .commodity_drawer .el-drawer__header{
+    margin-bottom: 10px;
+  }
   .handle-box {
     margin-bottom: 20px;
   }

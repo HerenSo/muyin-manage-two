@@ -47,7 +47,7 @@
             <el-button type="text" icon="el-icon-document-checked" class="" @click="handleAudit(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
             <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleAudit(9, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
             <el-button type="text" icon="el-icon-sold-out" class="red" @click="handleUpdateStatus(6, scope.row)" v-if="scope.row.status ==1 && (scope.row.type ==0 || scope.row.type ==2)">确认收到退还货物</el-button>
-            <el-button type="text" icon="el-icon-sell" class="" @click="handleUpdateStatus(6, scope.row)" v-if="scope.row.status ==1 && scope.row.type===3">确认换货送达</el-button>
+<!--            <el-button type="text" icon="el-icon-sell" class="" @click="handleUpdateStatus(6, scope.row)" v-if="scope.row.status ==1 && scope.row.type===3">确认换货送达</el-button>-->
           </template>
         </el-table-column>
       </el-table>

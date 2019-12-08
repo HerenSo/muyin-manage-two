@@ -405,6 +405,8 @@
                         this.$message.success(this.title+"成功！");
                         this.editVisible = false;
                         this.getData();
+                    }else{
+                        this.$message.error(res.msg);
                     }
                     this.subloading = false;
                 })

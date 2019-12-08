@@ -1,6 +1,6 @@
 <template>
     <div class="wrapper">
-        <v-head></v-head>
+        <v-head :total="total"></v-head>
         <v-sidebar></v-sidebar>
         <div class="content-box" :class="{'content-collapse':collapse}">
 <!--            <v-tags></v-tags>-->
@@ -25,7 +25,9 @@ export default {
     data() {
         return {
             tagsList: [],
-            collapse: false
+            collapse: false,
+            total:0,
+            websocketid:'',
         };
     },
     components: {
@@ -46,6 +48,41 @@ export default {
             }
             this.tagsList = arr;
         });
+
+    },
+    mounted(){
+        this.getData();
+    },
+    sockets: {
+
+        connect() {
+            this.websocketid = this.$socket.id;
+            console.log('链接服务器');
+        },
+
+        output(data,notime) {  //监听message事件，方法是后台定义和提供的
+
+            this.$notify({
+                title: '消息',
+                message: data+" "+notime,
+                position: 'bottom-right',
+                duration: 0
+            });
+
+        }
+
+    },
+    methods:{
+        // 获取消息数据
+        getData() {
+            this.$axios.post("/system-message/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,{status:0}).then(res => {
+                if(res.code == 200) {
+                    this.total = res.data.total;
+                }else{
+                    this.$message.error(res.msg);
+                }
+            })
+        },
     }
 };
 </script>

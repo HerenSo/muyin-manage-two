@@ -20,10 +20,11 @@
         <el-table-column prop="username" label="用户名" width="120" align="center"></el-table-column>
         <el-table-column prop="sex" label="性别" width="80">
           <template slot-scope="scope">
-            <el-tag :type="scope.row.member.sex===0?'':'success'">{{scope.row.member.sex===0?'男':"女"}}</el-tag>
+            <el-tag :type="scope.row.member.sex===1?'':scope.row.member.sex===0?'success':'info'">{{scope.row.member.sex===1?'男':scope.row.member.sex===0?'女':"未知"}}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="等级" prop="levelName" align="center"  >
+          <template slot-scope="scope">{{scope.row.member.levelName}}</template>
         </el-table-column>
         <el-table-column prop="userphone" label="手机号" width="120" align="center"></el-table-column>
         <el-table-column label="生日" width="120" align="center">
@@ -31,6 +32,7 @@
         </el-table-column>
         <el-table-column prop="wallet" label="余额" width="120" align="center"><template slot-scope="scope">{{scope.row.member.wallet}}</template></el-table-column>
         <el-table-column prop="point" label="积分" width="120" align="center"><template slot-scope="scope">{{scope.row.member.point}}</template></el-table-column>
+        <el-table-column prop="point" label="零元购次数" width="120" align="center"><template slot-scope="scope">{{scope.row.member.freeSellCount}}</template></el-table-column>
         <el-table-column prop="createTime" label="注册时间" width="160" align="center"></el-table-column>
         <el-table-column label="操作" width="150" align="center" fixed="right">
           <template slot-scope="scope">

@@ -14,19 +14,15 @@
                         <i class="el-icon-rank"></i>
                     </el-tooltip>
                 </div>
-                <!-- 消息中心 -->
-<!--                <div class="btn-bell">-->
-<!--                    <el-tooltip-->
-<!--                        effect="dark"-->
-<!--                        :content="message?`有${message}条未读消息`:`消息中心`"-->
-<!--                        placement="bottom"-->
-<!--                    >-->
-<!--                        <router-link to="/tabs">-->
-<!--                            <i class="el-icon-bell"></i>-->
-<!--                        </router-link>-->
-<!--                    </el-tooltip>-->
-<!--                    <span class="btn-bell-badge" v-if="message"></span>-->
-<!--                </div>-->
+              <!--                 消息中心-->
+              <div class="btn-bell">
+                <el-tooltip effect="dark" :content="total>0?`有${total}条未读消息`:`消息中心`" placement="bottom" >
+                  <router-link to="/tabs">
+                    <i class="el-icon-bell"></i>
+                  </router-link>
+                </el-tooltip>
+                <span class="btn-bell-badge" v-if="total"></span>
+              </div>
                 <!-- 用户头像 -->
                 <div class="user-avator">
                     <img :src="logoicon" />
@@ -100,9 +96,12 @@ export default {
             editVisible:false,
             resetSend:true,
             activeName:"first",
-            phone:{}
+            phone:{},
+            websocketid:'',
+            // total:0
         };
     },
+    props:["total"],
     computed: {
         username() {
             let username = localStorage.getItem('ms_username');
@@ -113,7 +112,37 @@ export default {
             return logoicon.headiconUrl ? logoicon.headiconUrl : this.userlogo;
         }
     },
+    // sockets: {
+    //
+    //     connect() {
+    //         this.websocketid = this.$socket.id;
+    //         console.log('链接服务器');
+    //     },
+    //
+    //     output(data,notime) {  //监听message事件，方法是后台定义和提供的
+    //         console.log("消息提示！！！！！！！！！！！！")
+    //         this. getData();
+    //         this.$notify({
+    //             title: '消息',
+    //             message: data+" "+notime,
+    //             position: 'bottom-right',
+    //             duration: 0
+    //         });
+    //
+    //     }
+    //
+    // },
     methods: {
+        // 获取消息数据
+        getData() {
+            this.$axios.post("/system-message/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,{status:0}).then(res => {
+                if(res.code == 200) {
+                    this.total = res.data.pages;
+                }else{
+                    this.$message.error(res.msg);
+                }
+            })
+        },
         submitForm() {
             let el,params;
             if(this.activeName == "first"){
