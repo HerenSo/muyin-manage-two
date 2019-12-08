@@ -50,6 +50,11 @@ export default new Router({
                     meta: { title: '商品管理' }
                 },
                 {
+                    path: '/consignment/index',
+                    component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/consignment/index.vue'),
+                    meta: { title: '寄卖商品' }
+                },
+                {
                     path: '/commodity/category',
                     component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/commodity/category.vue'),
                     meta: { title: '商品分类管理' }
