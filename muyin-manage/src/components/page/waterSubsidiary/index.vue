@@ -4,6 +4,7 @@
 
       <div class="handle-box">
         <el-button type="primary" icon="el-icon-refresh" class="handle-del " @click="refresh">刷新</el-button>
+        <el-button type="primary" icon="el-icon-printer" @click="handlePrinter">导出</el-button>
         <!--        <el-button type="primary" icon="el-icon-lx-add" class="handle-del " @click="handleEdit" v-if="right.add">新增</el-button>-->
 <!--        <el-button type="primary" icon="el-icon-delete" class="handle-del" @click="delAllSelection" v-if="right.del">批量删除</el-button>-->
 <!--        <el-select v-model="query.type" placeholder="交易类型" class="handle-select mr10 ml-10" @change="refresh">-->
@@ -15,24 +16,39 @@
 <!--          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsPaidTypelist"></el-option>-->
 <!--        </el-select>-->
         <el-input v-model="query.orderNumber" placeholder="请输入订单号查找" class="handle-input mr10 ml-10"></el-input>
+        <el-input v-model="query.supplyCustomerName" placeholder="请输入供货商名称查找" class="handle-input mr10 ml-10"></el-input>
+        <el-date-picker
+                v-model="time"
+                type="daterange"
+                align="right"
+                unlink-panels
+                range-separator="至"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                :picker-options="pickerOptions">
+        </el-date-picker>
+        <el-select v-model="query.status" placeholder="状态" class="handle-select ml-10 mr10" @change="refresh">
+          <el-option key="" label="全部" value=""></el-option>
+          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsStatuslist"></el-option>
+        </el-select>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
       <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
-        <el-table-column prop="code" label="流水号" min-width="120"></el-table-column>
-        <el-table-column prop="orderNumber" label="交易关联订单号" min-width="130"></el-table-column>
+        <el-table-column prop="code" label="流水号" min-width="180"></el-table-column>
+        <el-table-column prop="orderNumber" label="交易关联订单号" min-width="140"></el-table-column>
         <el-table-column prop="thirdOrderNumber" label="第三方交易流水号" min-width="140"></el-table-column>
-        <el-table-column prop="content" label="交易内容"></el-table-column>
-        <el-table-column prop="amount" label="实际入账金额" min-width="120"></el-table-column>
+        <el-table-column prop="content" label="交易内容" min-width="260"></el-table-column>
+        <el-table-column prop="amount" label="实际入账金额" min-width="80" align="center"></el-table-column>
         <el-table-column prop="supplyCustomerCode" label="供货商" min-width="120"></el-table-column>
         <!--        <el-table-column prop="cardCost" label="会员卡交易面额" min-width="130"></el-table-column>-->
         <!--        <el-table-column prop="cardNumber" label="会员卡号"></el-table-column>-->
-        <el-table-column prop="couponAmount" label="优惠券优惠金额" min-width="130"></el-table-column>
+        <el-table-column prop="couponAmount" label="优惠券优惠金额" min-width="80" align="center"></el-table-column>
         <!--        <el-table-column prop="point" label="积分消耗数值" min-width="120"></el-table-column>-->
-        <el-table-column prop="pointCost" label="积分抵扣金额" min-width="120"></el-table-column>
-        <el-table-column prop="walletCost" label="钱包抵扣金额" min-width="120"></el-table-column>
-        <el-table-column prop="supplyPrice" label="供货商支出金额" min-width="100" v-if="managerType == 2"></el-table-column>
-        <el-table-column prop="totalAmount" label="交易总金额" min-width="100"></el-table-column>
+        <el-table-column prop="pointCost" label="积分抵扣金额" min-width="80" align="center"></el-table-column>
+        <el-table-column prop="walletCost" label="钱包抵扣金额" min-width="80" align="center"></el-table-column>
+        <el-table-column prop="supplyPrice" label="供货商支出金额" min-width="80" align="center" v-if="managerType == 2"></el-table-column>
+        <el-table-column prop="totalAmount" label="交易总金额" min-width="100" align="center"></el-table-column>
         <el-table-column prop="type" label="交易类型" >
           <template slot-scope="scope">
           {{enums[scope.row.type]}}
@@ -45,8 +61,9 @@
         </el-table-column>
         <el-table-column prop="status" label="流水状态" >
           <template slot-scope="scope">
-            <el-tag :type="scope.row.status===0?'':(scope.row.status===1?'success':'danger')">
-              {{scope.row.status===0?'交易中':(scope.row.status===1?'已入账':'已取消')}}
+            <el-tag :type="scope.row.status===0?'':(scope.row.status===1?'success':'info')">
+<!--              {{scope.row.status===0?'交易中':(scope.row.status===1?'已入账':'已取消')}}-->
+              {{enumsStatus[scope.row.status]}}
             </el-tag>
           </template>
         </el-table-column>
@@ -107,11 +124,40 @@
         data() {
             return {
                 query: {
-                    createTime: '',
-                    title: '',
+                    startTime: '',
+                    endTime:"",
+                    supplyCustomerName: '',
                     status:'',
                     pageNum: 1,
                     pageSize: 10
+                },
+                time:[],
+                pickerOptions: {
+                    shortcuts: [{
+                        text: '最近一周',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近一个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }, {
+                        text: '最近三个月',
+                        onClick(picker) {
+                            const end = new Date();
+                            const start = new Date();
+                            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                            picker.$emit('pick', [start, end]);
+                        }
+                    }]
                 },
                 tableData: [],
                 loading:false,
@@ -133,8 +179,10 @@
                 formDisable:false,
                 enumslist:[],
                 enumsPaidTypelist:[],
+                enumsStatuslist:[],
                 enums:{}, // 交易类型枚举
-                enumsPaidType:{} // 交易方式枚举
+                enumsPaidType:{}, // 交易方式枚举
+                enumsStatus:{},
             };
         },
         mounted() {
@@ -155,6 +203,7 @@
             let enums = JSON.parse(localStorage.getItem("ClassEnums"));
             let enumslist = enums.WalletBillTypeEnum; // 交易类型
             let enumsPaidTypelist = enums.PaidTypeEnum;
+            let enumsStatuslist = enums.WalletBillStatusEnum;
             for(let key in enumslist){
                 this.enumslist.push(enumslist[key]);
             }
@@ -169,11 +218,22 @@
                 this.$set(this.enumsPaidType,item.code,item.name);
             })
 
+            for(let key in enumsStatuslist){
+                this.enumsStatuslist.push(enumsStatuslist[key]);
+            }
+            this.enumsStatuslist.map(item => {
+                this.$set(this.enumsStatus,item.code,item.name);
+            })
+
             this.getData();
         },
         methods: {
             // 获取数据
             getData() {
+                if(this.time.length>0){
+                    this.$set(this.query,"startTime",this.time[0])
+                    this.$set(this.query,"endTime",this.time[1])
+                }
                 this.loading = true;
                 this.$axios.post("/wallet-bill/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,this.query).then(res => {
                     if(res.code == 200) {
@@ -270,6 +330,21 @@
                     })
                 }).catch(() => {});
             },
+            handlePrinter(){
+                if(this.time.length>0){
+                    this.$set(this.query,"startTime",this.time[0])
+                    this.$set(this.query,"endTime",this.time[1])
+                }
+                this.$delete(this.query,"pageNum")
+                this.$delete(this.query,"pageSize")
+                let ret = ''
+                for (let it in this.query) {
+                    if(encodeURIComponent(this.query[it])){
+                        ret += encodeURIComponent(it) + '=' + encodeURIComponent(this.query[it]) + '&'
+                    }
+                }
+                window.open(this.baseUrl+'/wallet-bill/exportWalletBill?'+ret,'_blank');
+            },
             handleStatusChange(){
                 this.getData();
             },
@@ -306,7 +381,7 @@
   }
 
   .handle-input {
-    width: 300px;
+    width: 200px;
     display: inline-block;
   }
   .table {

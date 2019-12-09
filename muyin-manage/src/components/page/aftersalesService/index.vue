@@ -31,6 +31,11 @@
         <el-table-column prop="remark" label="审核原因" ></el-table-column>
         <el-table-column prop="backAmount" label="退还金额" align="center" ></el-table-column>
         <el-table-column prop="backWallet" label="退还钱包金额" align="center"  width="110"></el-table-column>
+        <el-table-column prop="type" label="售后类型" align="center"  width="120">
+          <template slot-scope="scope">
+              {{enumsType[scope.row.type]}}
+          </template>
+        </el-table-column>
         <el-table-column label="状态" prop="status" align="center" width="120" >
           <template slot-scope="scope">
             <el-tag :type="scope.row.status===0?'warning':(scope.row.status===6?'success':(scope.row.status===8?'info':(scope.row.status===9?'danger':'')))">
@@ -39,14 +44,14 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="申请时间" align="center"  width="160"></el-table-column>
-        <el-table-column label="操作" width="120" align="center" fixed="right">
+        <el-table-column label="操作" width="140" align="center" fixed="right">
           <template slot-scope="scope">
             <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>-->
             <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>-->
             <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleCheck(scope.$index, scope.row)" v-if="right.del">查看</el-button>-->
             <el-button type="text" icon="el-icon-document-checked" class="" @click="handleAudit(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
             <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleAudit(9, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
-            <el-button type="text" icon="el-icon-sold-out" class="red" @click="handleUpdateStatus(6, scope.row)" v-if="scope.row.status ==1 && (scope.row.type ==0 || scope.row.type ==2)">确认收到退还货物</el-button>
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(6, scope.row)" v-if="scope.row.status ==1 && (scope.row.type ==0 || scope.row.type ==3)">确认收到退还货物</el-button>
 <!--            <el-button type="text" icon="el-icon-sell" class="" @click="handleUpdateStatus(6, scope.row)" v-if="scope.row.status ==1 && scope.row.type===3">确认换货送达</el-button>-->
           </template>
         </el-table-column>
@@ -96,7 +101,9 @@
                 editVisible: false,
                 titleHandle:"确定审核通过",
                 total: 0,
-                form: {},
+                form: {
+                    remark:''
+                },
                 subloading:false,
                 typeValue:'',
                 category:[],
@@ -107,7 +114,9 @@
                 },
                 formDisable:false,
                 enumslist:[],
+                enumsTypelist:[],
                 enums:{}, // 枚举
+                enumsType:{}
             };
         },
         mounted() {
@@ -123,11 +132,18 @@
             // 枚举
             let enums = JSON.parse(localStorage.getItem("ClassEnums"));
             let enumslist = enums.MemberOrderServiceStatusEnum;
+            let enumsTypelist = enums.MemberOrderServiceTypeEnum;
             for(let key in enumslist){
                 this.enumslist.push(enumslist[key]);
             }
             this.enumslist.map(item => {
                 this.$set(this.enums,item.code,item.name);
+            })
+            for(let key in enumsTypelist){
+                this.enumsTypelist.push(enumsTypelist[key]);
+            }
+            this.enumsTypelist.map(item => {
+                this.$set(this.enumsType,item.code,item.name);
             })
 
             this.getData();
@@ -179,7 +195,7 @@
                 let url = "";
                 if(status == 6 && (row.type ==0 || row.type ==2)){
                     msg = "收到退还货物";
-                    url = "/member-order/confirmOrderServiceReceived?orderServiceCode ="+row.code;
+                    url = "/member-order/confirmOrderServiceReceived?orderServiceCode="+row.code;
                 }else if(status == 6 && row.type ==3){
                     msg = "换货送达";
                     url = "/member-order/confirmOrderServiceReceived?orderServiceCode="+row.code;
@@ -216,7 +232,9 @@
             },
             closeHandle(){
                 this.editVisible = false;
-                this.form = {};
+                this.form = {
+                    remark:''
+                };
             },
             refresh(){ // 刷新
                 this.getData();

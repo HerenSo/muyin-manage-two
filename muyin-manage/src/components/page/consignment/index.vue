@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="container mb-20 pt-20">
-      <h4 class="color-666">商品分类</h4>
-      <hr>
-      <v-category :typeValue="typeValue" :apiType="apiType"></v-category>
-    </div>
+<!--    <div class="container mb-20 pt-20">-->
+<!--      <h4 class="color-666">商品分类</h4>-->
+<!--      <hr>-->
+<!--      <v-category :typeValue="typeValue" :apiType="apiType"></v-category>-->
+<!--    </div>-->
     <div class="container">
 
       <div class="handle-box">
@@ -16,7 +16,7 @@
         </el-select>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
-      <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
+      <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <!--        <el-table-column prop="code" label="编号"></el-table-column>-->
         <el-table-column prop="name" label="商品名称"></el-table-column>
@@ -49,6 +49,7 @@
         </el-table-column>
         <el-table-column label="操作" width="120" align="center" fixed="right">
           <template slot-scope="scope">
+            <el-button type="text" icon="el-icon-document-checked" class="" @click="handleCheck(scope.row)">查看</el-button>
             <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(1, scope.row)" v-if="scope.row.status ==0 && right.audit">审核通过</el-button>
             <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleUpdateStatus(2, scope.row)" v-if="scope.row.status ==0 && right.audit">审核不通过</el-button>
             <el-button type="text" icon="el-icon-sold-out" class="red" @click="handleUpdateStatus(3, scope.row)" v-if="scope.row.status ==4 && right.audit">下架</el-button>
@@ -69,6 +70,157 @@
       </div>
     </div>
 
+    <!-- 编辑弹出框 -->
+    <el-drawer title="商品详情" :visible.sync="editVisible" size="60%" direction="rtl"  class="commodity_drawer">
+      <div class="demo-drawer__content">
+        <el-form ref="form" :model="form" label-width="140px" :rules="rules">
+          <el-tabs v-model="activeName">
+            <el-tab-pane label="基本信息" name="first">
+              <el-form-item label="商品名称"  prop="name">
+                <el-input v-model="form.name" placeholder="请输入商品名称" readonly="readonly"></el-input>
+              </el-form-item>
+              <el-form-item label="商品分类" >
+                <el-select v-model="form.type" placeholder=""disabled >
+                  <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsTypelist"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="商品所属类型">
+                <el-cascader
+                        v-model="form.categoryCode"
+                        disabled
+                        :options="category"
+                        :props="{ expandTrigger: 'hover',value:'code',label:'name',children:'subCategorys' }"></el-cascader>
+              </el-form-item>
+              <el-form-item label="商品展示原价"  prop="saleShowPrice" >
+                <el-input v-model="form.saleShowPrice" placeholder="请输入商品展示的原售价格" readonly="readonly"></el-input>
+              </el-form-item>
+              <el-form-item label="商品展示售价"  prop="salePrice" >
+                <el-input v-model="form.salePrice" placeholder="请输入商品实际售价" readonly="readonly"></el-input>
+              </el-form-item>
+              <el-form-item label="商品积分售价" >
+                <el-input v-model="form.pointPrice" placeholder="请输入商品积分售价" readonly="readonly"></el-input>
+              </el-form-item>
+              <el-form-item label="所属供货商" >
+                <el-select v-model="form.customerCode" placeholder="请选择" disabled>
+                  <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="商品供货价"  prop="supplyPrice">
+                <el-input v-model="form.supplyPrice" placeholder="请输入供货商商品供货价" readonly="readonly"></el-input>
+              </el-form-item>
+              <el-form-item label="开始销售时间"  readonly="readonly">
+                <el-date-picker
+                        v-model="form.saleTime"
+                        type="datetime"
+                        disabled
+                        placeholder="选择日期时间">
+                </el-date-picker>
+              </el-form-item>
+              <el-form-item label="售卖到期时间"  readonly="readonly">
+                <el-date-picker
+                        v-model="form.saleOverTime"
+                        type="datetime"
+                        disabled
+                        placeholder="选择日期时间">
+                </el-date-picker>
+              </el-form-item>
+              <el-form-item label="简单描述">
+                <el-input  v-model="form.description" placeholder="请输入简单描述"  readonly="readonly"></el-input>
+              </el-form-item>
+              <el-form-item label="是否支持积分抵扣">
+                <!--                        <el-select v-model="form.supportPoint" placeholder="">-->
+                <!--                            <el-option key="1" label="是" :value="1"></el-option>-->
+                <!--                            <el-option key="0" label="否" :value="0"></el-option>-->
+                <!--                        </el-select>-->
+                <el-switch
+                        v-model="form.supportPoint"
+                        disabled
+                        active-text="是"
+                        inactive-text="否"
+                        :active-value="1"
+                        :inactive-value="0">
+                </el-switch>
+              </el-form-item>
+              <el-form-item label="缩略图" >
+                <div class="headIconUrl">
+                  <i class="el-icon-plus"></i>
+                  <div class="crop-demo">
+                    <img :src="form.iconUrl" class="pre-img">
+                  </div>
+<!--                  <input ref="file" class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>-->
+                </div>
+<!--                <el-dialog class="cropDialog" title="裁剪图片" :visible.sync="dialogVisible" width="30%">-->
+<!--                  <vue-cropper ref='cropper' :src="imgSrc" :ready="cropImage" :zoom="cropImage" :cropmove="cropImage" style="width:100%;height:300px;"></vue-cropper>-->
+<!--                  <span slot="footer" class="dialog-footer">-->
+<!--                                <el-button @click="cancelCrop">取 消</el-button>-->
+<!--                                <el-button type="primary" @click="sureCrop">确 定</el-button>-->
+<!--                            </span>-->
+<!--                </el-dialog>-->
+              </el-form-item>
+              <el-form-item label="轮播顶图">
+                <!--                        <div class="backgroundImgUrl"><i class="el-icon-picture"></i></div>-->
+                <el-upload
+                        class="upload-demo banner_upload"
+                        :action="baseUrl+'/api/attachments/insertUploadFile'"
+                        :file-list="fileList"
+                        ref="banner"
+                        :data="{isInsert:true,type:1}"
+                        list-type="picture">
+<!--                  <el-button size="small" type="primary">点击上传</el-button>-->
+<!--                  <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
+                </el-upload>
+              </el-form-item>
+              <el-form-item label="" >
+              </el-form-item>
+            </el-tab-pane>
+            <el-tab-pane label="商品规格" name="second">
+              <el-form-item label="是否为主规格" label-width="120px">
+                <el-switch
+                        disabled
+                        v-model="commodityAttrsItem.isMain"
+                        active-text="是"
+                        inactive-text="否"
+                        :active-value="1"
+                        :inactive-value="0">
+                </el-switch>
+              </el-form-item>
+<!--              <el-divider content-position="left">规格</el-divider>-->
+              <el-form-item class="commodityAttrs" :label="item.name" label-width="120px" v-for="(item,index) in commodityAttrs" :key="index" >
+                <el-tag
+                        :key="tag"
+                        v-for="(tag,i) in item.commodityAttrItems"
+                        size="medium"
+                        style="margin-left: 0;margin-right: 10px">
+                  {{tag.tagName}}&nbsp;￥{{tag.salePrice}}/<del>{{tag.saleShowPrice}}</del>&nbsp;{{tag.stock}}件
+                </el-tag>
+<!--                <div class="attrClose" ><i class="el-icon-close"></i></div>-->
+              </el-form-item>
+            </el-tab-pane>
+            <el-tab-pane label="详情信息" name="third">
+              <el-form-item label="商品条形码编号">
+                <el-input v-model="commodityDetails.barNumber" placeholder="请输入商品条形码编号" readonly="readonly"></el-input>
+              </el-form-item>
+              <el-form-item label="保质期（天）">
+                <el-input v-model="commodityDetails.expirationDate" placeholder="请输入保质期" readonly="readonly"></el-input>
+              </el-form-item>
+              <el-form-item label="原产地">
+                <el-input v-model="commodityDetails.origin" placeholder="请输入原产地" readonly="readonly"></el-input>
+              </el-form-item>
+              <!--                    <el-form-item label="规格" required>-->
+              <!--                        <el-input v-model="commodityDetails.specification" placeholder="请输入规格"></el-input>-->
+              <!--                    </el-form-item>-->
+              <el-form-item label="商品描述" >
+                <el-input v-model="commodityDetails.deatils" placeholder="请输入商品描述" readonly="readonly"></el-input>
+              </el-form-item>
+              <el-form-item label="商品详情">
+                <quill-editor ref="myTextEditor" v-model="commodityDetails.description" :options="editorOption" disabled readonly="readonly"></quill-editor>
+              </el-form-item>
+            </el-tab-pane>
+          </el-tabs>
+
+        </el-form>
+      </div>
+    </el-drawer>
   </div>
 </template>
 
@@ -80,11 +232,14 @@
     import { quillEditor } from 'vue-quill-editor';
     import bus from '../../common/bus';
     import vCategory from '../../common/category.vue';
-
+    const toolbarOptions = [
+        ['clean']                                         // remove formatting button
+    ]
     export default {
         name: 'index',
         components: {
             vCategory,
+            quillEditor,
         },
         data() {
             return {
@@ -97,16 +252,53 @@
                 },
                 tableData: [],
                 loading:false,
+                editVisible:false,
                 multipleSelection: [],
                 total: 0,
+                activeName: 'first',
+                form: {},
+                rules: { // 表单验证规则
+                },
+                editorOption: {
+                    placeholder: '',
+                    modules: {
+                        toolbar: {
+                            container: toolbarOptions,  // 工具栏
+                            handlers: {
+                                'image': function (value) {
+                                    if (value) {
+                                        console.log('自定义图片');
+                                        document.querySelector('.setImageEditor').click()
+                                    } else {
+                                        this.quill.format('image', false);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                editorFileList:[],
                 typeValue:'',
                 apiType:'',
+                category:[], // 分类
+                customer:[], // 经销商
+                commodityDetails:{}, // 商品详情
+                attachmentsList:[], // 图片附件集合
+                commodityAttrs:[], // 属性
+                commodityAttrsItem:{},
+                dynamicTags: [],
                 right:{ // 权限
                     add:false,
                     edit:false,
                     del:false,
                     audit:false
                 },
+                defaultSrc: require('../../../assets/img/img.jpg'),
+                imgSrc: '',
+                cropImg: '',
+                dialogVisible: false,
+                file:'',
+                fileList:[],
                 enumslist:[],
                 enumsTypelist:[],
                 enumsType:{},
@@ -140,14 +332,14 @@
             this.enumsTypelist.map(item => {
                 this.$set(this.enumsType,item.code,item.name);
             })
-
-            this.typeValue = 0; // 0商品，1文章
-            this.apiType = 0; // 区别接口，0文章/商品；1用户/经销商
-            bus.$on('categoryCode', msg => {
-                this.query.categoryCode = msg;
-                this.getData();
-            });
-            // this.getData();
+            //
+            // this.typeValue = 0; // 0商品，1文章
+            // this.apiType = 0; // 区别接口，0文章/商品；1用户/经销商
+            // bus.$on('categoryCode', msg => {
+            //     this.query.categoryCode = msg;
+            //     this.getData();
+            // });
+            this.getData();
         },
         methods: {
             // 获取数据
@@ -162,6 +354,71 @@
                     }
                     this.loading = false;
                 })
+            },
+            getCategory(){// 获取分类
+                let params = {
+                    type:this.typeValue,
+                    status:0
+                }
+                this.$axios.post("/category/queryCategoryTree",params).then(res => {
+                    if(res.code == 200){
+                        this.category = res.data;
+                        this.category.map(item => {
+                            if(item.subCategorys.length == 0){
+                                delete item.subCategorys;
+                            }else{
+                                item.subCategorys.map(i => {
+                                    if(i.subCategorys.length == 0){
+                                        delete i.subCategorys;
+                                    }else{
+                                        i.subCategorys.map(a => {
+                                            if(a.subCategorys.length == 0){
+                                                delete a.subCategorys;
+                                            }else{
+                                                a.subCategorys.map(b => {
+                                                    if(b.subCategorys.length == 0){
+                                                        delete b.subCategorys;
+                                                    }
+                                                })
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                        })
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                })
+            },
+            getCustomer(){// 获取供销商
+                this.$axios.post("/customer/selectList",{}).then(res => {
+                    if(res.code == 200){
+                        this.customer = res.data;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                })
+            },
+            getDetails(code) { // 获取详情
+                this.$axios.get("/commodity/selectCommodityDetail?code="+code).then(res => {
+                    if(res.code == 200) {
+                        this.form = res.data;
+                        let categoryCode = this.form.categoryCode;
+                        this.form.categoryCode = [];
+                        this.form.categoryCode.push(categoryCode);
+                        console.log("categoryCode--",this.form.categoryCode)
+                        this.fileList =  res.data.attachmentsList;
+                        this.commodityDetails =  res.data.commodityDetails;
+                        this.commodityAttrs =  res.data.commodityAttrs;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                })
+            },
+            handleCheck(row){
+                this.editVisible = true;
+                this.getDetails(row.code);
             },
             // 触发搜索按钮
             handleSearch() {
@@ -353,5 +610,8 @@
         color: $color-theme;
       }
     }
+  }
+  .el-upload{
+    display: inherit;
   }
 </style>

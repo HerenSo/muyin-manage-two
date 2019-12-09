@@ -1,7 +1,7 @@
 <template>
     <div class="login-wrap">
       <div class="header">
-        <div class="logo"><img src="../../assets/img/logo_ico.png" height="70" />万博园管理平台</div>
+        <div class="logo"><img src="../../assets/img/logo_ico.png" height="70" />小红商管理平台</div>
       </div>
 <!--        <div class="login_info">-->
 <!--          <div><i>1</i><span>母婴一站式供应链</span></div>-->
@@ -11,7 +11,7 @@
 <!--          <div><i>5</i><span>一体化营销管理体系</span></div>-->
 <!--        </div>-->
         <div class="ms-login">
-            <div class="ms-title"><img src="../../assets/img/login_bg02.png" />万博园管理平台</div>
+            <div class="ms-title"><img src="../../assets/img/login_bg02.png" />小红商管理平台</div>
             <el-form :model="param" :rules="rules" ref="login" label-width="0px" class="ms-content">
                 <el-form-item prop="username">
                     <el-input v-model="param.username" placeholder="用户名" size="large" prefix-icon="el-icon-lx-people">
@@ -37,9 +37,10 @@
                 </div>
             </el-form>
         </div>
-<!--      <div class="footer">-->
-<!--        <div class="text-center">Copyright  2019-2020 Aize Technology. All Rights Reserved. 艾泽科技 版权所有</div>-->
-<!--      </div>-->
+      <div class="footer">
+        <div class="text-center">Copyright  2019-2020 WanBoYuan Technology. All Rights Reserved . 湖南万博元商业发展有限公司 版权所有 <a href="http://www.beian.miit.gov.cn" target="_blank"><img data-src="//img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png" width="16" src="//img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png"><span class="color-999"> 湘ICP备18025316号-1</span></a></div>
+
+      </div>
       <!--操作-->
       <el-dialog title="找回密码" :visible.sync="editVisible" width="420px" :before-close="closeHandle">
         <el-form :model="forget" :rules="rulesForget" ref="loginphone" label-width="0px" class="login_form">
@@ -205,12 +206,15 @@ export default {
     bottom: 0;
     box-sizing: border-box;
     width: 100%;
-    height: 50px;
-    line-height: 50px;
+    line-height: 30px;
+    padding: 10px 0;
     font-size: 14px;
     color: #999;
     background: $color-footer;
     text-align: center;
+  }
+  .footer > div a img{
+    vertical-align: -2px;
   }
   .header .logo{
     float: left;

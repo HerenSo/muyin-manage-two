@@ -6,18 +6,19 @@
             :collapse="collapse"
             background-color="#fff"
             text-color="#ffba4a"
-            active-text-color="#eb5505"
+            active-text-color="#faa54b"
             unique-opened
+            @select="handleSelect"
             router
         >
             <template v-for="(item,index) in items">
                 <template v-if="item.subMenus.length>0">
-                    <el-submenu :index="item.url" :key="index">
+                    <el-submenu :index="item.url" :key="item.url">
                         <template slot="title">
                             <i :class="item.icon"></i>
                             <span slot="title">{{ item.name }}</span>
                         </template>
-                        <template v-for="subItem in item.subMenus">
+                        <template v-for="(subItem,i) in item.subMenus">
 <!--                            <el-submenu-->
 <!--                                v-if="subItem.subMenus.length>0"-->
 <!--                                :index="subItem.url"-->
@@ -32,13 +33,14 @@
 <!--                            </el-submenu>-->
                             <el-menu-item
                                 :index="subItem.url"
-                                :key="subItem.url"
+                                :key="i"
+                                :class="{'active':subItem.active}"
                             >{{ subItem.name }}</el-menu-item>
                         </template>
                     </el-submenu>
                 </template>
                 <template v-else>
-                    <el-menu-item :index="index" :key="index">
+                    <el-menu-item :index="item.url" :key="index" :class="item.active">
                         <i :class="item.icon"></i>
                         <span slot="title">{{ item.name }}</span>
                     </el-menu-item>
@@ -245,12 +247,14 @@ export default {
                 //     url: '/donate',
                 //     name: '支持作者'
                 // }
-            ]
+            ],
+            activeIndex:''
         };
     },
     computed: {
         onRoutes() {
-            return this.$route.path.replace('/', '');
+            // console.log(this.$route.path.replace("/",""))
+            return this.$route.path;
         }
     },
     created() {
@@ -260,7 +264,18 @@ export default {
             bus.$emit('collapse-content', msg);
         });
         let authorities = JSON.parse(localStorage.getItem("user_information"));
+        // console.log(authorities.menus)
         this.items = authorities.menus;
+    },
+    watch:{
+      $route(){
+        this.handleSelect(this.activeIndex)
+      }
+    },
+    methods:{
+        handleSelect(index){
+            this.activeIndex = index;
+        }
     }
 };
 </script>
@@ -294,7 +309,7 @@ export default {
   color: #606266;
 }
 .el-submenu__title.is-active i,.el-menu-item.is-active i,.el-menu-item.is-active{
-  color: $color-sys !important;
+  color: $color-theme !important;
   /*background-color: $color-sys-three !important;*/
 }
 </style>

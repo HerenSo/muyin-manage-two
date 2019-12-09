@@ -61,7 +61,7 @@ export default {
         },
 
         output(data,notime) {  //监听message事件，方法是后台定义和提供的
-
+            console.log(data);
             this.$notify({
                 title: '消息',
                 message: data+" "+notime,

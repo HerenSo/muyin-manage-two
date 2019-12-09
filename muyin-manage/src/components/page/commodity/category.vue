@@ -217,8 +217,10 @@
                     this.$message.error("请输入分类名称！");
                     return;
                 }
-                this.form.parentCode = this.form.parentCode[this.form.parentCode.length -1]
-                if(!this.form.iconUrl && this.form.parentCode){
+                if(this.form.parentCode.length>0){
+                    this.form.parentCode = this.form.parentCode[this.form.parentCode.length -1]
+                }
+                if(!this.form.iconUrl && this.form.parentCode.length>0){
                     this.$message.error("请上传缩略图！");
                     return;
                 }
@@ -229,6 +231,8 @@
                         this.$message.success(this.title+"成功！");
                         this.editVisible = false;
                         this.getData();
+                    }else{
+                        this.$message.error(res.msg);
                     }
                     this.subloading = false;
                 })
