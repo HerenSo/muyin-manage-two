@@ -26,8 +26,8 @@ const i18n = new VueI18n({
 Vue.prototype.$axios = axios;
 
 // 生产环境
-Vue.prototype.baseUrl = 'http://120.79.56.120:8080';
-// Vue.prototype.baseUrl = 'https://wbysc.com.cn/wby';
+// Vue.prototype.baseUrl = 'http://120.79.56.120:8080';
+Vue.prototype.baseUrl = 'https://wbysc.com.cn/wby';
 
 
 // 消息
@@ -40,8 +40,8 @@ if(information){
 }
 Vue.use(new VueSocketIO({
     debug: true,
-    connection: SocketIO('http://120.79.56.120:8084?customerCode='+customerCode) //xxx填后台给的socket地址，
-    // connection: SocketIO('https://wbysc.com.cn/wby?customerCode='+customerCode) //xxx填后台给的socket地址，
+    // connection: SocketIO('http://120.79.56.120:8084?customerCode='+customerCode) //xxx填后台给的socket地址，
+    connection: SocketIO('https://wbysc.com.cn:8084?customerCode='+customerCode) //xxx填后台给的socket地址，
 }))
 
 //使用钩子函数对路由进行权限跳转
