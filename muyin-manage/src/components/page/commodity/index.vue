@@ -38,6 +38,14 @@
             </el-image>
           </template>
         </el-table-column>
+        <el-table-column label="商品分类" width="120" align="center">
+            <template slot-scope="scope">
+                <el-tag>
+                    {{enumsType[scope.row.type]}}
+                </el-tag>
+            </template>
+        </el-table-column>
+        <el-table-column prop="categoryName" label="商品所属类型" width="120" align="center"></el-table-column>
         <el-table-column prop="saleShowPrice" label="销售价格" width="120" align="center"></el-table-column>
         <el-table-column prop="salePrice" label="当前销售价格" width="120" align="center"></el-table-column>
         <el-table-column prop="supplyPrice" label="供货价格" width="120" align="center"></el-table-column>
@@ -138,6 +146,9 @@
                     </el-form-item>
                     <el-form-item label="简单描述" required>
                         <el-input  v-model="form.description" placeholder="请输入简单描述"></el-input>
+                    </el-form-item>
+                    <el-form-item label="热度" prop="hot">
+                        <el-input v-model="form.hot" placeholder="请输入热度"></el-input>
                     </el-form-item>
                     <el-form-item label="是否支持积分抵扣" required>
 <!--                        <el-select v-model="form.supportPoint" placeholder="">-->
@@ -349,6 +360,19 @@
                     ],
                     supplyPrice: [
                         { required: true, message: '请输入供货价', trigger: 'blur' }
+                    ],
+                    hot: [
+                        { message: '请输入正整数', trigger: 'blur' },
+                        {
+                            validator(rule, value, callback) {
+                                if (Number.isInteger(Number(value)) && Number(value) > 0) {
+                                    callback()
+                                } else if(value !== '' ){
+                                    callback(new Error('请输入正整数'))
+                                }
+                            },
+                            trigger: 'blur'
+                        }
                     ]
                 },
                 subloading:false,
@@ -551,7 +575,10 @@
                         console.log("fileList",this.form.attachmentsList);
                         this.form.commodityDetails = this.commodityDetails;
                         this.form.commodityAttrs = this.commodityAttrs;
-                        this.form.categoryCode = this.form.categoryCode[this.form.categoryCode.length -1];
+
+                        if(this.form.categoryCode)
+                            this.form.categoryCode = this.form.categoryCode[this.form.categoryCode.length -1];
+
                         this.subloading = true;
                         this.$axios.post("/commodity/insertOrUpdate",this.form).then(res => {
                             if(res.code == 200){

@@ -38,7 +38,7 @@
             </el-form>
         </div>
       <div class="footer">
-        <div class="text-center">Copyright  2019-2020 WanBoYuan Technology. All Rights Reserved . 湖南万博元商业发展有限公司 版权所有 <a href="http://www.beian.miit.gov.cn" target="_blank"><img data-src="//img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png" width="16" src="//img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png"><span class="color-999"> 湘ICP备18025316号-1</span></a></div>
+        <div class="text-center">Copyright  2019-2060 WanBoYuan Technology. All Rights Reserved . 湖南万博元商业发展有限公司 版权所有 <a href="http://www.beian.miit.gov.cn" target="_blank"><img data-src="//img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png" width="16" src="//img.alicdn.com/tfs/TB1..50QpXXXXX7XpXXXXXXXXXX-40-40.png"><span class="color-999"> 湘ICP备18025316号-1</span></a></div>
 
       </div>
       <!--操作-->

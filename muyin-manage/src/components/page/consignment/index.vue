@@ -29,11 +29,16 @@
             </el-image>
           </template>
         </el-table-column>
+        <el-table-column label="商品分类" width="120" align="center">
+          <template slot-scope="scope">
+            <el-tag>
+              {{enumsType[scope.row.type]}}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="saleShowPrice" label="销售价格" width="120" align="center"></el-table-column>
         <el-table-column prop="salePrice" label="当前销售价格" width="120" align="center"></el-table-column>
         <el-table-column prop="supplyPrice" label="供货价格" width="120" align="center"></el-table-column>
-        <el-table-column prop="saleTime" label="开始销售" width="100" align="center"></el-table-column>
-        <el-table-column prop="saleOverTime" label="售卖到期" width="100" align="center"></el-table-column>
         <el-table-column label="可否积分抵扣" align="center" width="120" >
           <template slot-scope="scope">
             <el-tag :type="scope.row.supportPoint===0?'danger':(scope.row.supportPoint===1?'success':'')">{{scope.row.supportPoint===0?'否':(scope.row.supportPoint===1?'是':'')}}</el-tag>
