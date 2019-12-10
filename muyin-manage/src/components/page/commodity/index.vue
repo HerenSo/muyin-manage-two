@@ -109,6 +109,7 @@
                     </el-form-item>
                     <el-form-item label="商品所属类型">
                         <el-cascader
+                                clearable
                                 v-model="form.categoryCode"
                                 :options="category"
                                 :props="{ expandTrigger: 'hover',value:'code',label:'name',children:'subCategorys' }"></el-cascader>
@@ -130,6 +131,9 @@
                     <el-form-item label="商品供货价" required prop="supplyPrice">
                         <el-input v-model="form.supplyPrice" placeholder="请输入供货商商品供货价"></el-input>
                     </el-form-item>
+                  <el-form-item label="配送费">
+                    <el-input v-model="form.postage" placeholder="请输入配送费"></el-input>
+                  </el-form-item>
                     <el-form-item label="开始销售时间" required>
                         <el-date-picker
                                 v-model="form.saleTime"

@@ -38,11 +38,11 @@ let customerCode ="";
 if(information){
     customerCode = information.customerCode || "";
 }
-Vue.use(new VueSocketIO({
-    debug: true,
-    // connection: SocketIO('http://120.79.56.120:8084?customerCode='+customerCode) //xxx填后台给的socket地址，
-    connection: SocketIO('https://wbysc.com.cn:8084?customerCode='+customerCode) //xxx填后台给的socket地址，
-}))
+// Vue.use(new VueSocketIO({
+//     debug: true,
+//     // connection: SocketIO('http://120.79.56.120:8084?customerCode='+customerCode) //xxx填后台给的socket地址，
+//     connection: SocketIO('https://wbysc.com.cn:8084?customerCode='+customerCode) //xxx填后台给的socket地址，
+// }))
 
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {

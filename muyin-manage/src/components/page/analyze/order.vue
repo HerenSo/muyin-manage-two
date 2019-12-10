@@ -246,7 +246,7 @@
         created(){
             this.yestodayHandle();
             this.getData();
-            this.handleListener();
+            // this.handleListener();
             this.changeDate();
             this.getCustomer();
             // 权限
@@ -257,7 +257,7 @@
 
         },
         activated(){
-            this.handleListener();
+            // this.handleListener();
         },
         deactivated(){
             window.removeEventListener('resize', this.renderChart);
@@ -269,7 +269,7 @@
                 this.$axios.post("/statistical-order/selectStatisticalOrder",this.query).then(res => {
                     if(res.code == 200) {
                         if(res.data){
-                            // this.info = res.data;
+                            this.info = res.data;
                         }else{
                             this.info = {};
                             // this.$message.error(res.msg);

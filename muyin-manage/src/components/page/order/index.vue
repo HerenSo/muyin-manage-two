@@ -31,6 +31,9 @@
         <el-table-column prop="consigneeName" label="收件人"></el-table-column>
         <el-table-column prop="consigneePhone" label="联系方式" width="120" align="center"></el-table-column>
         <el-table-column prop="addressDetail" label="收货地址" width="150"></el-table-column>
+        <el-table-column prop="logisticsNumber" label="物流公司" width="120"></el-table-column>
+        <el-table-column prop="logisticsName" label="物流单号" width="150"></el-table-column>
+        <el-table-column prop="customerName" label="供货商" min-width="120" align="center" v-if="managerType == 2"></el-table-column>
         <el-table-column prop="totalPrice" label="合计价格"></el-table-column>
         <el-table-column prop="postage" label="配送费"></el-table-column>
         <el-table-column prop="paidAmount" label="实际支付"></el-table-column>
@@ -50,7 +53,7 @@
           <template slot-scope="scope">
 <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>-->
 <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>-->
-            <el-button type="text" icon="el-icon-view" class="" @click="handleCheck(scope.$index, scope.row)" v-if="right.del">查看</el-button>
+            <el-button type="text" icon="el-icon-view" class="" @click="handleCheck(scope.$index, scope.row)" >查看</el-button>
             <el-button type="text" icon="el-icon-document-checked" class="" @click="handleUpdateStatus(3, scope.row.number)" v-if="scope.row.status ==2 && customerCode == scope.row.customerCode">受理</el-button>
             <el-button type="text" icon="el-icon-document-delete" class="red" @click="handleSome(9,scope.row.number)" v-if="scope.row.status ==2 && customerCode == scope.row.customerCode">拒绝</el-button>
             <el-button type="text" icon="el-icon-sold-out" class="" @click="handleSome(4, scope.row.number)" v-if="scope.row.status ==3 && customerCode == scope.row.customerCode">发货</el-button>
@@ -218,12 +221,14 @@
                 enumsPaidTypelist:[],
                 enumsPaidType:{}, // 枚举
                 customerCode:'',
+                managerType:'',
             };
         },
         mounted() {
             // 权限
 
             let authorities = JSON.parse(localStorage.getItem("user_information"));
+            this.managerType = authorities.managerType;
             this.customerCode = authorities.customerCode;
             authorities.authorities.map((item) => {
                 switch (item.authority) {
