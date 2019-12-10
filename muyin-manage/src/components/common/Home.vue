@@ -75,7 +75,7 @@ export default {
     methods:{
         // 获取消息数据
         getData() {
-            this.$axios.post("/system-message/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,{status:0}).then(res => {
+            this.$axios.post("/system-message/selectPageList?pageNum=1&pageSize=999",{status:0}).then(res => {
                 if(res.code == 200) {
                     this.total = res.data.total;
                 }else{

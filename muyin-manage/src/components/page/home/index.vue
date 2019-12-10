@@ -21,9 +21,9 @@
                 this.$axios.post("/statistical-order/selectStatisticalOrder",this.query).then(res => {
                     if(res.code == 200) {
                         if(res.data){
-                            this.info = res.data;
+                            // this.info = res.data;
                         }else{
-                            this.info = {};
+                            // this.info = {};
                             // this.$message.error(res.msg);
                         }
 

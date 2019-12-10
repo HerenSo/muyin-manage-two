@@ -98,6 +98,7 @@ export default {
             activeName:"first",
             phone:{},
             websocketid:'',
+            info:[],
             // total:0
         };
     },
@@ -135,9 +136,31 @@ export default {
     methods: {
         // 获取消息数据
         getData() {
-            this.$axios.post("/system-message/selectPageList?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,{status:0}).then(res => {
+            this.$axios.post("/system-message/selectPageList?pageNum=1&pageSize=999",{status:0}).then(res => {
                 if(res.code == 200) {
                     this.total = res.data.pages;
+                }else{
+                    this.$message.error(res.msg);
+                }
+            })
+        },
+        // 获取数据
+        getMessage() {
+            // this.$set(this.query,"queryStartTime",this.queryTime[0]);
+            // this.$set(this.query,"queryEndTime",this.queryTime[1]);
+            this.$axios.post("/system-message/selectCurrentUnreadMessage").then(res => {
+                if(res.code == 200) {
+                    this.info = res.data;
+                    if(this.info.length > 0){
+                        this.info.map(item => {
+                            this.$notify({
+                                title: '消息',
+                                message: "",
+                                position: 'bottom-right',
+                                duration: 0
+                            });
+                        })
+                    }
                 }else{
                     this.$message.error(res.msg);
                 }
@@ -275,6 +298,11 @@ export default {
         }
     },
     mounted() {
+        let i = setInterval(e =>{
+            this.getMessage();
+            this.getData();
+        },10000);
+
         if (document.body.clientWidth < 1500) {
             this.collapseChage();
         }
