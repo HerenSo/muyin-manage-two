@@ -70,6 +70,11 @@ export default new Router({
                     meta: { title: '售后服务' }
                 },
                 {
+                    path: '/withdrawalRecord/index',
+                    component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/withdrawalRecord/index.vue'),
+                    meta: { title: '提现管理' }
+                },
+                {
                     path: '/customer/index',
                     component: () => import(/* webpackChunkName: "analyze-user" */ '../components/page/customer/index.vue'),
                     meta: { title: '经销商' }
