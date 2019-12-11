@@ -113,26 +113,26 @@ export default {
             return logoicon.headiconUrl ? logoicon.headiconUrl : this.userlogo;
         }
     },
-    // sockets: {
-    //
-    //     connect() {
-    //         this.websocketid = this.$socket.id;
-    //         console.log('链接服务器');
-    //     },
-    //
-    //     output(data,notime) {  //监听message事件，方法是后台定义和提供的
-    //         console.log("消息提示！！！！！！！！！！！！")
-    //         this. getData();
-    //         this.$notify({
-    //             title: '消息',
-    //             message: data+" "+notime,
-    //             position: 'bottom-right',
-    //             duration: 0
-    //         });
-    //
-    //     }
-    //
-    // },
+    sockets: {
+
+        connect() {
+            this.websocketid = this.$socket.id;
+            console.log('链接服务器');
+        },
+
+        output(data,notime) {  //监听message事件，方法是后台定义和提供的
+            console.log("消息提示！！！！！！！！！！！！")
+            this. getData();
+            this.$notify({
+                title: '消息',
+                message: data+" "+notime,
+                position: 'bottom-right',
+                duration: 0
+            });
+
+        }
+
+    },
     methods: {
         // 获取消息数据
         getData() {
@@ -298,10 +298,10 @@ export default {
         }
     },
     mounted() {
-        let i = setInterval(e =>{
-            this.getMessage();
-            this.getData();
-        },10000);
+        // let i = setInterval(e =>{
+        //     this.getMessage();
+        //     this.getData();
+        // },10000);
 
         if (document.body.clientWidth < 1500) {
             this.collapseChage();

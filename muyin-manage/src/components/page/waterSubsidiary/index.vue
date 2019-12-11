@@ -36,18 +36,19 @@
       <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="code" label="流水号" min-width="180"></el-table-column>
+<!--        <el-table-column prop="code" label="商品名称" min-width="180"></el-table-column>-->
         <el-table-column prop="orderNumber" label="交易关联订单号" min-width="140"></el-table-column>
         <el-table-column prop="thirdOrderNumber" label="第三方交易流水号" min-width="140"></el-table-column>
         <el-table-column prop="content" label="交易内容" min-width="260"></el-table-column>
         <el-table-column prop="amount" label="实际入账金额" min-width="80" align="center"></el-table-column>
-        <el-table-column prop="supplyCustomerCode" label="供货商" min-width="120"></el-table-column>
+        <el-table-column prop="supplyCustomerName" label="供货商" min-width="120" v-if="managerType == 2"></el-table-column>
         <!--        <el-table-column prop="cardCost" label="会员卡交易面额" min-width="130"></el-table-column>-->
         <!--        <el-table-column prop="cardNumber" label="会员卡号"></el-table-column>-->
         <el-table-column prop="couponAmount" label="优惠券优惠金额" min-width="80" align="center"></el-table-column>
         <!--        <el-table-column prop="point" label="积分消耗数值" min-width="120"></el-table-column>-->
         <el-table-column prop="pointCost" label="积分抵扣金额" min-width="80" align="center"></el-table-column>
         <el-table-column prop="walletCost" label="钱包抵扣金额" min-width="80" align="center"></el-table-column>
-        <el-table-column prop="supplyPrice" label="供货商支出金额" min-width="80" align="center" v-if="managerType == 2"></el-table-column>
+        <el-table-column prop="supplyReduce" label="供货商成本" min-width="80" align="center" v-if="managerType == 2"></el-table-column>
         <el-table-column prop="totalAmount" label="交易总金额" min-width="100" align="center"></el-table-column>
         <el-table-column prop="type" label="交易类型" >
           <template slot-scope="scope">

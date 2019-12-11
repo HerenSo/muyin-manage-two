@@ -53,25 +53,25 @@ export default {
     mounted(){
         this.getData();
     },
-    sockets: {
-
-        connect() {
-            this.websocketid = this.$socket.id;
-            console.log('链接服务器');
-        },
-
-        output(data,notime) {  //监听message事件，方法是后台定义和提供的
-            console.log(data);
-            this.$notify({
-                title: '消息',
-                message: data+" "+notime,
-                position: 'bottom-right',
-                duration: 0
-            });
-
-        }
-
-    },
+    // sockets: {
+    //
+    //     connect() {
+    //         this.websocketid = this.$socket.id;
+    //         console.log('链接服务器');
+    //     },
+    //
+    //     output(data,notime) {  //监听message事件，方法是后台定义和提供的
+    //         console.log(data);
+    //         this.$notify({
+    //             title: '消息',
+    //             message: data+" "+notime,
+    //             position: 'bottom-right',
+    //             duration: 0
+    //         });
+    //
+    //     }
+    //
+    // },
     methods:{
         // 获取消息数据
         getData() {

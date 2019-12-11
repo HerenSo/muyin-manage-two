@@ -175,6 +175,7 @@
                             </div>
                             <input ref="file" class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
                         </div>
+                        <span class="color-999">（建议上传图片尺寸480*480）</span>
                         <el-dialog class="cropDialog" title="裁剪图片" :visible.sync="dialogVisible" width="30%">
                             <vue-cropper ref='cropper' :src="imgSrc" :ready="cropImage" :zoom="cropImage" :cropmove="cropImage" style="width:100%;height:300px;"></vue-cropper>
                             <span slot="footer" class="dialog-footer">
@@ -203,7 +204,7 @@
                     </el-form-item>
                 </el-tab-pane>
                 <el-tab-pane label="商品规格" name="second">
-                    <el-form-item label="规格类型" label-width="120px">
+                    <el-form-item label="规格类型" label-width="100px">
                         <el-input v-model="commodityAttrsItem.name" placeholder="请输入属性类型，例：颜色" style="width:440px;padding-right: 10px"></el-input>
                         <div class="mt-10 border">
                             <el-tag
@@ -214,23 +215,33 @@
                                     :disable-transitions="false"
                                     style="margin-left: 0;margin-right: 10px"
                                     @close="handleTagsClose(tag)">
-                                {{tag.tagName}}&nbsp;￥{{tag.salePrice}}/<del>{{tag.saleShowPrice}}</del>&nbsp;{{tag.stock}}件
+                              <span class="inputTag">{{tag.tagName}} <img :src="tag.imageUrl" /> &nbsp;￥{{tag.salePrice}}/<del>{{tag.saleShowPrice}}</del>&nbsp;{{tag.stock}}件</span>
                             </el-tag>
-                            <div v-if="inputVisible" class="">
-                                <el-input class="input-new-tag mt-10"  v-model="inputValue.tagName" placeholder="属性名称，例：红色" ref="saveTagInput" size="small">
+                            <div v-if="inputVisible" class="inputAttrsGroup">
+                                <el-input class="input-new-tag"  v-model="inputValue.tagName" placeholder="属性名称，例：红色" ref="saveTagInput" size="small">
                                 </el-input>
-                                <el-input class="input-new-tag mt-10" v-model="inputValue.saleShowPrice" placeholder="销售价格"  ref="saveTagInput" size="small"  >
+                                <el-input class="input-new-tag" v-model="inputValue.saleShowPrice" placeholder="销售价格"  ref="saveTagInput" size="small"  >
                                 </el-input>
-                                <el-input class="input-new-tag mt-10" v-model="inputValue.salePrice" placeholder="当前价格"  ref="saveTagInput" size="small" >
+                                <el-input class="input-new-tag" v-model="inputValue.salePrice" placeholder="当前价格"  ref="saveTagInput" size="small" >
                                 </el-input>
-                                <el-input class="input-new-tag mt-10" v-model="inputValue.stock" placeholder="库存量"  ref="saveTagInput" size="small" >
+                                <el-input class="input-new-tag" v-model="inputValue.stock" placeholder="库存量"  ref="saveTagInput" size="small" >
                                 </el-input>
-                                <el-button v-if="inputVisible" class="button-new-tag" size="small"  style="margin-left: 0;" @click="handleInputConfirm">确定</el-button>
+                              <div class="headAttrsUrl" v-if="inputValue.imageUrl">
+<!--                                <i class="el-icon-plus"></i>-->
+                                <div class="crop-demo">
+                                  <img :src="inputValue.imageUrl" class="pre-img">
+                                </div>
+                              </div>
+                              <div class="headAttrsUrl" v-else>
+                                <el-button  class="button-new-tag" size="small"  style="margin-left: 0;" >上传图片</el-button>
+                                <input ref="file" class="crop-input" type="file" name="image" accept="image/*" @change="setAttrImage"/>
+                              </div>
+                                <el-button v-if="inputVisible" type="primary" class="button-new-tag" size="small"  style="margin-left: 0;" @click="handleInputConfirm">确定</el-button>
                             </div>
                             <el-button v-if="!inputVisible" class="button-new-tag" size="small" @click="showInput" style="margin-left: 0;">+ 添加属性值</el-button>
                         </div>
                     </el-form-item>
-                    <el-form-item label="是否为主规格" label-width="120px">
+                    <el-form-item label="设为主规格" label-width="100px">
                         <el-switch
                             v-model="commodityAttrsItem.isMain"
                             active-text="是"
@@ -424,7 +435,8 @@
                 enumslist:[],
                 enumsTypelist:[],
                 enumsType:{},
-                enums:{} // 枚举
+                enums:{}, // 枚举
+                croploading:false,
             };
         },
         mounted() {
@@ -807,6 +819,30 @@
                 };
                 reader.readAsDataURL(this.file);
             },
+
+            setAttrImage(e){ // 选择商品属性图
+                this.attrfile = e.target.files[0];
+                if (!this.attrfile.type.includes('image/')) {
+                    this.$message.error("请上传png/jpg格式文件！");
+                    return;
+                }
+                let params = {
+                    file:this.attrfile,
+                    type:1,
+                    isInsert:false,
+                    dataType:"multipart"
+                }
+                this.croploading = true;
+                this.$axios.post("/api/attachments/insertUploadFile",params).then(res => {
+                    if(res.code == 200){
+                        this.$message.success("上传成功！");
+                        this.$set(this.inputValue, 'imageUrl', res.data.url);
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                    this.croploading = false;
+                })
+            },
             cropImage () { // 剪裁缩略图
                 let cropImg = this.$refs.cropper.getCroppedCanvas().toDataURL();
                 this.cropImg = this.processData(cropImg);
@@ -955,11 +991,11 @@
         }
     }
   .pre-img{
-      width: 120px;
-      height: 120px;
-      /*background: #f8f8f8;*/
-      /*border: 1px solid #eee;*/
-      border-radius: 5px;
+    width: 120px;
+    height: 120px;
+    /*background: #f8f8f8;*/
+    /*border: 1px solid #eee;*/
+    border-radius: 5px;
   }
   .crop-demo{
       position: absolute;
@@ -1021,4 +1057,56 @@
             }
         }
     }
+
+
+
+  .inputTag{
+    vertical-align: middle;
+    img{
+      width: 20px;
+      height: 20px;
+      border-radius: 2px;
+      vertical-align: -5px;
+    }
+  }
+  .inputAttrsGroup{
+    display: flex;
+    margin-top: 10px;
+
+    .input-new-tag{
+      width:100px;
+      &:nth-child(1){
+        width:160px;
+      }
+    }
+  }
+  .headAttrsUrl{
+    position: relative;
+    border-radius: 4px;
+    border:1px solid #ededed;
+    height: 30px;
+    width: auto;
+    min-width: 30px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    .pre-img{
+      width: 30px;
+      height: 30px;
+    }
+    .crop-input{
+      width: 80px;
+      height: 30px;
+    }
+    .crop-demo{
+       width: 30px;
+       height: 30px;
+     }
+    i{
+      font-size: 20px;
+      color: #ddd;
+    }
+
+  }
 </style>

@@ -55,6 +55,18 @@
         </el-card>
       </el-col>
     </el-row>
+    <el-card shadow="hover">
+      <el-table :data="order" >
+        <el-table-column label="时间" prop="date">
+        </el-table-column>
+        <el-table-column label="新注册数" prop="newCount">
+        </el-table-column>
+        <el-table-column label="日访问" prop="dayVisit">
+        </el-table-column>
+        <el-table-column label="累计注册" prop="count">
+        </el-table-column>
+      </el-table>
+    </el-card>
     <!--      </el-collapse-item>-->
     <!--      <el-collapse-item title="7日核心指标" name="3">-->
     <!--        <template slot="title">-->
@@ -232,7 +244,8 @@
                 query:{},
                 customer:[], // 经销商
                 managerType:"", // 管理员类型
-                query:{}
+                query:{},
+                order:[],
             }
         },
         components: {
@@ -266,10 +279,15 @@
         methods: {
             // 获取数据
             getData() {
+                if(this.queryTime.length>0){
+                    this.$set(this.query,"queryStartTime",this.queryTime[0]);
+                    this.$set(this.query,"queryEndTime",this.queryTime[1]);
+                }
                 this.$axios.post("/statistical-order/selectStatisticalOrder",this.query).then(res => {
                     if(res.code == 200) {
                         if(res.data){
                             this.info = res.data;
+                            this.getOrder();
                         }else{
                             this.info = {};
                             // this.$message.error(res.msg);
@@ -284,6 +302,15 @@
                 this.$axios.post("/customer/selectList",{}).then(res => {
                     if(res.code == 200){
                         this.customer = res.data;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
+                })
+            },
+            getOrder(){// 获取
+                this.$axios.post("/member-order/selectMemberOrderCountPage",this.query).then(res => {
+                    if(res.code == 200){
+                        this.order = res.data.records;
                     }else{
                         this.$message.error(res.msg);
                     }

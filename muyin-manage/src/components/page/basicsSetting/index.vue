@@ -39,12 +39,12 @@
           <el-form-item label="金牌会员升级需要邀请会员数"  >
             <el-input v-model="form.member_levelup4_amount" placeholder="" class="width260"></el-input>
           </el-form-item>
-          <el-form-item label="积分折算1元实际金额比率值"  >
-            <el-input v-model="form.point_convert_per_amount_rat" placeholder="" class="width260"></el-input><span class="color-999">&nbsp;&nbsp;(默认1元:100积分)</span>
-          </el-form-item>
-          <el-form-item label="会员消费金钱1元折算积分奖励比率"  >
-            <el-input v-model="form.member_point_conversion_rat" placeholder="" class="width260"></el-input>
-          </el-form-item>
+<!--          <el-form-item label="积分折算1元实际金额比率值"  >-->
+<!--            <el-input v-model="form.point_convert_per_amount_rat" placeholder="" class="width260"></el-input><span class="color-999">&nbsp;&nbsp;(默认1元:100积分)</span>-->
+<!--          </el-form-item>-->
+<!--          <el-form-item label="会员消费金钱1元折算积分奖励比率"  >-->
+<!--            <el-input v-model="form.member_point_conversion_rat" placeholder="" class="width260"></el-input>-->
+<!--          </el-form-item>-->
           <el-form-item label="寄卖商品抽成比例"  >
             <el-input v-model="form.consign_for_sale_commission_rat" placeholder="" class="width260"></el-input>
           </el-form-item>

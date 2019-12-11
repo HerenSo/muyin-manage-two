@@ -23,17 +23,18 @@
                 <el-table-column prop="couponName" label="优惠券名称" min-width="120px"></el-table-column>
                 <el-table-column prop="preferentialAmount" label="优惠金额" align="center"></el-table-column>
                 <el-table-column prop="triggerAmount" label="触发金额" align="center"></el-table-column>
-                <el-table-column prop="starttime" label="生效时间" width="150" align="center"></el-table-column>
-                <el-table-column prop="endtime" label="失效时间" width="150" align="center"></el-table-column>
+                <el-table-column prop="starttime" label="生效时间" width="160" align="center"></el-table-column>
+                <el-table-column prop="endtime" label="失效时间" width="160" align="center"></el-table-column>
                 <el-table-column prop="paymentAmount" label="发放量" align="center">
                   <template slot-scope="scope">
                     {{scope.row.paymentAmount == -1 ? "无限制":scope.row.paymentAmount}}
                   </template>
                 </el-table-column>
-                <el-table-column  label="适用范围">
+                <el-table-column  label="适用范围" width="130" align="center">
                     <template slot-scope="scope">
 <!--                        {{scope.row.scope == "0" ? "无限制":(scope.row.scope == "1"?"部分商品可用":(scope.row.scope == "2"?"部分商品不可用":"限在线配送订单"))}}-->
                       {{enumsScope[scope.row.scope]}}
+                      <el-button type="text" @click="handleCheck(scope.$index, scope.row)" v-if="scope.row.scope == '1' || scope.row.scope == '2'">查看</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="叠加类型" prop="superpositionRule" align="center" width="120" >
@@ -190,6 +191,29 @@
             </div>
         </el-drawer>
 
+        <!--适用商品-->
+      <el-dialog title="适用商品" :visible.sync="dialogVisible" width="30%" :before-close="handleAccountClose">
+        <el-table :data="commodityByCoupon" border class="table"  header-cell-class-name="table-header">
+          <el-table-column prop="commodityName" label="商品名称"></el-table-column>
+          <el-table-column prop="createName" label="缩略图" width="120" align="center">
+            <template slot-scope="scope">
+              <el-image :src="scope.row.commodityIconUrl" style="width: 50px; height: 50px" fit="cover">
+                <div slot="error" class="image-slot">
+                  <i class="el-icon-picture f50 color-border"></i>
+                </div>
+              </el-image>
+            </template>
+          </el-table-column>
+<!--          <el-table-column label="商品分类" width="120" align="center">-->
+<!--            <template slot-scope="scope">-->
+<!--              <el-tag>-->
+<!--                {{enumsCommodityType[scope.row.type]}}-->
+<!--              </el-tag>-->
+<!--            </template>-->
+<!--          </el-table-column>-->
+        </el-table>
+
+      </el-dialog>
     </div>
 </template>
 
@@ -245,7 +269,11 @@
                 enums:{}, // 枚举
                 enumsScope:{},
                 enumsType:{},
-                enumsSuperpositionRule:{}
+                enumsSuperpositionRule:{},
+                enumsCommodityType:{},
+                enumsCommodityTypelist:[],
+                dialogVisible:false,
+                commodityByCoupon:[], // 适用商品
             };
         },
         mounted() {
@@ -266,6 +294,7 @@
             let enumslist = enums.CouponStatusEnum; // 状态
             let enumsScopelist = enums.CouponScopeEnum; // 范围
             let enumsTypelist = enums.CouponTypeEnum; // 类型
+            let enumsCommodityTypelist = enums.CommodityTypeEnum;
             let enumsSuperpositionRulelist = enums.CouponSuperpositionRuleEnum; // 是否可叠加
             for(let key in enumslist){ //
                 this.enumslist.push(enumslist[key]);
@@ -290,6 +319,12 @@
             }
             this.enumsSuperpositionRulelist.map(item => {
                 this.$set(this.enumsSuperpositionRule,item.code,item.name);
+            })
+            for(let key in enumsCommodityTypelist){ //
+                this.enumsCommodityTypelist.push(enumsCommodityTypelist[key]);
+            }
+            this.enumsCommodityTypelist.map(item => {
+                this.$set(this.enumsCommodityType,item.code,item.name);
             })
 
             this.getData();
@@ -352,9 +387,9 @@
                 })
             },
             getDetails(code){
-                this.$axios.get("/coupon/selectByPrimaryKey?code="+code).then(res => {
+                this.$axios.post("/coupon/queryCommodityByCouponPage?couponCode="+code).then(res => {
                     if(res.code == 200) {
-                        this.form = res.data;
+                        this.commodityByCoupon = res.data.records;
                     }else{
                         this.$message.error(res.msg);
                     }
@@ -457,11 +492,12 @@
                     })
                 }).catch(() => {});
             },
-            handleCheck(index,row){
-                this.title = '订单详情';
+            handleCheck(index,row){ // 查看可用商品
                 this.getDetails(row.code);
-                this.formDisable = true;
-                this.editVisible = true;
+                this.dialogVisible = true;
+            },
+            handleAccountClose(){
+                this.dialogVisible = false;
             },
             // 触发搜索按钮
             handleSearch() {
