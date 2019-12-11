@@ -491,6 +491,7 @@
                 }
             },
             handleCheckService(status,number){
+                this.titleHandle = "售后详情";
                 this.editVisibleHandle = true;
                 this.getServiceDetails(number);
             },
