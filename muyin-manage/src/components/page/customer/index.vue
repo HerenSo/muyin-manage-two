@@ -166,12 +166,12 @@
     <el-dialog title="资金流水" :visible.sync="dialogVisible" width="90%" :before-close="handleAccountClose">
       <el-table :data="tableAccount" border class="table"  header-cell-class-name="table-header">
         <el-table-column prop="code" label="流水号"></el-table-column>
-        <el-table-column prop="userid" label="账户ID" width="80" align="center"></el-table-column>
+<!--        <el-table-column prop="userid" label="账户ID" width="80" align="center"></el-table-column>-->
         <el-table-column prop="orderNumber" label="订单号" align="center"></el-table-column>
         <el-table-column prop="totalAmount" label="总金额" width="80" align="center"></el-table-column>
         <el-table-column prop="amount" label="实付金额"></el-table-column>
-        <el-table-column prop="cardCost" label="交易面额" width="120" align="center"></el-table-column>
-        <el-table-column prop="cardNumber" label="会员卡号" width="80" align="center"></el-table-column>
+<!--        <el-table-column prop="cardCost" label="交易面额" width="120" align="center"></el-table-column>-->
+<!--        <el-table-column prop="cardNumber" label="会员卡号" width="80" align="center"></el-table-column>-->
         <el-table-column prop="couponAmount" label="优惠金额" width="80" align="center"></el-table-column>
         <el-table-column prop="content" label="交易内容" align="center"></el-table-column>
         <el-table-column prop="createTime" label="交易时期" width="150" align="center"></el-table-column>

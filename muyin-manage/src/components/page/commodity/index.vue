@@ -376,19 +376,19 @@
                     supplyPrice: [
                         { required: true, message: '请输入供货价', trigger: 'blur' }
                     ],
-                    hot: [
-                        { message: '请输入正整数', trigger: 'blur' },
-                        {
-                            validator(rule, value, callback) {
-                                if (Number.isInteger(Number(value)) && Number(value) > 0) {
-                                    callback()
-                                } else if(value !== '' ){
-                                    callback(new Error('请输入正整数'))
-                                }
-                            },
-                            trigger: 'blur'
-                        }
-                    ]
+                    // hot: [
+                    //     { message: '请输入正整数', trigger: 'blur' },
+                    //     // {
+                    //     //     validator(rule, value, callback) {
+                    //     //         if (Number.isInteger(Number(value)) && Number(value) > 0) {
+                    //     //             callback()
+                    //     //         } else if(value !== '' ){
+                    //     //             callback(new Error('请输入正整数'))
+                    //     //         }
+                    //     //     },
+                    //     //     trigger: 'blur'
+                    //     // }
+                    // ]
                 },
                 subloading:false,
                 editorOption: {
@@ -576,6 +576,10 @@
                         }
                         if(isNaN(this.commodityDetails.expirationDate) && this.commodityDetails.expirationDate){
                             this.$message.error("保质期需输入数字！或为空");
+                            return;
+                        }
+                        if(this.form.hot && !(/(^[1-9]\d*$)/.test(this.form.hot))){
+                            this.$message.error("热度请输入正整数！或为空");
                             return;
                         }
                         console.log(this.fileList)
