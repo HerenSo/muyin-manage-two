@@ -351,7 +351,7 @@
                 })
             },
             getServiceDetails(orderNumber){
-                this.$axios.post("/member-order-service/selectPageList?orderNumber="+orderNumber).then(res => {
+                this.$axios.post("/member-order-service/selectPageList?pageNum=1&pageSize=999",{orderNumber:orderNumber}).then(res => {
                     if(res.code == 200) {
                         this.service = res.data;
                     }else{
@@ -491,6 +491,7 @@
                 }
             },
             handleCheckService(status,number){
+                this.titleHandle = "售后详情";
                 this.editVisibleHandle = true;
                 this.getServiceDetails(number);
             },
