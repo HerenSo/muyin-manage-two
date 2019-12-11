@@ -175,7 +175,7 @@
                             </div>
                             <input ref="file" class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
                         </div>
-                        <span class="color-999">（建议上传图片尺寸480*480）</span>
+                        <span class="color-999">（建议上传图片尺寸170*170）</span>
                         <el-dialog class="cropDialog" title="裁剪图片" :visible.sync="dialogVisible" width="30%">
                             <vue-cropper ref='cropper' :src="imgSrc" :ready="cropImage" :zoom="cropImage" :cropmove="cropImage" style="width:100%;height:300px;"></vue-cropper>
                             <span slot="footer" class="dialog-footer">
@@ -197,7 +197,7 @@
                                 :data="{isInsert:true,type:1}"
                                 list-type="picture">
                             <el-button size="small" type="primary">点击上传</el-button>
-                            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+                            <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb，建议尺寸375*375</div>
                         </el-upload>
                     </el-form-item>
                     <el-form-item label="" >

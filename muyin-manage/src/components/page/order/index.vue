@@ -206,6 +206,42 @@
                 <el-button type="primary" @click="submitHandle">确 定</el-button>
             </span>
     </el-dialog>
+
+    <!--售后-->
+    <el-dialog title="售后详情" :visible.sync="serviceVisible" width="70%" >
+      <el-table :data="service" border class="table" ref="serviceTable"  header-cell-class-name="table-header">
+        <el-table-column prop="orderNumber" label="订单编号"></el-table-column>
+        <el-table-column prop="commodityName" label="商品名称"></el-table-column>
+        <el-table-column prop="commodityIconUrl" label="缩略图" width="120" align="center">
+          <template slot-scope="scope">
+            <el-image :src="scope.row.commodityIconUrl" style="width: 50px; height: 50px" fit="cover">
+              <div slot="error" class="image-slot">
+                <i class="el-icon-picture f50 color-border"></i>
+              </div>
+            </el-image>
+          </template>
+        </el-table-column>
+<!--        <el-table-column prop="outRefundId" label="第三方支付平台退款单号" width="180" ></el-table-column>-->
+        <el-table-column prop="reason" label="申请理由" ></el-table-column>
+        <el-table-column prop="remark" label="审核原因" ></el-table-column>
+        <el-table-column prop="backAmount" label="退还金额" align="center" ></el-table-column>
+        <el-table-column prop="backWallet" label="退还钱包金额" align="center"  width="110"></el-table-column>
+        <el-table-column prop="type" label="售后类型" align="center"  width="120">
+          <template slot-scope="scope">
+            {{enumsType[scope.row.type]}}
+          </template>
+        </el-table-column>
+        <el-table-column label="状态" prop="status" align="center" width="120" >
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.status===0?'warning':(scope.row.status===6?'success':(scope.row.status===8?'info':(scope.row.status===9?'danger':'')))">
+              {{enumsService[scope.row.status]}}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="createTime" label="申请时间" align="center"  width="160"></el-table-column>
+
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -251,9 +287,12 @@
                 enumsService:{},
                 enumsPaidTypelist:[],
                 enumsPaidType:{}, // 枚举
+                enumsTypelist:[],
+                enumsType:{},
                 customerCode:'',
                 managerType:'',
                 service:[], // 售后服务
+                serviceVisible:false,
                 express:[], // 物流
                 activeName:"first",
             };
@@ -278,6 +317,7 @@
             let enumslist = enums.MemberOrderStatusEnum;
             let enumsServicelist = enums.MemberOrderServiceStatusEnum;
             let enumsPaidTypelist = enums.OrderPaidTypeEnum;
+            let enumsTypelist = enums.MemberOrderServiceTypeEnum; // 售后类型
             for(let key in enumslist){
                 this.enumslist.push(enumslist[key]);
             }
@@ -296,6 +336,12 @@
             }
             this.enumsPaidTypelist.map(item => {
                 this.$set(this.enumsPaidType,item.code,item.name);
+            })
+            for(let key in enumsTypelist){
+                this.enumsTypelist.push(enumsTypelist[key]);
+            }
+            this.enumsTypelist.map(item => {
+                this.$set(this.enumsType,item.code,item.name);
             })
 
             this.getData();
@@ -353,7 +399,8 @@
             getServiceDetails(orderNumber){
                 this.$axios.post("/member-order-service/selectPageList?pageNum=1&pageSize=999",{orderNumber:orderNumber}).then(res => {
                     if(res.code == 200) {
-                        this.service = res.data;
+                        this.service = res.data.records;
+                        console.log(this.service)
                     }else{
                         this.$message.error(res.msg);
                     }
@@ -490,9 +537,8 @@
                     this.titleHandle = "填写拒绝原因";
                 }
             },
-            handleCheckService(status,number){
-                this.titleHandle = "售后详情";
-                this.editVisibleHandle = true;
+            handleCheckService(status,number){ // 售后
+                this.serviceVisible = true;
                 this.getServiceDetails(number);
             },
             // 触发搜索按钮

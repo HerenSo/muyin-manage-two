@@ -78,6 +78,9 @@
                             </div>
                             <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
                         </div>
+                      <div class="color-999">轮播图（建议上传图片尺寸340*155）</div>
+                      <div class="color-999">首页活动大图（建议上传图片尺寸350*100）</div>
+                      <div class="color-999">推广图（建议上传图片尺寸172*70）</div>
                     </el-form-item>
                     <el-form-item label="所属一级分类" >
                         <el-select v-model="form.categoryCode" placeholder="请选择分类">
