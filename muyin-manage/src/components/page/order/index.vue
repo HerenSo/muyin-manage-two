@@ -31,8 +31,8 @@
         <el-table-column prop="consigneeName" label="收件人"></el-table-column>
         <el-table-column prop="consigneePhone" label="联系方式" width="120" align="center"></el-table-column>
         <el-table-column prop="addressDetail" label="收货地址" width="150"></el-table-column>
-        <el-table-column prop="logisticsNumber" label="物流公司" width="120"></el-table-column>
-        <el-table-column prop="logisticsName" label="物流单号" width="150"></el-table-column>
+        <el-table-column prop="logisticsName" label="物流公司" width="150"></el-table-column>
+        <el-table-column prop="logisticsNumber" label="物流单号" width="120"></el-table-column>
         <el-table-column prop="customerName" label="供货商" min-width="120" align="center" v-if="managerType == 2"></el-table-column>
         <el-table-column prop="totalPrice" label="合计价格"></el-table-column>
         <el-table-column prop="postage" label="配送费"></el-table-column>
@@ -157,7 +157,7 @@
               <el-table-column label="状态" prop="status" align="center" width="120" >
                 <template slot-scope="scope" >
                   <div v-if="scope.row.orderServiceStatus || scope.row.orderServiceStatus == 0">{{enumsService[scope.row.orderServiceStatus]}}</div>
-                  <div v-else>{{enums[scope.row.status]}}</div>
+                  <div v-else>{{enums[form.status]}}</div>
                 </template>
               </el-table-column>
           </el-table>

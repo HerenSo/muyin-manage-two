@@ -51,6 +51,7 @@
 <!--            <el-button type="text" icon="el-icon-delete" @click="handleCheck(scope.$index, scope.row)">查看</el-button>-->
             <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>
             <el-button type="text" icon="el-icon-turn-off" class="red" @click="handleDelete(9, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2 ">注销</el-button>
+            <el-button type="text" icon="el-icon-c-scale-to-original" class="" @click="handleSettle(scope.$index, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2 ">结算</el-button>
             <el-button type="text" icon="el-icon-tickets" @click="handleAccount(scope.$index, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2">资金流水</el-button>
             <el-button type="text" icon="el-icon-document-checked" class="" @click="handleDelete(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
             <el-button type="text" icon="el-icon-document-add" class="red" @click="handleDelete(2, scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
@@ -110,6 +111,12 @@
           </el-form-item>
           <el-form-item label="商户固定电话号码" >
             <el-input v-model="form.telephone" placeholder="" :readonly="ischeck"></el-input>
+          </el-form-item>
+          <el-form-item label="银行名称" >
+            <el-input v-model="form.bankName" placeholder="" :readonly="ischeck"></el-input>
+          </el-form-item>
+          <el-form-item label="银行卡号" >
+            <el-input v-model="form.bankCode" placeholder="" :readonly="ischeck"></el-input>
           </el-form-item>
           <el-form-item label="合作合同编号"  :required="!ischeck">
             <el-input v-model="form.contractNumber" placeholder="" :readonly="ischeck"></el-input>
@@ -212,6 +219,23 @@
         ></el-pagination>
       </div>
     </el-dialog>
+
+
+    <!--    资金结算-->
+    <el-dialog title="资金结算" :visible.sync="dialogSettleVisible" width="30%" :before-close="handleSettleClose">
+      <el-date-picker
+              v-model="settle.value"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+      </el-date-picker>
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogSettleVisible = false">取 消</el-button>
+          <el-button type="primary" @click="submitSettle(1)">仅导出</el-button>
+          <el-button type="primary" @click="submitSettle(2)">导出并结算</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -258,6 +282,10 @@
                 },
                 ischeck:false,
                 dialogVisible:false,
+                dialogSettleVisible:false,
+                settle:{
+                    value:''
+                },
                 tableAccount:[],
                 account:{
                     code:'',
@@ -427,6 +455,34 @@
               this.dialogVisible = true;
                 this.$set(this.account, 'customerCode', row.code);
                 this.getAccount();
+            },
+            submitSettle(status){
+                if(this.settle.value.length == 0){
+                    this.$message.error("请选择时间段");
+                    return;
+                }
+                this.$set(this.settle,"startTime",this.settle.value[0])
+                this.$set(this.settle,"endTime",this.settle.value[1])
+                if(status == 1){
+                    this.$set(this.settle,"needClose",false)
+                }else{
+                    this.$set(this.settle,"needClose",true)
+                }
+                let ret = ''
+                for (let it in this.settle) {
+                    if(encodeURIComponent(this.settle[it])){
+                        ret += encodeURIComponent(it) + '=' + encodeURIComponent(this.settle[it]) + '&'
+                    }
+                }
+                window.open(this.baseUrl+'/wallet-bill/exportWalletBill?'+ret,'_blank');
+                this.dialogSettleVisible = false;
+                this.settle={
+                    value:''
+                }
+            },
+            handleSettle(index,row){ // 结算
+                this.dialogSettleVisible = true;
+                this.$set(this.settle, 'customerCode', row.code);
             },
             handleCheck(index,row){ // 查看
                 this.title = '商户详情';
@@ -610,6 +666,12 @@
                     code:'',
                     pageNum: 1,
                     pageSize: 10
+                }
+            },
+            handleSettleClose(){
+                this.dialogSettleVisible = false;
+                this.settle={
+                    value:'',
                 }
             },
             refresh(){ // 刷新
