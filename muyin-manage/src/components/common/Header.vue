@@ -52,7 +52,6 @@
                             type="password"
                             placeholder="验证码"
                             v-model="forget.vercode"
-                            @keyup.enter.native="submitForm()"
                             prefix-icon="el-icon-lx-lock"
                             size="large"
                             class="width260"
@@ -198,42 +197,6 @@ export default {
                 }
             })
         },
-        submitForm() {
-            let el,params;
-            if(this.activeName == "first"){
-                el = this.$refs.login;
-                this.$set(this.param, 'dataType', 'form');
-                params = this.param;
-            }else{
-                el = this.$refs.loginphone;
-                this.$set(this.phone, 'dataType', 'form');
-                params = this.phone;
-            }
-            el.validate(valid => {
-                if (valid) {
-                    this.$axios.post("/login",params).then(res => {
-                        console.log(res)
-                        if(res.code == 200) {
-                            this.getClassEnums();
-                            this.$message.success('登录成功');
-                            localStorage.setItem('ms_username', res.data.username);
-                            localStorage.setItem('user_information', JSON.stringify(res.data));
-
-                            this.$router.push('/');
-                        }else{
-                            this.$message.error(res.msg);
-                            this.ytext ="获取验证码";
-                            this.resetSend = true;
-                        }
-                    })
-
-                } else {
-                    this.$message.error('请输入账号和密码');
-                    console.log('error submit!!');
-                    return false;
-                }
-            });
-        },
         // 用户名下拉菜单选择事件
         handleCommand(command) {
             if (command == 'loginout') {
@@ -318,11 +281,6 @@ export default {
                     this.$message.error(res.msg);
                 }
             })
-        },
-        forgetPassword(){
-            this.editVisible = true;
-            this.ytext ="获取验证码";
-            this.resetSend = true;
         },
         closeHandle(){
             this.editVisible = false;

@@ -264,7 +264,6 @@
                 },
                 queryTime:[],
                 info:{},
-                query:{},
                 customer:[], // 经销商
                 managerType:"", // 管理员类型
                 query:{

@@ -118,7 +118,7 @@
                       <el-input v-model="form.saleShowPrice" placeholder="请输入商品展示的原售价格"></el-input>
                     </el-form-item>
                     <el-form-item label="商品展示售价" required prop="salePrice">
-                      <el-input v-model="form.salePrice" placeholder="请输入商品实际售价"></el-input>
+                      <el-input v-model="form.salePrice" placeholder="请输入商品展示售价"></el-input>
                     </el-form-item>
                     <el-form-item label="商品积分售价" required>
                         <el-input v-model="form.pointPrice" placeholder="请输入商品积分售价"></el-input>
@@ -260,7 +260,7 @@
                             v-for="(tag,i) in item.commodityAttrItems"
                             size="medium"
                             style="margin-left: 0;margin-right: 10px">
-                            {{tag.tagName}}&nbsp;￥{{tag.salePrice}}/<del>{{tag.saleShowPrice}}</del>&nbsp;{{tag.stock}}件
+                          <span class="inputTag">{{tag.tagName}} <img :src="tag.imageUrl" /> &nbsp;￥{{tag.salePrice}}/<del>{{tag.saleShowPrice}}</del>&nbsp;{{tag.stock}}件</span>
                         </el-tag>
                         <div class="attrClose" @click="handleAttrsClose(index)"><i class="el-icon-close"></i></div>
                     </el-form-item>
@@ -431,6 +431,7 @@
                 cropImg: '',
                 dialogVisible: false,
                 file:'',
+                attrfile:'',
                 fileList:[],
                 enumslist:[],
                 enumsTypelist:[],

@@ -456,7 +456,7 @@
                 this.$set(this.account, 'customerCode', row.code);
                 this.getAccount();
             },
-            submitSettle(status){
+            submitSettle(status){ // 导出 结算
                 if(this.settle.value.length == 0){
                     this.$message.error("请选择时间段");
                     return;
