@@ -18,12 +18,19 @@
         <el-table-column prop="serviceCharge" label="应扣除手续费金额" width="120" align="center"></el-table-column>
         <el-table-column prop="reason" label="审核缘由" width="120" align="center"></el-table-column>
         <el-table-column prop="remark" label="备注" width="120" align="center"></el-table-column>
-        <el-table-column label="操作" width="150" align="center" fixed="right">
-          <template slot-scope="scope">
-            <el-button type="text" icon="el-icon-document-checked" class="" @click="auditMemberWithdrawal(scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
-            <el-button type="text" icon="el-icon-document-delete" class="red" @click="showAuditWithdrawal(scope.row)" v-if="scope.row.status ==0">审核不通过</el-button>
-          </template>
-        </el-table-column>
+          <el-table-column label="操作" width="150" align="center" fixed="right">
+              <template slot-scope="scope">
+                  <el-button type="text" icon="el-icon-document-checked" class=""
+                             @click="auditMemberWithdrawal(scope.row)" v-if="scope.row.status ==0">审核通过
+                  </el-button>
+                  <el-button type="text" icon="el-icon-document-delete" class="red"
+                             @click="showAuditWithdrawal(scope.row)" v-if="scope.row.status ==0">审核不通过
+                  </el-button>
+                  <el-tag v-if="scope.row.status !== 0" :type="scope.row.status===0?'warning':(scope.row.status===1?'success':'danger')">
+                      {{enums[scope.row.status]}}
+                  </el-tag>
+              </template>
+          </el-table-column>
       </el-table>
       <div class="pagination">
         <el-pagination
@@ -69,6 +76,8 @@
                     pageSize: 10
                 },
                 tableData: [],
+                enumslist:[],
+                enums:{},
                 loading:false,
                 total: 0,
                 title:'编辑',
@@ -92,14 +101,24 @@
         },
         mounted() {
             // 权限
-            let authorities = JSON.parse(localStorage.getItem("user_information"));
+            let authorities = JSON.parse(localStorage.getItem('user_information'));
             authorities.authorities.map((item) => {
                 switch (item.authority) {
-                    case 'MEMBER_WITHDRAWAL_RECORD_AUDIT':this.right.audit = true;break;
-                    default:break;
+                    case 'MEMBER_WITHDRAWAL_RECORD_AUDIT':
+                        this.right.audit = true;
+                        break;
+                    default:
+                        break;
                 }
-            })
-
+            });
+            let enums = JSON.parse(localStorage.getItem('ClassEnums'));
+            let enumslist = enums.MemberWithdrawalStatusEnum;
+            for (let key in enumslist) {
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums, item.code, item.name);
+            });
             this.getData();
         },
         methods: {
@@ -130,6 +149,8 @@
                         if (res.code === 200) {
                             this.$message.success("审核成功！");
                             this.getData();
+                        }else{
+                            this.$message.error(res.msg);
                         }
                     })
                 }).catch(() => {});
@@ -148,7 +169,8 @@
                     this.$message.success("操作成功！");
                     this.editVisibleHandle = false;
                     this.getData();
-
+                  }else{
+                      this.$message.error(res.msg);
                   }
                 })
               }).catch(() => {});

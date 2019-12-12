@@ -79,14 +79,14 @@
               <el-option :key="item.roleid" :label="item.roleName" :value="item.roleid" v-for="(item) in roleList"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="管理员类型">
-            <el-select v-model="form.managerType" placeholder="请选择管理员类型">
-              <!--<el-option key="0" label="无" :value="0"></el-option>
-              <el-option key="1" label="经销商" :value="1"></el-option>
-              <el-option key="2" label="供货商" :value="2"></el-option>-->
-              <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsManagerTypelist"></el-option>
-            </el-select>
-          </el-form-item>
+<!--          <el-form-item label="管理员类型">-->
+<!--            <el-select v-model="form.managerType" placeholder="请选择管理员类型">-->
+<!--              &lt;!&ndash;<el-option key="0" label="无" :value="0"></el-option>-->
+<!--              <el-option key="1" label="经销商" :value="1"></el-option>-->
+<!--              <el-option key="2" label="供货商" :value="2"></el-option>&ndash;&gt;-->
+<!--              <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsManagerTypelist"></el-option>-->
+<!--            </el-select>-->
+<!--          </el-form-item>-->
           <!--          <el-form-item label="状态" required>-->
           <!--            <el-select v-model="form.status" placeholder="请选择状态">-->
           <!--              &lt;!&ndash;<el-option key="0" label="待审核" :value="0"></el-option>-->
@@ -256,6 +256,8 @@
                         this.$message.success(this.title+"成功！");
                         this.editVisible = false;
                         this.getData();
+                    }else{
+                      this.$message.error(res.msg);
                     }
                     this.subloading = false;
                 })
