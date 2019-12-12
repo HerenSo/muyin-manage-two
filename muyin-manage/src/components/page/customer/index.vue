@@ -46,7 +46,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="createTime" label="注册时间" width="160" align="center"></el-table-column>
-        <el-table-column label="操作" width="120" align="center" fixed="right">
+        <el-table-column label="操作" width="160" align="center" fixed="right">
           <template slot-scope="scope">
 <!--            <el-button type="text" icon="el-icon-delete" @click="handleCheck(scope.$index, scope.row)">查看</el-button>-->
             <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>

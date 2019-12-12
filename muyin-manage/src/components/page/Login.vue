@@ -100,6 +100,9 @@ export default {
             phone:{}
         };
     },
+    mounted(){
+        this.$socket.disconnect();
+    },
     methods: {
         submitForm() {
             this.$refs.login.validate(valid => {

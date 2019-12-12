@@ -1,4 +1,17 @@
 import Vue from 'vue';
+// 消息
+import VueSocketIO from 'vue-socket.io';
+import SocketIO from 'socket.io-client';
+let information = JSON.parse(localStorage.getItem('user_information'))
+let customerCode ="";
+if(information){
+    customerCode = information.customerCode || "";
+}
+Vue.use(new VueSocketIO({
+    debug: true,
+    // connection: SocketIO('http://120.79.56.120:8084?customerCode='+customerCode) //xxx填后台给的socket地址，
+    connection: SocketIO('https://wbysc.com.cn?customerCode='+customerCode) //xxx填后台给的socket地址，
+}))
 import App from './App.vue';
 import router from './router';
 import axios from 'axios';
@@ -30,19 +43,7 @@ Vue.prototype.$axios = axios;
 Vue.prototype.baseUrl = 'https://wbysc.com.cn/wby';
 
 
-// 消息
-import VueSocketIO from 'vue-socket.io';
-import SocketIO from 'socket.io-client';
-let information = JSON.parse(localStorage.getItem('user_information'))
-let customerCode ="";
-if(information){
-    customerCode = information.customerCode || "";
-}
-Vue.use(new VueSocketIO({
-    debug: true,
-    // connection: SocketIO('http://120.79.56.120:8084?customerCode='+customerCode) //xxx填后台给的socket地址，
-    connection: SocketIO('https://www.geeso.cn?customerCode='+customerCode) //xxx填后台给的socket地址，
-}))
+
 
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {

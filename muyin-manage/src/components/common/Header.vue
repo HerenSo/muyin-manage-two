@@ -70,6 +70,16 @@
                 <el-button type="primary" @click="submitHandle">确 定</el-button>
             </span>
         </el-dialog>
+      <audio  id="audio_news" style="opacity: 0">
+        <source src="../../assets/mp3/news.mp3" type="audio/mpeg">
+        <source src="../../assets/mp3/news.wav" type="audio/wav">
+        Your browser does not support the audio tag.
+      </audio>
+      <audio id="audio_order" style="opacity: 0">
+        <source src="../../assets/mp3/order.mp3" type="audio/mpeg">
+        <source src="../../assets/mp3/order.wav" type="audio/wav">
+        Your browser does not support the audio tag.
+      </audio>
     </div>
 </template>
 <script>
@@ -99,10 +109,10 @@ export default {
             phone:{},
             websocketid:'',
             info:[],
-            // total:0
+            total:0
         };
     },
-    props:["total"],
+    // props:["total"],
     computed: {
         username() {
             let username = localStorage.getItem('ms_username');
@@ -119,19 +129,41 @@ export default {
             this.websocketid = this.$socket.id;
             console.log('链接服务器');
         },
+        reconnect(){
+            this.$socket.emit('connect', 1)
+            console.log('重新链接服务器');
+        },
+        disconnect(){
+            console.log('断开链接服务器，重新链接服务器');
+            this.$socket.emit('connect', 1)
+        },
 
-        output(data,notime) {  //监听message事件，方法是后台定义和提供的
-            console.log("消息提示！！！！！！！！！！！！")
+        event_notice(data) {  //监听message事件，方法是后台定义和提供的
+            // console.log("您有新的消息通知，请及时处理！")
             this. getData();
             this.$notify({
                 title: '消息',
-                message: data+" "+notime,
+                message: "您有新的消息通知，请及时处理！",
                 position: 'bottom-right',
-                duration: 0
+                duration: 9500
             });
+            let audio = document.getElementById("audio_news");
+            audio.play();
+        },
+
+        event_new_order(data) {  //监听message事件，方法是后台定义和提供的
+            // console.log("您有新的订单，请及时处理！")
+            this. getData();
+            this.$notify({
+                title: '提醒',
+                message: "您有新的订单，请及时处理！",
+                position: 'bottom-right',
+                duration: 9500
+            });
+            let audio = document.getElementById("audio_order");
+            audio.play();
 
         }
-
     },
     methods: {
         // 获取消息数据
@@ -302,6 +334,8 @@ export default {
         //     this.getMessage();
         //     this.getData();
         // },10000);
+        this.getData();
+        this.$socket.emit('connect', 1)
 
         if (document.body.clientWidth < 1500) {
             this.collapseChage();

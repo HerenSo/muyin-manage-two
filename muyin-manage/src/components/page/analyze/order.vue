@@ -57,15 +57,38 @@
     </el-row>
     <el-card shadow="hover">
       <el-table :data="order" >
-        <el-table-column label="时间" prop="date">
+        <el-table-column prop="number" label="订单编号" width="150"></el-table-column>
+        <el-table-column prop="consigneeName" label="收件人"></el-table-column>
+        <el-table-column prop="consigneePhone" label="联系方式" width="120" align="center"></el-table-column>
+        <el-table-column prop="addressDetail" label="收货地址" width="150"></el-table-column>
+        <el-table-column prop="logisticsName" label="物流公司" width="150"></el-table-column>
+        <el-table-column prop="logisticsNumber" label="物流单号" width="120"></el-table-column>
+        <el-table-column prop="customerName" label="供货商" min-width="120" align="center" v-if="managerType == 2"></el-table-column>
+        <el-table-column prop="totalPrice" label="合计价格"></el-table-column>
+        <el-table-column prop="postage" label="配送费"></el-table-column>
+        <el-table-column prop="paidAmount" label="实际支付"></el-table-column>
+        <el-table-column prop="paidTime" label="支付时间" width="150"></el-table-column>
+        <el-table-column label="状态" prop="status" align="center" width="120" >
+          <template slot-scope="scope">
+            <el-tag :type="scope.row.status===2?'warning':(scope.row.status===7?'success':(scope.row.status===9?'info':(scope.row.status===8?'danger':'')))">
+              {{enums[scope.row.status]}}
+            </el-tag>
+          </template>
         </el-table-column>
-        <el-table-column label="新注册数" prop="newCount">
-        </el-table-column>
-        <el-table-column label="日访问" prop="dayVisit">
-        </el-table-column>
-        <el-table-column label="累计注册" prop="count">
-        </el-table-column>
+        <el-table-column prop="createTime" label="创建时间" width="150" align="center"></el-table-column>
       </el-table>
+
+      <div class="pagination">
+        <el-pagination
+                background
+                layout="total, sizes, prev, pager, next, jumper"
+                :current-page="query.pageNum"
+                :page-size="query.pageSize"
+                :page-count="total"
+                @current-change="handlePageChange"
+                @size-change="handleSizeChange"
+        ></el-pagination>
+      </div>
     </el-card>
     <!--      </el-collapse-item>-->
     <!--      <el-collapse-item title="7日核心指标" name="3">-->
@@ -244,8 +267,14 @@
                 query:{},
                 customer:[], // 经销商
                 managerType:"", // 管理员类型
-                query:{},
+                query:{
+                    pageNum:1,
+                    pageSize:10,
+                },
+                total:0,
                 order:[],
+                enumslist:[],
+                enums:{},
             }
         },
         components: {
@@ -262,12 +291,21 @@
             // this.handleListener();
             this.changeDate();
             this.getCustomer();
-            // 权限
 
+            // 权限
             let authorities = JSON.parse(localStorage.getItem("user_information"));
             this.managerType = authorities.managerType;
-            console.log(this.managerType)
+            // console.log(this.managerType);
 
+            // 枚举
+            let enums = JSON.parse(localStorage.getItem("ClassEnums"));
+            let enumslist = enums.MemberOrderStatusEnum;
+            for(let key in enumslist){
+                this.enumslist.push(enumslist[key]);
+            }
+            this.enumslist.map(item => {
+                this.$set(this.enums,item.code,item.name);
+            })
         },
         activated(){
             // this.handleListener();
@@ -308,9 +346,10 @@
                 })
             },
             getOrder(){// 获取
-                this.$axios.post("/member-order/selectMemberOrderCountPage",this.query).then(res => {
+                this.$axios.post("/member-order/selectMemberOrderCountPage?pageNum="+this.query.pageNum+"&pageSize="+this.query.pageSize,this.query).then(res => {
                     if(res.code == 200){
                         this.order = res.data.records;
+                        this.total = res.data.pages;
                     }else{
                         this.$message.error(res.msg);
                     }
@@ -353,7 +392,18 @@
                 this.$refs.bar.renderChart();
                 this.$refs.line.renderChart();
                 this.$refs.line2.renderChart();
-            }
+            },
+            // 分页导航
+            handlePageChange(val) {
+                this.$set(this.query, 'pageNum', val);
+                this.getOrder();
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+                this.$set(this.query, 'pageNum', 1);
+                this.$set(this.query, 'pageSize', val);
+                this.getOrder();
+            },
         },
     }
 
