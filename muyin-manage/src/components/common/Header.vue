@@ -140,6 +140,7 @@ export default {
         event_notice(data) {  //监听message事件，方法是后台定义和提供的
             // console.log("您有新的消息通知，请及时处理！")
             this. getData();
+            bus.$emit('message', 1);
             this.$notify({
                 title: '消息',
                 message: "您有新的消息通知，请及时处理！",
@@ -153,6 +154,7 @@ export default {
         event_new_order(data) {  //监听message事件，方法是后台定义和提供的
             // console.log("您有新的订单，请及时处理！")
             this. getData();
+            bus.$emit('message', 1);
             this.$notify({
                 title: '提醒',
                 message: "您有新的订单，请及时处理！",
@@ -287,7 +289,7 @@ export default {
             this.forget = {};
         }
     },
-    mounted() {
+    created() {
         // let i = setInterval(e =>{
         //     this.getMessage();
         //     this.getData();

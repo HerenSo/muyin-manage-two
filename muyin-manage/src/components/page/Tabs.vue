@@ -12,7 +12,7 @@
             <el-table-column prop="createTime" width="180" ></el-table-column>
             <el-table-column width="120">
               <template slot-scope="scope">
-                <el-button size="small" @click="handleRead(scope.row)">标为已读</el-button>
+                <el-button size="small" >标为已读</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -64,6 +64,7 @@
 </template>
 
 <script>
+    import bus from '../common/bus';
     export default {
         name: 'tabs',
         data() {
@@ -102,6 +103,13 @@
             }
         },
         mounted(){
+            bus.$on('message', (msg) => {
+                if(msg){
+                    this.getData();
+                    this.getData2();
+                }
+            });
+
             this.getData();
             this.getData2();
         },
@@ -143,10 +151,8 @@
                         dangerouslyUseHTMLString: true,
                         confirmButtonText: '确定',
                         callback: action => {
-                            // this.$message({
-                            //     type: 'info',
-                            //     message: `action: ${ action }`
-                            // });
+                            localStorage.setItem("targetCode",row.targetCode);
+                            this.$router.push("/order/index");
                         }
                     });
                 }
@@ -171,7 +177,7 @@
                     })
                     this.$axios.delete("/system-message/delete?code="+row.code).then(res => {
                         if(res.code == 200) {
-                            this.$message.success("批量删除成功！");
+                            this.$message.success("删除成功！");
                             this.getData2();
                         }else{
                             this.$message.error(res.msg);

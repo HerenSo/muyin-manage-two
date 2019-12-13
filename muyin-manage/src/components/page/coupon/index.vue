@@ -402,15 +402,15 @@
                     this.$message.error("请输入优惠券名称！");
                     return;
                 }
-                if(!this.form.preferentialAmount){
+                if(!this.form.preferentialAmount && this.form.preferentialAmount != 0){
                     this.$message.error("请输入优惠金额！");
                     return;
                 }
-                if(!this.form.paymentAmount){
+                if(!this.form.paymentAmount && this.form.paymentAmount != 0){
                     this.$message.error("请输入发放量！");
                     return;
                 }
-                if(!this.form.triggerAmount){
+                if(!this.form.triggerAmount && this.form.triggerAmount != 0){
                     this.$message.error("请输入优惠券有效触发金额！");
                     return;
                 }
@@ -422,7 +422,7 @@
                     this.$message.error("请选择失效时间！");
                     return;
                 }
-                if(!this.form.scope){
+                if(!this.form.scope && this.form.scope != 0){
                     this.$message.error("请选择适用范围！");
                     return;
                 }

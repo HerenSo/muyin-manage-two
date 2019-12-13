@@ -474,6 +474,7 @@
                         ret += encodeURIComponent(it) + '=' + encodeURIComponent(this.settle[it]) + '&'
                     }
                 }
+                // console.log(ret)
                 window.open(this.baseUrl+'/wallet-bill/exportWalletBill?'+ret,'_blank');
                 this.dialogSettleVisible = false;
                 this.settle={

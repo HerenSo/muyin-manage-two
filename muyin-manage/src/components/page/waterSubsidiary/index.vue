@@ -71,13 +71,14 @@
         </el-table-column>
         <el-table-column prop="platformCommission" label="平台抽成" width="80" align="center" v-if="managerType == 2"></el-table-column>
         <el-table-column prop="createTime" label="交易时期" width="160" align="center"></el-table-column>
-<!--        <el-table-column label="操作" width="120" align="center">-->
-<!--          <template slot-scope="scope">-->
+        <el-table-column label="操作" width="120" align="center" fixed="right">
+          <template slot-scope="scope">
 <!--            <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>-->
 <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)" v-if="right.del">删除</el-button>-->
 <!--            <el-button type="text" icon="el-icon-delete" class="red" @click="handleCheck(scope.$index, scope.row)" v-if="right.del">查看</el-button>-->
-<!--          </template>-->
-<!--        </el-table-column>-->
+            <el-button type="text" icon="el-icon-view" class="" @click="handleCheck(scope.$index, scope.row)" >查看订单</el-button>
+          </template>
+        </el-table-column>
       </el-table>
       <div class="pagination">
         <el-pagination
@@ -92,23 +93,93 @@
       </div>
     </div>
 
+
     <!-- 编辑弹出框 -->
-    <el-drawer :title="title" :visible.sync="editVisible" size="40%" direction="rtl" :before-close="handleClose">
+    <el-drawer :title="title" :visible.sync="editVisible" size="60%" direction="rtl" :before-close="handleClose" class="commodity_drawer">
       <div class="demo-drawer__content">
-        <el-form ref="form" :model="form" label-width="120px">
-          <el-form-item label="订单号" required>
-            <el-input v-model="form.number" :disabled="formDisable"></el-input>
-          </el-form-item>
-          <el-form-item label="支付方式" required>
-            <!--            <el-input v-model="form.paidType" ></el-input>-->
-            <el-select v-model="form.paidType" placeholder="支付方式" :disabled="formDisable">
-              <el-option key="0" label="微信APP" value="0"></el-option>
-              <el-option key="1" label="微信JSAPI" value="1"></el-option>
-              <el-option key="2" label="支付支付" value="2"></el-option>
-              <el-option key="3" label="其他" value="3"></el-option>
-            </el-select>
-          </el-form-item>
-        </el-form>
+        <el-tabs v-model="activeName">
+          <el-tab-pane label="基本信息" name="first">
+            <el-form ref="form" :model="form" label-width="120px">
+              <el-form-item label="订单号" required>
+                <el-input v-model="form.number" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="收货人姓名" required>
+                <el-input v-model="form.consigneeName" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="收货人电话" required>
+                <el-input v-model="form.consigneePhone" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="收货人地址" required>
+                <el-input v-model="form.addressDetail" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <!--          <el-form-item label="商品名称" required>-->
+              <!--            <el-input v-model="form.title" :disabled="formDisable"></el-input>-->
+              <!--          </el-form-item>-->
+              <el-form-item label="余额支付金额" required>
+                <el-input v-model="form.walletCost" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="优惠券支付金额" required>
+                <el-input v-model="form.couponAmountCost" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="积分支付金额" required>
+                <el-input v-model="form.pointCost" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="配送费" required>
+                <el-input v-model="form.postage" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="实际支付金额" required>
+                <el-input v-model="form.paidAmount" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="支付方式" required>
+                <!--            <el-input v-model="form.paidType" ></el-input>-->
+                <el-select v-model="form.paidType" placeholder="支付方式" :disabled="formDisable">
+                  <!--              <el-option key="0" label="微信APP" value="0"></el-option>-->
+                  <!--              <el-option key="1" label="微信JSAPI" value="1"></el-option>-->
+                  <!--              <el-option key="2" label="支付支付" value="2"></el-option>-->
+                  <!--              <el-option key="3" label="其他" value="3"></el-option>-->
+                  <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsPaidTypelist"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="购买时间" required>
+                <el-input v-model="form.createTime" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="支付时间" required>
+                <el-input v-model="form.paidTime" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="支付信息" required>
+                <el-input v-model="form.title" :disabled="formDisable"></el-input>
+              </el-form-item>
+              <el-form-item label="会员备注" required>
+                <el-input v-model="form.remarks" :disabled="formDisable"></el-input>
+              </el-form-item>
+            </el-form>
+          </el-tab-pane>
+
+          <el-tab-pane label="商品信息" name="second">
+            <el-table :data="form.memberOrderItemList" border class="table" ref="table" :loading="loading" header-cell-class-name="table-header" >
+              <el-table-column prop="commodityName" label="商品名称" width="160"></el-table-column>
+              <el-table-column prop="commodityIconUrl" label="缩略图" width="120" align="center">
+                <template slot-scope="scope">
+                  <el-image :src="scope.row.commodityIconUrl" style="width: 50px; height: 50px" fit="cover">
+                    <div slot="error" class="image-slot">
+                      <i class="el-icon-picture f50 color-border"></i>
+                    </div>
+                  </el-image>
+                </template>
+              </el-table-column>
+              <el-table-column prop="salePrice" label="单价"  align="center"></el-table-column>
+              <el-table-column prop="commodityAttrItemDesc" label="规格"  align="center"></el-table-column>
+              <el-table-column prop="commodityCount" label="商品数量" align="center"></el-table-column>
+              <el-table-column label="状态" prop="status" align="center" width="120" >
+                <template slot-scope="scope" >
+                  <div v-if="scope.row.orderServiceStatus || scope.row.orderServiceStatus == 0">{{enumsService[scope.row.orderServiceStatus]}}</div>
+                  <div v-else>{{enumsOrder[form.status]}}</div>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-tab-pane>
+
+        </el-tabs>
         <!--        <span slot="footer" class="dialog-footer demo-drawer__footer">-->
         <!--            <el-button @click="editVisible = false">取 消</el-button>-->
         <!--            <el-button type="primary" @click="saveEdit" :loading="subloading">{{ subloading ? '提交中 ...' : '确 定' }}</el-button>-->
@@ -166,6 +237,7 @@
                 multipleSelection: [],
                 delList: [],
                 editVisible: false,
+                activeName:'first',
                 total: 0,
                 title:'编辑',
                 form: {},
@@ -185,6 +257,11 @@
                 enums:{}, // 交易类型枚举
                 enumsPaidType:{}, // 交易方式枚举
                 enumsStatus:{},
+                enumsOrderlist:[],
+                enumsOrder:{}, // 枚举
+                enumsServicelist:[],
+                enumsService:{},
+                formDisable:false,
             };
         },
         mounted() {
@@ -206,6 +283,8 @@
             let enumslist = enums.WalletBillTypeEnum; // 交易类型
             let enumsPaidTypelist = enums.PaidTypeEnum;
             let enumsStatuslist = enums.WalletBillStatusEnum;
+            let enumsOrderlist = enums.MemberOrderStatusEnum;
+            let enumsServicelist = enums.MemberOrderServiceStatusEnum;
             for(let key in enumslist){
                 this.enumslist.push(enumslist[key]);
             }
@@ -226,6 +305,18 @@
             this.enumsStatuslist.map(item => {
                 this.$set(this.enumsStatus,item.code,item.name);
             })
+            for(let key in enumsOrderlist){
+                this.enumsOrderlist.push(enumsOrderlist[key]);
+            }
+            this.enumsOrderlist.map(item => {
+                this.$set(this.enumsOrder,item.code,item.name);
+            })
+            for(let key in enumsServicelist){
+                this.enumsServicelist.push(enumsServicelist[key]);
+            }
+            this.enumsServicelist.map(item => {
+                this.$set(this.enumsService,item.code,item.name);
+            })
 
             this.getData();
         },
@@ -245,6 +336,15 @@
                         this.$message.error(res.msg);
                     }
                     this.loading = false;
+                })
+            },
+            getDetails(number){
+                this.$axios.get("/member-order/selectByPrimaryKey?number="+number).then(res => {
+                    if(res.code == 200) {
+                        this.form = res.data;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
                 })
             },
             // 保存编辑
@@ -284,6 +384,7 @@
             },
             handleCheck(index,row){
                 this.title = '订单详情';
+                this.getDetails(row.orderNumber);
                 this.formDisable = true;
                 this.editVisible = true;
             },

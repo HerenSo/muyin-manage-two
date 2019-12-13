@@ -256,7 +256,7 @@
                     <el-divider content-position="left">规格</el-divider>
                     <el-form-item class="commodityAttrs" :label="item.name" label-width="120px" v-for="(item,index) in commodityAttrs" :key="index" >
                         <el-tag
-                            :key="tag"
+                            :key="i"
                             v-for="(tag,i) in item.commodityAttrItems"
                             size="medium"
                             style="margin-left: 0;margin-right: 10px">
@@ -501,7 +501,7 @@
                         let categoryCode = this.form.categoryCode;
                         this.form.categoryCode = [];
                         this.form.categoryCode.push(categoryCode);
-                        console.log("categoryCode--",this.form.categoryCode)
+                        // console.log("categoryCode--",this.form.categoryCode)
                         this.fileList =  res.data.attachmentsList;
                         this.commodityDetails =  res.data.commodityDetails;
                         this.commodityAttrs =  res.data.commodityAttrs;
@@ -593,12 +593,16 @@
                             }
                         })
                         this.form.attachmentsList = this.attachmentsList;
-                        console.log("fileList",this.form.attachmentsList);
+                        // console.log("fileList",this.form.attachmentsList);
                         this.form.commodityDetails = this.commodityDetails;
                         this.form.commodityAttrs = this.commodityAttrs;
 
-                        if(this.form.categoryCode)
+                        // console.log(this.form.categoryCode)
+                        if(this.form.categoryCode > 0){
                             this.form.categoryCode = this.form.categoryCode[this.form.categoryCode.length -1];
+                        }else{
+                            this.form.categoryCode = ""
+                        }
 
                         this.subloading = true;
                         this.$axios.post("/commodity/insertOrUpdate",this.form).then(res => {
