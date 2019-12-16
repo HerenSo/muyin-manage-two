@@ -49,6 +49,7 @@
         <el-table-column prop="saleShowPrice" label="销售价格" width="120" align="center"></el-table-column>
         <el-table-column prop="salePrice" label="当前销售价格" width="120" align="center"></el-table-column>
         <el-table-column prop="supplyPrice" label="供货价格" width="120" align="center"></el-table-column>
+        <el-table-column prop="commodityStock" label="剩余库存"  align="center"></el-table-column>
         <el-table-column prop="saleTime" label="开始销售" width="100" align="center"></el-table-column>
         <el-table-column prop="saleOverTime" label="售卖到期" width="100" align="center"></el-table-column>
         <el-table-column label="可否积分抵扣" align="center" width="120" >
@@ -94,7 +95,7 @@
         <el-form ref="form" :model="form" label-width="140px" :rules="rules">
             <el-tabs v-model="activeName">
                 <el-tab-pane label="基本信息" name="first">
-                    <el-form-item label="商品名称" required prop="name">
+                    <el-form-item label="商品名称"  prop="name">
                         <el-input v-model="form.name" placeholder="请输入商品名称"></el-input>
                     </el-form-item>
                     <el-form-item label="商品分类" required>
@@ -114,10 +115,10 @@
                                 :options="category"
                                 :props="{ expandTrigger: 'hover',value:'code',label:'name',children:'subCategorys' }"></el-cascader>
                     </el-form-item>
-                    <el-form-item label="商品展示原价" required prop="saleShowPrice">
+                    <el-form-item label="商品展示原价" prop="saleShowPrice">
                       <el-input v-model="form.saleShowPrice" placeholder="请输入商品展示的原售价格"></el-input>
                     </el-form-item>
-                    <el-form-item label="商品展示售价" required prop="salePrice">
+                    <el-form-item label="商品展示售价" prop="salePrice">
                       <el-input v-model="form.salePrice" placeholder="请输入商品展示售价"></el-input>
                     </el-form-item>
                     <el-form-item label="商品积分售价" required>
@@ -128,12 +129,9 @@
                             <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
                         </el-select>
                     </el-form-item>
-                    <el-form-item label="商品供货价" required prop="supplyPrice">
+                    <el-form-item label="商品供货价" prop="supplyPrice">
                         <el-input v-model="form.supplyPrice" placeholder="请输入供货商商品供货价"></el-input>
                     </el-form-item>
-                  <el-form-item label="剩余库存" prop="commodityStock">
-                    <el-input v-model="form.commodityStock" placeholder="请输入供货商商品供货价"></el-input>
-                  </el-form-item>
                   <el-form-item label="配送费">
                     <el-input v-model="form.postage" placeholder="请输入配送费"></el-input>
                   </el-form-item>
@@ -288,7 +286,7 @@
                           <span class="inputTag">{{tag.tagName}} <img :src="tag.imageUrl" v-if="tag.imageUrl" /> &nbsp;￥{{tag.salePrice}}/<del>{{tag.saleShowPrice}}</del>&nbsp;{{tag.stock}}件</span>
                         </el-tag>
                         <div class="attrClose" @click="handleAttrsClose(index)"><i class="el-icon-close"></i></div>
-                        <div class="attrClose  attredit" @click="handleAttrsEdit(index)"><i class="el-icon-edit"></i></div>
+                        <div class="attrClose attredit" @click="handleAttrsEdit(index)"><i class="el-icon-edit"></i></div>
                     </el-form-item>
                 </el-tab-pane>
                 <el-tab-pane label="详情信息" name="third">
@@ -388,7 +386,12 @@
                 total: 0,
                 title:'编辑',
                 activeName: 'first',
-                form: {},
+                form: {
+                    name: '',
+                    saleShowPrice: '',
+                    salePrice: '',
+                    supplyPrice: '',
+                },
                 rules: { // 表单验证规则
                     name: [
                         { required: true, message: '请输入商品名称', trigger: 'blur' }
@@ -969,6 +972,7 @@
                 this.commodityAttrsItemIndex = '';
                 this.commodityAttrsIndex = '';
                 this.$refs.banner.clearFiles();
+                this.$refs[form].resetFields();
             },
             refresh(){ // 刷新
                 this.getData();
@@ -1122,7 +1126,7 @@
                 color: $color-theme;
             }
         }
-      .attredit{
+      .attrClose.attredit{
         top:-25px;
         right: 15px;
       }
