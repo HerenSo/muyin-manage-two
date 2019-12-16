@@ -14,7 +14,7 @@
         <el-input v-model="query.userphone" placeholder="请输入手机号码查找" class="handle-input mr10 ml-10"></el-input>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
-      <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
+      <el-table :data="tableData" border class="table" ref="multipleTable" v-loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="nickname" label="昵称"><template slot-scope="scope">{{scope.row.member.nickname}}</template></el-table-column>
         <el-table-column prop="username" label="用户名" width="120" align="center"></el-table-column>

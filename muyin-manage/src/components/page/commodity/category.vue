@@ -163,6 +163,7 @@
             // 获取 列表数据
             getData() {
                 this.$set(this.query, 'type', 0);
+                this.loading = true;
                 this.$axios.post('/category/selectPageList?pageSize='+this.query.pageSize+'&pageNum='+this.query.pageNum,this.query).then((res) => {
                     if(res.code == 200){
                         this.tableData = res.data.records;
@@ -171,6 +172,7 @@
                         this.$message.error(res.msg);
                     }
                 })
+                this.loading = false;
             },
             getCategory(){// 获取分类
                 let params = {

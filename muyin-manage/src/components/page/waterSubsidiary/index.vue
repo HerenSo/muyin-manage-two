@@ -33,7 +33,7 @@
         </el-select>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
-      <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
+      <el-table :data="tableData" border class="table" ref="multipleTable" v-loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="code" label="流水号" min-width="180"></el-table-column>
 <!--        <el-table-column prop="code" label="商品名称" min-width="180"></el-table-column>-->
@@ -156,7 +156,7 @@
           </el-tab-pane>
 
           <el-tab-pane label="商品信息" name="second">
-            <el-table :data="form.memberOrderItemList" border class="table" ref="table" :loading="loading" header-cell-class-name="table-header" >
+            <el-table :data="form.memberOrderItemList" border class="table" ref="table" v-loading="loading" header-cell-class-name="table-header" >
               <el-table-column prop="commodityName" label="商品名称" width="160"></el-table-column>
               <el-table-column prop="commodityIconUrl" label="缩略图" width="120" align="center">
                 <template slot-scope="scope">

@@ -25,7 +25,7 @@
         </el-select>
         <el-button type="primary" icon="el-icon-search" @click="handleSearch">搜索</el-button>
       </div>
-      <el-table :data="tableData" border class="table" ref="multipleTable" :loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
+      <el-table :data="tableData" border class="table" ref="multipleTable" v-loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
 <!--        <el-table-column prop="code" label="编号"></el-table-column>-->
         <el-table-column prop="name" label="商品名称"></el-table-column>
@@ -218,8 +218,30 @@
                                     :disable-transitions="false"
                                     style="margin-left: 0;margin-right: 10px"
                                     @close="handleTagsClose(tag)">
-                              <span class="inputTag">{{tag.tagName}} <img :src="tag.imageUrl" /> &nbsp;￥{{tag.salePrice}}/<del>{{tag.saleShowPrice}}</del>&nbsp;{{tag.stock}}件</span>
+                              <span class="inputTag">{{tag.tagName}} <img :src="tag.imageUrl" v-if="tag.imageUrl" /> &nbsp;￥{{tag.salePrice}}/<del>{{tag.saleShowPrice}}</del>&nbsp;{{tag.stock}}件</span>
                             </el-tag>
+                          <!--编辑属性-->
+                          <div v-if="isAttrsEdit" class="inputAttrsGroup" v-for="(edit,index) in commodityAttrsItem.commodityAttrItems" :key="index">
+                            <el-input class="input-new-tag"  v-model="edit.tagName" placeholder="属性名称，例：红色" ref="saveTagInput" size="small">
+                            </el-input>
+                            <el-input class="input-new-tag" v-model="edit.saleShowPrice" placeholder="销售价格"  ref="saveTagInput" size="small"  >
+                            </el-input>
+                            <el-input class="input-new-tag" v-model="edit.salePrice" placeholder="当前价格"  ref="saveTagInput" size="small" >
+                            </el-input>
+                            <el-input class="input-new-tag" v-model="edit.stock" placeholder="库存量"  ref="saveTagInput" size="small" >
+                            </el-input>
+                            <div class="headAttrsUrl">
+                              <!--                                <i class="el-icon-plus"></i>-->
+                              <div class="crop-demo">
+                                <img :src="edit.imageUrl" class="pre-img" v-if="edit.imageUrl">
+                              </div>
+                            </div>
+                            <div class="headAttrsUrl">
+                              <el-button  class="button-new-tag" size="small"  style="margin-left: 0;" >修改图片</el-button>
+                              <input ref="file" class="crop-input" type="file" name="image" accept="image/*" @change="setAttrImage" @click="editAttrImage(index)"/>
+                            </div>
+                          </div>
+                          <!--新增属性-->
                             <div v-if="inputVisible" class="inputAttrsGroup">
                                 <el-input class="input-new-tag"  v-model="inputValue.tagName" placeholder="属性名称，例：红色" ref="saveTagInput" size="small">
                                 </el-input>
@@ -232,7 +254,7 @@
                               <div class="headAttrsUrl" v-if="inputValue.imageUrl">
 <!--                                <i class="el-icon-plus"></i>-->
                                 <div class="crop-demo">
-                                  <img :src="inputValue.imageUrl" class="pre-img">
+                                  <img :src="inputValue.imageUrl" class="pre-img" v-if="inputValue.imageUrl">
                                 </div>
                               </div>
                               <div class="headAttrsUrl" v-else>
@@ -254,7 +276,7 @@
                         </el-switch>
                     </el-form-item>
                     <el-form-item label="" label-width="120px">
-                        <el-button size="small" type="primary" @click="submitCommodityAttrs">确定添加</el-button>
+                        <el-button size="small" type="primary" @click="submitCommodityAttrs">{{isAttrsEdit?'确定':'确定添加'}}</el-button>
                     </el-form-item>
                     <el-divider content-position="left">规格</el-divider>
                     <el-form-item class="commodityAttrs" :label="item.name" label-width="120px" v-for="(item,index) in commodityAttrs" :key="index" >
@@ -263,9 +285,10 @@
                             v-for="(tag,i) in item.commodityAttrItems"
                             size="medium"
                             style="margin-left: 0;margin-right: 10px">
-                          <span class="inputTag">{{tag.tagName}} <img :src="tag.imageUrl" /> &nbsp;￥{{tag.salePrice}}/<del>{{tag.saleShowPrice}}</del>&nbsp;{{tag.stock}}件</span>
+                          <span class="inputTag">{{tag.tagName}} <img :src="tag.imageUrl" v-if="tag.imageUrl" /> &nbsp;￥{{tag.salePrice}}/<del>{{tag.saleShowPrice}}</del>&nbsp;{{tag.stock}}件</span>
                         </el-tag>
                         <div class="attrClose" @click="handleAttrsClose(index)"><i class="el-icon-close"></i></div>
+                        <div class="attrClose  attredit" @click="handleAttrsEdit(index)"><i class="el-icon-edit"></i></div>
                     </el-form-item>
                 </el-tab-pane>
                 <el-tab-pane label="详情信息" name="third">
@@ -441,6 +464,9 @@
                 enumsType:{},
                 enums:{}, // 枚举
                 croploading:false,
+                isAttrsEdit:false,
+                commodityAttrsIndex:'',
+                commodityAttrsItemIndex:'',
             };
         },
         mounted() {
@@ -639,8 +665,18 @@
             handleTagsClose(tag) { // 删除商品属性值
                 this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
             },
+            handleAttrsEdit(index){
+                console.log(this.commodityAttrs[index]);
+                this.commodityAttrsIndex = index;
+                this.isAttrsEdit = true;
+                this.commodityAttrsItem = this.commodityAttrs[index];
+                this.dynamicTags = this.commodityAttrs[index].commodityAttrItems;
+            },
             handleAttrsClose(index){
                 this.commodityAttrs.splice(index, 1);
+                this.isAttrsEdit = false;
+                this.commodityAttrsItemIndex = '';
+                this.commodityAttrsIndex = '';
                 this.$forceUpdate();
             },
             showInput() { // 输入商品属性值
@@ -669,7 +705,7 @@
                 this.inputVisible = false;
                 this.inputValue = {};
             },
-            submitCommodityAttrs(){ // 确定添加商品属性
+            submitCommodityAttrs(){ // 确定商品属性
                 if(!this.commodityAttrsItem.name){
                     this.$message.error("请输入属性名称！");
                     return;
@@ -682,10 +718,17 @@
                     this.commodityAttrsItem.isMain = 0;
                 }
                 this.commodityAttrsItem.commodityAttrItems = this.dynamicTags;
-                this.commodityAttrs.push(this.commodityAttrsItem);
+                if(this.isAttrsEdit){
+                    this.commodityAttrs[this.commodityAttrsIndex] = this.commodityAttrsItem;
+                }else{
+                    this.commodityAttrs.push(this.commodityAttrsItem);
+                }
                 this.dynamicTags = [];
                 this.commodityAttrsItem = {};
                 this.inputVisible = false;
+                this.isAttrsEdit = false;
+                this.commodityAttrsItemIndex = '';
+                this.commodityAttrsIndex = '';
                 console.log(this.commodityAttrs)
             },
             // 触发搜索按钮
@@ -831,7 +874,10 @@
                 };
                 reader.readAsDataURL(this.file);
             },
-
+            editAttrImage(index){
+                this.commodityAttrsItemIndex = index;
+                console.log(this.commodityAttrsItemIndex)
+            },
             setAttrImage(e){ // 选择商品属性图
                 this.attrfile = e.target.files[0];
                 if (!this.attrfile.type.includes('image/')) {
@@ -848,7 +894,12 @@
                 this.$axios.post("/api/attachments/insertUploadFile",params).then(res => {
                     if(res.code == 200){
                         this.$message.success("上传成功！");
-                        this.$set(this.inputValue, 'imageUrl', res.data.url);
+                        if(this.commodityAttrsIndex || this.commodityAttrsIndex == 0){
+                            this.commodityAttrs[this.commodityAttrsIndex].commodityAttrItems[this.commodityAttrsItemIndex].imageUrl = res.data.url;
+                        }else{
+                            this.$set(this.inputValue, 'imageUrl', res.data.url);
+                        }
+
                     }else{
                         this.$message.error(res.msg);
                     }
@@ -914,6 +965,9 @@
                 this.dynamicTags = [];
                 this.inputValue = {};
                 this.commodityDetails = {};
+                this.isAttrsEdit = false;
+                this.commodityAttrsItemIndex = '';
+                this.commodityAttrsIndex = '';
                 this.$refs.banner.clearFiles();
             },
             refresh(){ // 刷新
@@ -1068,6 +1122,10 @@
                 color: $color-theme;
             }
         }
+      .attredit{
+        top:-25px;
+        right: 15px;
+      }
     }
 
 
@@ -1083,7 +1141,7 @@
   }
   .inputAttrsGroup{
     display: flex;
-    margin-top: 10px;
+    margin: 8px 0;
 
     .input-new-tag{
       width:100px;
