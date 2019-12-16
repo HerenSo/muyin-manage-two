@@ -131,6 +131,9 @@
                     <el-form-item label="商品供货价" required prop="supplyPrice">
                         <el-input v-model="form.supplyPrice" placeholder="请输入供货商商品供货价"></el-input>
                     </el-form-item>
+                  <el-form-item label="剩余库存" prop="commodityStock">
+                    <el-input v-model="form.commodityStock" placeholder="请输入供货商商品供货价"></el-input>
+                  </el-form-item>
                   <el-form-item label="配送费">
                     <el-input v-model="form.postage" placeholder="请输入配送费"></el-input>
                   </el-form-item>
@@ -598,7 +601,7 @@
                         this.form.commodityAttrs = this.commodityAttrs;
 
                         // console.log(this.form.categoryCode)
-                        if(this.form.categoryCode > 0){
+                        if(this.form.categoryCode.length > 0){
                             this.form.categoryCode = this.form.categoryCode[this.form.categoryCode.length -1];
                         }else{
                             this.form.categoryCode = ""
