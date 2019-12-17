@@ -10,8 +10,13 @@
       <div class="handle-box">
         <el-button type="primary" icon="el-icon-refresh" class="handle-del " @click="refresh">刷新</el-button>
         <el-button type="primary" icon="el-icon-lx-add" class="handle-del " @click="handleEdit" v-if="right.add">新增</el-button>
+        <el-button type="primary" icon="el-icon-printer" @click="handlePrinter">导出</el-button>
         <el-button type="primary" icon="el-icon-delete" class="handle-del" @click="delAllSelection" v-if="right.del">批量删除</el-button>
         <el-input v-model="query.name" placeholder="请输入商品名称" class="handle-input mr10 ml-10"></el-input>
+        <el-select v-model="query.customerCode" placeholder="请选择供货商" @change="refresh" v-if="managerType == 2" class="mr10">
+          <el-option key="" label="全部" value=""></el-option>
+          <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
+        </el-select>
 <!--        <el-date-picker v-model="query.saleTime" type="date" placeholder="请选择销售时间" class="mr10">-->
 <!--        </el-date-picker>-->
         <el-select v-model="query.status" placeholder="状态" class="handle-select mr10" @change="refresh">
@@ -52,6 +57,7 @@
         <el-table-column prop="commodityStock" label="剩余库存"  align="center"></el-table-column>
         <el-table-column prop="saleTime" label="开始销售" width="100" align="center"></el-table-column>
         <el-table-column prop="saleOverTime" label="售卖到期" width="100" align="center"></el-table-column>
+        <el-table-column prop="customerName" label="供货商" min-width="120" v-if="managerType == 2"></el-table-column>
         <el-table-column label="可否积分抵扣" align="center" width="120" >
           <template slot-scope="scope">
             <el-tag :type="scope.row.supportPoint===0?'danger':(scope.row.supportPoint===1?'success':'')">{{scope.row.supportPoint===0?'否':(scope.row.supportPoint===1?'是':'')}}</el-tag>
@@ -257,7 +263,7 @@
                               </div>
                               <div class="headAttrsUrl" v-else>
                                 <el-button  class="button-new-tag" size="small"  style="margin-left: 0;" >上传图片</el-button>
-                                <input ref="file" class="crop-input" type="file" name="image" accept="image/*" @change="setAttrImage"/>
+                                <input ref="file" class="crop-input" type="file" name="image" accept="image/*" @change="setAttrImage"  @click="addAttrImage"/>
                               </div>
                                 <el-button v-if="inputVisible" type="primary" class="button-new-tag" size="small"  style="margin-left: 0;" @click="handleInputConfirm">确定</el-button>
                             </div>
@@ -305,7 +311,8 @@
                     <el-form-item label="商品描述">
                         <el-input v-model="commodityDetails.deatils" placeholder="请输入商品描述"></el-input>
                     </el-form-item>
-                    <el-form-item label="商品详情" required>
+                    <el-form-item label="商品详情" required >
+                        <span class="color-999" style="position: absolute;left: -90px;top:30px;">（图片宽375）</span>
                         <quill-editor ref="myTextEditor" v-model="commodityDetails.description" :options="editorOption"></quill-editor>
                     </el-form-item>
                 </el-tab-pane>
@@ -372,8 +379,6 @@
         data() {
             return {
                 query: {
-                    createTime: '',
-                    title: '',
                     status:'',
                     pageNum: 1,
                     pageSize: 10
@@ -391,6 +396,7 @@
                     saleShowPrice: '',
                     salePrice: '',
                     supplyPrice: '',
+                    categoryCode:[],
                 },
                 rules: { // 表单验证规则
                     name: [
@@ -470,12 +476,14 @@
                 isAttrsEdit:false,
                 commodityAttrsIndex:'',
                 commodityAttrsItemIndex:'',
+                managerType:''
             };
         },
         mounted() {
             // 权限
 
             let authorities = JSON.parse(localStorage.getItem("user_information"));
+            this.managerType = authorities.managerType;
             authorities.authorities.map((item) => {
                 switch (item.authority) {
                     case 'ROLE_COMMODITY_EDIT':this.right.edit = true;break;
@@ -662,7 +670,9 @@
                     this.getDetails(row.code);
                 }else{
                     this.title = '新增';
-                    this.form = {}
+                    this.form = {
+                        categoryCode:[]
+                    }
                 }
             },
             handleTagsClose(tag) { // 删除商品属性值
@@ -881,6 +891,9 @@
                 this.commodityAttrsItemIndex = index;
                 console.log(this.commodityAttrsItemIndex)
             },
+            addAttrImage(){
+                this.commodityAttrsItemIndex = "";
+            },
             setAttrImage(e){ // 选择商品属性图
                 this.attrfile = e.target.files[0];
                 if (!this.attrfile.type.includes('image/')) {
@@ -897,8 +910,12 @@
                 this.$axios.post("/api/attachments/insertUploadFile",params).then(res => {
                     if(res.code == 200){
                         this.$message.success("上传成功！");
-                        if(this.commodityAttrsIndex || this.commodityAttrsIndex == 0){
-                            this.commodityAttrs[this.commodityAttrsIndex].commodityAttrItems[this.commodityAttrsItemIndex].imageUrl = res.data.url;
+                        if(this.commodityAttrsItemIndex || this.commodityAttrsItemIndex === 0){
+                            if(this.commodityAttrs[this.commodityAttrsIndex].commodityAttrItems[this.commodityAttrsItemIndex].imageUrl){
+                                this.commodityAttrs[this.commodityAttrsIndex].commodityAttrItems[this.commodityAttrsItemIndex].imageUrl = res.data.url;
+                            }else{
+                                this.$set(this.commodityAttrs[this.commodityAttrsIndex].commodityAttrItems[this.commodityAttrsItemIndex], 'imageUrl', res.data.url);
+                            }
                         }else{
                             this.$set(this.inputValue, 'imageUrl', res.data.url);
                         }
@@ -945,6 +962,17 @@
                 this.dialogVisible = false;
                 // this.cropImg = this.defaultSrc;
             },
+            handlePrinter(){
+                this.$delete(this.query,"pageNum")
+                this.$delete(this.query,"pageSize")
+                let ret = ''
+                for (let it in this.query) {
+                    if(encodeURIComponent(this.query[it])){
+                        ret += encodeURIComponent(it) + '=' + encodeURIComponent(this.query[it]) + '&'
+                    }
+                }
+                window.open(this.baseUrl+'/commodity/exportCommodity?'+ret,'_blank');
+            },
             handleStatusChange(){
                 this.getData();
             },
@@ -962,7 +990,9 @@
             handleClose(){
                 this.editVisible = false;
                 this.subloading = false;
-                this.form = {};
+                this.form = {
+                    categoryCode:[]
+                };
                 this.commodityAttrsItem = {};
                 this.commodityAttrs = [];
                 this.dynamicTags = [];

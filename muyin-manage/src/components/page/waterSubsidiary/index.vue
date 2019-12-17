@@ -16,7 +16,10 @@
 <!--          <el-option :key="index" :label="item.name" :value="item.code" v-for="(item,index) in enumsPaidTypelist"></el-option>-->
 <!--        </el-select>-->
         <el-input v-model="query.orderNumber" placeholder="请输入订单号查找" class="handle-input mr10 ml-10"></el-input>
-        <el-input v-model="query.supplyCustomerName" placeholder="请输入供货商名称查找" class="handle-input mr10 ml-10"></el-input>
+<!--        <el-input v-model="query.customerCode" placeholder="请输入供货商名称查找" class="handle-input mr10 ml-10"></el-input>-->
+        <el-select v-model="query.customerCode" placeholder="请选择供货商" @change="refresh" v-if="managerType == 2" class="mr10">
+          <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
+        </el-select>
         <el-date-picker
                 v-model="time"
                 type="daterange"
@@ -36,40 +39,40 @@
       <el-table :data="tableData" border class="table" ref="multipleTable" v-loading="loading" header-cell-class-name="table-header" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="code" label="流水号" min-width="180"></el-table-column>
-<!--        <el-table-column prop="code" label="商品名称" min-width="180"></el-table-column>-->
         <el-table-column prop="orderNumber" label="交易关联订单号" min-width="140"></el-table-column>
         <el-table-column prop="thirdOrderNumber" label="第三方交易流水号" min-width="140"></el-table-column>
         <el-table-column prop="content" label="交易内容" min-width="260"></el-table-column>
         <el-table-column prop="amount" label="实际入账金额" min-width="80" align="center" v-if="managerType == 2"></el-table-column>
         <el-table-column prop="amount" label="供货价" min-width="80" align="center" v-if="managerType != 2"></el-table-column>
-        <el-table-column prop="supplyCustomerName" label="供货商" min-width="120" v-if="managerType == 2"></el-table-column>
-        <!--        <el-table-column prop="cardCost" label="会员卡交易面额" min-width="130"></el-table-column>-->
-        <!--        <el-table-column prop="cardNumber" label="会员卡号"></el-table-column>-->
-        <el-table-column prop="couponAmount" label="优惠券优惠金额" min-width="80" align="center" v-if="managerType == 2"></el-table-column>
-        <!--        <el-table-column prop="point" label="积分消耗数值" min-width="120"></el-table-column>-->
-        <el-table-column prop="pointCost" label="积分抵扣金额" min-width="80" align="center" v-if="managerType == 2"></el-table-column>
+        <el-table-column prop="customerName" label="供货商" min-width="120" v-if="managerType == 2">
+          <template slot-scope="scope">{{scope.row.customerName}}</template>
+        </el-table-column>
+        <el-table-column prop="couponAmount" label="优惠券优惠金额" min-width="80" align="center" v-if="managerType == 2">
+          <template slot-scope="scope">{{scope.row.couponAmount}}</template>
+        </el-table-column>
+        <el-table-column prop="pointCost" label="积分抵扣金额" min-width="80" align="center" v-if="managerType == 2">
+          <template slot-scope="scope">{{scope.row.pointCost}}</template></el-table-column>
         <el-table-column prop="walletCost" label="钱包抵扣金额" min-width="80" align="center" v-if="managerType == 2"></el-table-column>
-        <el-table-column prop="supplyReduce" label="供货商成本" min-width="80" align="center" v-if="managerType == 2"></el-table-column>
+        <el-table-column prop="supplyReduce" label="供货商成本" min-width="70" align="center" v-if="managerType == 2"></el-table-column>
         <el-table-column prop="totalAmount" label="交易总金额" min-width="100" align="center" v-if="managerType == 2"></el-table-column>
-        <el-table-column prop="type" label="交易类型" >
+        <el-table-column   label="交易类型" >
           <template slot-scope="scope">
           {{enums[scope.row.type]}}
           </template>
         </el-table-column>
-        <el-table-column label="方式" prop="paidType"  min-width="120" align="center">
+        <el-table-column label="方式"   min-width="120" align="center">
           <template slot-scope="scope">
             {{enumsPaidType[scope.row.paidType]}}
           </template>
         </el-table-column>
-        <el-table-column prop="status" label="流水状态" >
+        <el-table-column prop="platformCommission" label="平台抽成" width="80" align="center" v-if="managerType == 2"></el-table-column>
+        <el-table-column  label="流水状态" >
           <template slot-scope="scope">
             <el-tag :type="scope.row.status===0?'':(scope.row.status===1?'success':'info')">
-<!--              {{scope.row.status===0?'交易中':(scope.row.status===1?'已入账':'已取消')}}-->
               {{enumsStatus[scope.row.status]}}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="platformCommission" label="平台抽成" width="80" align="center" v-if="managerType == 2"></el-table-column>
         <el-table-column prop="createTime" label="交易时期" width="160" align="center"></el-table-column>
         <el-table-column label="操作" width="120" align="center" fixed="right">
           <template slot-scope="scope">
@@ -199,7 +202,7 @@
                 query: {
                     startTime: '',
                     endTime:"",
-                    supplyCustomerName: '',
+                    customerCode: '',
                     status:'',
                     pageNum: 1,
                     pageSize: 10
@@ -262,6 +265,7 @@
                 enumsServicelist:[],
                 enumsService:{},
                 formDisable:false,
+                customer:[], // 供货商
             };
         },
         mounted() {
@@ -319,6 +323,7 @@
             })
 
             this.getData();
+            this.getCustomer();
         },
         methods: {
             // 获取数据
@@ -336,6 +341,15 @@
                         this.$message.error(res.msg);
                     }
                     this.loading = false;
+                })
+            },
+            getCustomer(){// 获取供销商
+                this.$axios.post("/customer/selectList",{}).then(res => {
+                    if(res.code == 200){
+                        this.customer = res.data;
+                    }else{
+                        this.$message.error(res.msg);
+                    }
                 })
             },
             getDetails(number){
