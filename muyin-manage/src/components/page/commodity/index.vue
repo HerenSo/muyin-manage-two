@@ -380,6 +380,8 @@
             return {
                 query: {
                     status:'',
+                    customerCode:'',
+                    name:'',
                     pageNum: 1,
                     pageSize: 10
                 },
@@ -963,8 +965,9 @@
                 // this.cropImg = this.defaultSrc;
             },
             handlePrinter(){
-                this.$delete(this.query,"pageNum")
-                this.$delete(this.query,"pageSize")
+                this.$delete(this.query,"pageNum");
+                this.$delete(this.query,"pageSize");
+                this.$delete(this.query,"categoryCode");
                 let ret = ''
                 for (let it in this.query) {
                     if(encodeURIComponent(this.query[it])){
