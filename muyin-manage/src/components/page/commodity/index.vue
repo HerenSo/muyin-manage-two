@@ -130,7 +130,7 @@
                     <el-form-item label="商品积分售价" required>
                         <el-input v-model="form.pointPrice" placeholder="请输入商品积分售价"></el-input>
                     </el-form-item>
-                    <el-form-item label="所属供货商" required>
+                    <el-form-item label="所属供货商" required v-if="managerType == 2">
                         <el-select v-model="form.customerCode" placeholder="请选择">
                             <el-option v-for="(item,index) in customer" :key="index" :label="item.name" :value="item.code"></el-option>
                         </el-select>
@@ -148,7 +148,7 @@
                                 placeholder="选择日期时间">
                         </el-date-picker>
                     </el-form-item>
-                    <el-form-item label="售卖到期时间" required>
+                    <el-form-item label="售卖到期时间">
                         <el-date-picker
                                 v-model="form.saleOverTime"
                                 type="datetime"

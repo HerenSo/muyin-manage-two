@@ -37,9 +37,9 @@
           <el-form-item label="等级级别" v-if="apiType == 1">
               <el-input v-model="formCategory.level"></el-input>
           </el-form-item>
-          <el-form-item label="消费折扣" v-if="apiType == 1">
-              <el-input v-model="formCategory.discount"></el-input>
-          </el-form-item>
+<!--          <el-form-item label="消费折扣" v-if="apiType == 1">-->
+<!--              <el-input v-model="formCategory.discount"></el-input>-->
+<!--          </el-form-item>-->
           <el-form-item label="等级积分比率" v-if="apiType == 1">
               <el-input v-model="formCategory.pointRate"></el-input>
           </el-form-item>
@@ -71,6 +71,9 @@
                 </span>
               </el-dialog>
           </el-form-item>
+<!--          <el-form-item label="排序">-->
+<!--            <el-input v-model="formCategory.sortLevel"></el-input>-->
+<!--          </el-form-item>-->
       </el-form>
       <span slot="footer" class="dialog-footer">
                 <el-button @click="editVisibleCategory = false">取 消</el-button>
@@ -192,7 +195,9 @@
                     return;
                 }
                 this.$set(this.formCategory,"type",this.type);
-                this.$set(this.formCategory,"parentCode",this.parentcategoryCode);
+                if(this.formCategory.code != this.parentcategoryCode) {
+                    this.$set(this.formCategory, "parentCode", this.parentcategoryCode);
+                }
                 this.$axios.post(this.apiAddUrl,this.formCategory).then(res => {
                     if(res.code == 200){
                         console.log(res)

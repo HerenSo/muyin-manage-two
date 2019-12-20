@@ -88,6 +88,7 @@
                             </span>
                         </el-dialog>
                     </el-form-item>
+<!--                  <el-form-item label="排序" label-width="100px"><el-input v-model="form.sortLevel" autocomplete="off"></el-input></el-form-item>-->
                 </el-form>
                 <span slot="footer" class="dialog-footer demo-drawer__footer">
             <el-button @click="editVisible = false">取 消</el-button>
@@ -242,12 +243,15 @@
             handleEdit(index, row) {
                 this.editVisible = true;
                 if(row){
-                    this.form.code = row.code;
-                    this.form.name = row.name;
-                    this.form.iconUrl = row.iconUrl;
+                    this.form={
+                        code : row.code,
+                        name : row.name,
+                        iconUrl : row.iconUrl,
+                        // ortLevel : row.sortLevel
+                    };
                     // this.form.parentCode = row.parentCode;
                     let parentCode = row.parentCode
-                    this.form.parentCode = [];
+                    this.$set(this.form,"parentCode" ,[]);
                     this.form.parentCode.push(parentCode);
                     console.log("parentCode--",this.form.parentCode)
                     this.title = '编辑';
