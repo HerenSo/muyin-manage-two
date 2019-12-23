@@ -452,11 +452,11 @@
                     this.$set(this.query,"startTime",this.time[0])
                     this.$set(this.query,"endTime",this.time[1])
                 }
-                this.$delete(this.query,"pageNum")
-                this.$delete(this.query,"pageSize")
+                // this.$delete(this.query,"pageNum")
+                // this.$delete(this.query,"pageSize")
                 let ret = ''
                 for (let it in this.query) {
-                    if(encodeURIComponent(this.query[it])){
+                    if(encodeURIComponent(this.query[it]) && it != "pageNum" && it != "pageSize"){
                         ret += encodeURIComponent(it) + '=' + encodeURIComponent(this.query[it]) + '&'
                     }
                 }

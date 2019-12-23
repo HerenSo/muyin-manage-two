@@ -965,16 +965,17 @@
                 // this.cropImg = this.defaultSrc;
             },
             handlePrinter(){
-                this.$delete(this.query,"pageNum");
-                this.$delete(this.query,"pageSize");
-                this.$delete(this.query,"categoryCode");
+                // this.$delete(this.query,"pageNum");
+                // this.$delete(this.query,"pageSize");
+                // this.$delete(this.query,"categoryCode");
                 let ret = ''
                 for (let it in this.query) {
-                    if(encodeURIComponent(this.query[it])){
+                    if(encodeURIComponent(this.query[it]) && it != "pageNum" && it != "pageSize" && it != "categoryCode"){
                         ret += encodeURIComponent(it) + '=' + encodeURIComponent(this.query[it]) + '&'
                     }
                 }
                 window.open(this.baseUrl+'/commodity/exportCommodity?'+ret,'_blank');
+
             },
             handleStatusChange(){
                 this.getData();
