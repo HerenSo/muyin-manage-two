@@ -42,9 +42,9 @@
         </div>
         <!--弹窗-->
         <el-dialog title="修改密码" :visible.sync="editVisible" width="420px" :before-close="closeHandle">
-            <el-form :model="forget" :rules="rulesForget" ref="loginphone" label-width="0px" class="login_form">
+            <el-form :model="forget" :rules="rulesForget" ref="forget" label-width="0px" class="login_form">
                 <el-form-item prop="userPhone">
-                    <el-input v-model="forget.userPhone" placeholder="手机号码" size="large" prefix-icon="el-icon-mobile-phone">
+                    <el-input v-model="forget.userPhone" placeholder="手机号码" size="large" prefix-icon="el-icon-mobile-phone" autofocus>
                     </el-input>
                 </el-form-item>
                 <el-form-item prop="vercode">
@@ -60,12 +60,16 @@
                     <el-button size="large" class="ml-5 getcode" @click="getcode" >{{ytext}}</el-button>
                 </el-form-item>
                 <el-form-item prop="newPassword">
-                    <el-input v-model="forget.newPassword " placeholder="新密码" size="large" prefix-icon="el-icon-lx-lock">
-                    </el-input>
+                  <el-input v-model="forget.newPassword" type="password" placeholder="新密码" size="large" prefix-icon="el-icon-lx-lock">
+                  </el-input>
+                </el-form-item>
+                <el-form-item prop="affirmPassword">
+                  <el-input v-model="forget.affirmPassword" type="password"  placeholder="确认密码" size="large" prefix-icon="el-icon-lx-lock">
+                  </el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="closeHandle">取 消</el-button>
                 <el-button type="primary" @click="submitHandle">确 定</el-button>
             </span>
         </el-dialog>
@@ -85,6 +89,35 @@
 import bus from '../common/bus';
 export default {
     data() {
+        var validatePhone = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('手机号码不能为空'));
+            }
+            setTimeout(() => {
+                if(this.commonjs.regPhone(value)){
+                    return callback(new Error('请填写正确的手机号码'));
+                }
+            }, 1000);
+        };
+        var validatePass = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请输入密码'));
+            } else {
+                if (this.forget.affirmPassword !== '') {
+                    this.$refs.forget.validateField('affirmPassword');
+                }
+                callback();
+            }
+        };
+        var validatePass2 = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请再次输入密码'));
+            } else if (value !== this.forget.newPassword) {
+                callback(new Error('两次输入密码不一致!'));
+            } else {
+                callback();
+            }
+        };
         return {
             collapse: false,
             fullscreen: false,
@@ -98,9 +131,10 @@ export default {
                 password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
             },
             rulesForget: {
-                userPhone: [{ required: true, message: '请输入手机号码', trigger: 'blur' }],
+                userPhone: [{ required: true,validator: validatePhone,  message: '请输入手机号码', trigger: 'blur' }],
                 vercode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-                newPassword: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
+                newPassword: [{validator: validatePass, trigger: 'blur'}],
+                affirmPassword:[{validator: validatePass2, trigger: 'blur'}]
             },
             editVisible:false,
             resetSend:true,
@@ -274,18 +308,24 @@ export default {
 
         },
         submitHandle(){
-            this.$axios.post("/user/resetPwd?newPassword="+this.forget.newPassword+"&userPhone="+this.forget.userPhone+"&vercode="+this.forget.vercode,{}).then(res => {
-                if (res.code == 200) {
-                    this.$message.success("修改密码成功！");
-                    this.editVisible = false;
-                    this.getData();
-                }else{
-                    this.$message.error(res.msg);
+            this.$refs.forget.validate(valid => {
+                if (valid) {
+                    this.$axios.post("/user/resetPwd?newPassword=" + this.forget.newPassword + "&userPhone=" + this.forget.userPhone + "&vercode=" + this.forget.vercode, {}).then(res => {
+                        if (res.code == 200) {
+                            this.$message.success("修改密码成功！");
+                            this.editVisible = false;
+                            this.getData();
+                        } else {
+                            this.$message.error(res.msg);
+                        }
+                    })
                 }
             })
         },
         closeHandle(){
             this.editVisible = false;
+            // this.$refs.forget.resetFields();
+            this.$refs.forget.clearValidate();
             this.forget = {};
         }
     },

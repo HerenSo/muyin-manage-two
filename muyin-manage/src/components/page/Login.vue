@@ -62,12 +62,16 @@
             <el-button size="large" class="ml-5 getcode" @click="getcode" >{{ytext}}</el-button>
           </el-form-item>
           <el-form-item prop="newPassword">
-            <el-input v-model="forget.newPassword " placeholder="新密码" size="large" prefix-icon="el-icon-lx-lock">
+            <el-input v-model="forget.newPassword" type="password" placeholder="新密码" size="large" prefix-icon="el-icon-lx-lock">
+            </el-input>
+          </el-form-item>
+          <el-form-item prop="affirmPassword">
+            <el-input v-model="forget.affirmPassword" type="password"  placeholder="确认密码" size="large" prefix-icon="el-icon-lx-lock">
             </el-input>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="closeHandle">取 消</el-button>
                 <el-button type="primary" @click="submitHandle">确 定</el-button>
             </span>
       </el-dialog>
@@ -77,6 +81,35 @@
 <script>
 export default {
     data: function() {
+        var validatePhone = (rule, value, callback) => {
+            if (!value) {
+                return callback(new Error('手机号码不能为空'));
+            }
+            setTimeout(() => {
+                if(this.commonjs.regPhone(value)){
+                    return callback(new Error('请填写正确的手机号码'));
+                }
+            }, 1000);
+        };
+        var validatePass = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请输入密码'));
+            } else {
+                if (this.forget.affirmPassword !== '') {
+                    this.$refs.forget.validateField('affirmPassword');
+                }
+                callback();
+            }
+        };
+        var validatePass2 = (rule, value, callback) => {
+            if (value === '') {
+                callback(new Error('请再次输入密码'));
+            } else if (value !== this.forget.newPassword) {
+                callback(new Error('两次输入密码不一致!'));
+            } else {
+                callback();
+            }
+        };
         return {
             param: {
                 username: '',
@@ -87,9 +120,10 @@ export default {
                 password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
             },
             rulesForget: {
-                userPhone: [{ required: true, message: '请输入手机号码', trigger: 'blur' }],
+                userPhone: [{ required: true,validator: validatePhone,  message: '请输入手机号码', trigger: 'blur' }],
                 vercode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-                newPassword: [{ required: true, message: '请输入新密码', trigger: 'blur' }],
+                newPassword: [{validator: validatePass, trigger: 'blur'}],
+                affirmPassword:[{validator: validatePass2, trigger: 'blur'}]
             },
             rememberPassword:true,
             ytext:"获取验证码",
@@ -169,13 +203,17 @@ export default {
             // newPassword: "123456"
             // userPhone: "18273298098"
             // vercode: "6780"
-            this.$axios.post("/user/resetPwd?newPassword="+this.forget.newPassword+"&userPhone="+this.forget.userPhone+"&vercode="+this.forget.vercode,{}).then(res => {
-                if (res.code == 200) {
-                    this.$message.success("找回密码成功！");
-                    this.editVisible = false;
-                    this.getData();
-                }else{
-                    this.$message.error(res.msg);
+            this.$refs.forget.validate(valid => {
+                if (valid) {
+                    this.$axios.post("/user/resetPwd?newPassword=" + this.forget.newPassword + "&userPhone=" + this.forget.userPhone + "&vercode=" + this.forget.vercode, {}).then(res => {
+                        if (res.code == 200) {
+                            this.$message.success("找回密码成功！");
+                            this.editVisible = false;
+                            this.getData();
+                        } else {
+                            this.$message.error(res.msg);
+                        }
+                    })
                 }
             })
         },
