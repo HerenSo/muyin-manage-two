@@ -276,7 +276,8 @@
                 this.$axios.post("/api/attachments/insertUploadFile",params).then(res => {
                     if(res.code == 200){
                         this.$message.success("上传成功！");
-                        this.$set(this.form, 'THE_USER_MEMBER_RIGHTS_URL', res.data.url);
+                        // this.$set(this.form, 'THE_USER_MEMBER_RIGHTS_URL', res.data.url);
+                        this.$set(this.form,"the_user_member_rights_url",res.data.url)
                         this.dialogVisible = false;
                     }else{
                         this.$message.error(res.msg);

@@ -39,7 +39,7 @@
         <el-table-column prop="orderCount" label="总订单量" width="100" align="center"></el-table-column>
         <el-table-column label="状态" align="center" width="100" >
           <template slot-scope="scope">
-            <el-tag :type="scope.row.status===0?'warning':(scope.row.status===1?'success':(scope.row.status===2?'danger':(scope.row.status===3?'info':'')))">
+            <el-tag :type="scope.row.status===0?'warning':(scope.row.status===1?'success':(scope.row.status===2?'danger':(scope.row.status===9?'info':'')))">
 <!--              {{scope.row.status===0?'待审核':(scope.row.status===1?'审核成功':(scope.row.status===2?'审核失败':(scope.row.status===9?'注销':'正常')))}}-->
               {{enums[scope.row.status]}}
             </el-tag>
@@ -50,7 +50,8 @@
           <template slot-scope="scope">
 <!--            <el-button type="text" icon="el-icon-delete" @click="handleCheck(scope.$index, scope.row)">查看</el-button>-->
             <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" v-if="right.edit">编辑</el-button>
-            <el-button type="text" icon="el-icon-turn-off" class="red" @click="handleDelete(9, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2 ">注销</el-button>
+            <el-button type="text" icon="el-icon-turn-off" class="red" @click="handleDelete(9, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2 && scope.row.status != 9 ">注销</el-button>
+            <el-button type="text" icon="el-icon-turn-off" class="" @click="handleDelete(1, scope.row)" v-if="scope.row.status == 9 ">恢复</el-button>
             <el-button type="text" icon="el-icon-c-scale-to-original" class="" @click="handleSettle(scope.$index, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2 ">结算</el-button>
             <el-button type="text" icon="el-icon-tickets" @click="handleAccount(scope.$index, scope.row)" v-if="scope.row.status != 0 && scope.row.status != 2">资金流水</el-button>
             <el-button type="text" icon="el-icon-document-checked" class="" @click="handleDelete(1, scope.row)" v-if="scope.row.status ==0">审核通过</el-button>
@@ -503,6 +504,9 @@
                     msg = "注销";
                 }else if(status == 1){
                     msg = "审核通过";
+                    if(row.status == 9){
+                        msg = "恢复";
+                    }
                 }else if(status == 2){
                     msg = "审核不通过";
                 }
