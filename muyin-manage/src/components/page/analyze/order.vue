@@ -358,11 +358,27 @@
                 //昨天的时间
                 var day1 = new Date();
                 day1.setTime(day1.getTime()-24*60*60*1000);
-                var s1 = day1.getFullYear()+"-" + (day1.getMonth()+1) + "-" + day1.getDate();
+                var mon1 = (day1.getMonth()+1) + "";
+                var d1 =  day1.getDate() + "";
+                if(mon1.length<2){
+                    mon1 = '0' + mon1;
+                }
+                if(d1.length<2){
+                    d1 = '0' + d1;
+                }
+                var s1 = day1.getFullYear()+"-" + mon1 + "-" +d1;
                 //今天的时间
                 var day2 = new Date();
                 day2.setTime(day2.getTime());
-                var s2 = day2.getFullYear()+"-" + (day2.getMonth()+1) + "-" + day2.getDate();
+                var mon2 = (day2.getMonth()+1) + "";
+                var d2 =  day2.getDate() + "";
+                if(mon2.length<2){
+                    mon2 = '0' + mon2;
+                }
+                if(d2.length<2){
+                    d2 = '0' + d2;
+                }
+                var s2 = day2.getFullYear()+"-" + mon2 + "-" + d2;
                 this.queryTime = [s1+" 00:00:00",s2+" 00:00:00"]
             },
             changeDate(){
