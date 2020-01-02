@@ -541,8 +541,35 @@
                     if(res.code == 200) {
                         this.form = res.data;
                         let categoryCode = this.form.categoryCode;
+                        let p1,p2,p3;
                         this.form.categoryCode = [];
-                        this.form.categoryCode.push(categoryCode);
+                        this.category.map(item => {
+                            p1 = item.code;
+                            if(item.code == categoryCode){
+                                this.form.categoryCode.push(categoryCode);
+                            }else{
+                                // console.log(item)
+                                if(item.subCategorys){
+                                    item.subCategorys.map(a => {
+                                        p2 = a.code;
+                                        if(a.code == categoryCode){
+                                            this.form.categoryCode.push(p1);
+                                            this.form.categoryCode.push(categoryCode);
+                                        }else{
+                                            if(a.subCategorys){
+                                                a.subCategorys.map(b => {
+                                                    if(b.code == categoryCode){
+                                                        this.form.categoryCode.push(p1);
+                                                        this.form.categoryCode.push(p2);
+                                                        this.form.categoryCode.push(categoryCode);
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    })
+                                }
+                            }
+                        })
                         // console.log("categoryCode--",this.form.categoryCode)
                         this.fileList =  res.data.attachmentsList;
                         this.commodityDetails =  res.data.commodityDetails;
