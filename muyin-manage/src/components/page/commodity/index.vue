@@ -543,9 +543,9 @@
                         this.fileList =  res.data.attachmentsList;
                         this.commodityDetails =  res.data.commodityDetails;
                         this.commodityAttrs =  res.data.commodityAttrs;
-                        let codes = this.findPathById(this.form.categoryCode,this.category);
-                        this.form.categoryCode = [];
-                        this.form.categoryCode = this.form.categoryCode.concat(codes);
+                        // let codes = this.findPathById(this.form.categoryCode,this.category);
+                        // this.form.categoryCode = [];
+                        // this.form.categoryCode = this.form.categoryCode.concat(codes);
                         // console.log("categoryCode--",this.form.categoryCode)
                     }else{
                         this.$message.error(res.msg);
@@ -649,10 +649,12 @@
                         this.form.commodityAttrs = this.commodityAttrs;
 
                         // console.log(this.form.categoryCode)
-                        if(this.form.categoryCode.length > 0){
-                            this.form.categoryCode = this.form.categoryCode[this.form.categoryCode.length -1];
-                        }else{
-                            this.form.categoryCode = ""
+                        if(typeof this.form.categoryCode != 'string'){
+                            if(this.form.categoryCode.length > 0){
+                                this.form.categoryCode = this.form.categoryCode[this.form.categoryCode.length -1];
+                            }else{
+                                this.form.categoryCode = ""
+                            }
                         }
 
                         this.subloading = true;
