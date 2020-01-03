@@ -540,42 +540,35 @@
                 this.$axios.get("/commodity/selectCommodityDetail?code="+code).then(res => {
                     if(res.code == 200) {
                         this.form = res.data;
-                        let categoryCode = this.form.categoryCode;
-                        let p1,p2,p3;
-                        this.form.categoryCode = [];
-                        this.category.map(item => {
-                            p1 = item.code;
-                            if(item.code == categoryCode){
-                                this.form.categoryCode.push(categoryCode);
-                            }else{
-                                // console.log(item)
-                                if(item.subCategorys){
-                                    item.subCategorys.map(a => {
-                                        p2 = a.code;
-                                        if(a.code == categoryCode){
-                                            this.form.categoryCode.push(p1);
-                                            this.form.categoryCode.push(categoryCode);
-                                        }else{
-                                            if(a.subCategorys){
-                                                a.subCategorys.map(b => {
-                                                    if(b.code == categoryCode){
-                                                        this.form.categoryCode.push(p1);
-                                                        this.form.categoryCode.push(p2);
-                                                        this.form.categoryCode.push(categoryCode);
-                                                    }
-                                                })
-                                            }
-                                        }
-                                    })
-                                }
-                            }
-                        })
-                        // console.log("categoryCode--",this.form.categoryCode)
                         this.fileList =  res.data.attachmentsList;
                         this.commodityDetails =  res.data.commodityDetails;
                         this.commodityAttrs =  res.data.commodityAttrs;
+                        let codes = this.findPathById(this.form.categoryCode,this.category);
+                        this.form.categoryCode = [];
+                        this.form.categoryCode = this.form.categoryCode.concat(codes);
+                        // console.log("categoryCode--",this.form.categoryCode)
                     }else{
                         this.$message.error(res.msg);
+                    }
+                })
+            },
+            findPathById(code,datas,path){ // 通过子元素code查找分类的父级
+                if(!path){
+                    path = [];
+                }
+                datas.map(item => {
+                    let tmppath = path.concat();
+                    tmppath.push(item.code);
+                    // console.log("item.subCategorys--",item.subCategorys)
+                    if (item.code == code) {
+                        return tmppath;
+                    }
+                    if(item.subCategorys.length > 0) {
+                        let resultpath = this.findPathById(code, item.subCategorys, tmppath);
+                        // console.log("resultpath--",resultpath)
+                        if (resultpath) {
+                            return resultpath;
+                        }
                     }
                 })
             },
@@ -587,31 +580,20 @@
                 this.$axios.post("/category/queryCategoryTree",params).then(res => {
                     if(res.code == 200){
                         this.category = res.data;
-                        this.category.map(item => {
-                            if(item.subCategorys.length == 0){
-                                delete item.subCategorys;
-                            }else{
-                                item.subCategorys.map(i => {
-                                    if(i.subCategorys.length == 0){
-                                        delete i.subCategorys;
-                                    }else{
-                                        i.subCategorys.map(a => {
-                                            if(a.subCategorys.length == 0){
-                                                delete a.subCategorys;
-                                            }else{
-                                                a.subCategorys.map(b => {
-                                                    if(b.subCategorys.length == 0){
-                                                        delete b.subCategorys;
-                                                    }
-                                                })
-                                            }
-                                        })
-                                    }
-                                })
-                            }
-                        })
+                        this.clearKongSubCategorys(this.category);
                     }else{
                         this.$message.error(res.msg);
+                    }
+                })
+            },
+            clearKongSubCategorys(datas){ // 清除分类数据中空子集
+                datas.map(item => {
+                    if(item.subCategorys){
+                        if (item.subCategorys.length == 0) {
+                            delete item.subCategorys;
+                        } else {
+                            this.clearKongSubCategorys(item.subCategorys);
+                        }
                     }
                 })
             },
@@ -677,9 +659,9 @@
                         this.$axios.post("/commodity/insertOrUpdate",this.form).then(res => {
                             if(res.code == 200){
                                 this.$message.success(this.title+"成功！");
+                                this.getData();
                                 this.editVisible = false;
                                 this.handleClose();
-                                this.getData();
                             }else{
                                 this.$message.error(res.msg);
                             }
@@ -1033,7 +1015,7 @@
                 this.commodityAttrsItemIndex = '';
                 this.commodityAttrsIndex = '';
                 this.$refs.banner.clearFiles();
-                this.$refs[form].resetFields();
+                this.$refs.form.resetFields();
             },
             refresh(){ // 刷新
                 this.getData();
