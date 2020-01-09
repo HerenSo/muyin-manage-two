@@ -43,6 +43,14 @@ axios.interceptors.request.use( config => {
                 return ret
             }else{
                 config.headers['Content-Type'] = 'application/json;charset=UTF-8';
+                var re = /^[0-9]+.?[0-9]*/;//判断字符串是否为数字//判断正整数/[1−9]+[0−9]∗]∗/
+                for (let it in data) {
+                    if(re.test(data[it]) && typeof data[it] =='string'){
+                        // data[it] = data[it].trim();
+                        data[it] = data[it].replace(/^\s+|\s+$/g,"");
+                        // console.log(it,data[it])
+                    }
+                }
                 return JSON.stringify(data)
             }
 
