@@ -122,13 +122,13 @@
                                 :props="{ expandTrigger: 'hover',value:'code',label:'name',children:'subCategorys' }"></el-cascader>
                     </el-form-item>
                     <el-form-item label="商品展示原价" prop="saleShowPrice">
-                      <el-input v-model="form.saleShowPrice" placeholder="请输入商品展示的原售价格"></el-input>
+                      <el-input type="number" v-model="form.saleShowPrice" placeholder="请输入商品展示的原售价格"></el-input>
                     </el-form-item>
                     <el-form-item label="商品展示售价" prop="salePrice">
-                      <el-input v-model="form.salePrice" placeholder="请输入商品展示售价"></el-input>
+                      <el-input type="number" v-model="form.salePrice" placeholder="请输入商品展示售价"></el-input>
                     </el-form-item>
                     <el-form-item label="商品积分售价" required>
-                        <el-input v-model="form.pointPrice" placeholder="请输入商品积分售价"></el-input>
+                        <el-input type="number" v-model="form.pointPrice" placeholder="请输入商品积分售价"></el-input>
                     </el-form-item>
                     <el-form-item label="所属供货商" required v-if="managerType == 2">
                         <el-select v-model="form.customerCode" placeholder="请选择">
@@ -136,10 +136,10 @@
                         </el-select>
                     </el-form-item>
                     <el-form-item label="商品供货价" prop="supplyPrice">
-                        <el-input v-model="form.supplyPrice" placeholder="请输入供货商商品供货价"></el-input>
+                        <el-input type="number" v-model="form.supplyPrice" placeholder="请输入供货商商品供货价"></el-input>
                     </el-form-item>
                   <el-form-item label="配送费">
-                    <el-input v-model="form.postage" placeholder="请输入配送费"></el-input>
+                    <el-input type="number" v-model="form.postage" placeholder="请输入配送费"></el-input>
                   </el-form-item>
                     <el-form-item label="开始销售时间" required>
                         <el-date-picker
@@ -159,7 +159,7 @@
                         <el-input  v-model="form.description" placeholder="请输入简单描述"></el-input>
                     </el-form-item>
                     <el-form-item label="热度" prop="hot">
-                        <el-input v-model="form.hot" placeholder="请输入热度"></el-input>
+                        <el-input type="number" v-model="form.hot" placeholder="请输入热度"></el-input>
                     </el-form-item>
                     <el-form-item label="是否支持积分抵扣" required>
 <!--                        <el-select v-model="form.supportPoint" placeholder="">-->
@@ -228,11 +228,11 @@
                           <div v-if="isAttrsEdit" class="inputAttrsGroup" v-for="(edit,index) in commodityAttrsItem.commodityAttrItems" :key="index">
                             <el-input class="input-new-tag"  v-model="edit.tagName" placeholder="属性名称，例：红色" ref="saveTagInput" size="small">
                             </el-input>
-                            <el-input class="input-new-tag" v-model="edit.saleShowPrice" placeholder="销售价格"  ref="saveTagInput" size="small"  >
+                            <el-input class="input-new-tag" type="number" v-model="edit.saleShowPrice" placeholder="销售价格"  ref="saveTagInput" size="small"  >
                             </el-input>
-                            <el-input class="input-new-tag" v-model="edit.salePrice" placeholder="当前价格"  ref="saveTagInput" size="small" >
+                            <el-input class="input-new-tag" type="number" v-model="edit.salePrice" placeholder="当前价格"  ref="saveTagInput" size="small" >
                             </el-input>
-                            <el-input class="input-new-tag" v-model="edit.stock" placeholder="库存量"  ref="saveTagInput" size="small" >
+                            <el-input class="input-new-tag" type="number" v-model="edit.stock" placeholder="库存量"  ref="saveTagInput" size="small" >
                             </el-input>
                             <div class="headAttrsUrl">
                               <!--                                <i class="el-icon-plus"></i>-->
@@ -249,11 +249,11 @@
                             <div v-if="inputVisible" class="inputAttrsGroup">
                                 <el-input class="input-new-tag"  v-model="inputValue.tagName" placeholder="属性名称，例：红色" ref="saveTagInput" size="small">
                                 </el-input>
-                                <el-input class="input-new-tag" v-model="inputValue.saleShowPrice" placeholder="销售价格"  ref="saveTagInput" size="small"  >
+                                <el-input class="input-new-tag" type="number" v-model="inputValue.saleShowPrice" placeholder="销售价格"  ref="saveTagInput" size="small"  >
                                 </el-input>
-                                <el-input class="input-new-tag" v-model="inputValue.salePrice" placeholder="当前价格"  ref="saveTagInput" size="small" >
+                                <el-input class="input-new-tag" type="number" v-model="inputValue.salePrice" placeholder="当前价格"  ref="saveTagInput" size="small" >
                                 </el-input>
-                                <el-input class="input-new-tag" v-model="inputValue.stock" placeholder="库存量"  ref="saveTagInput" size="small" >
+                                <el-input class="input-new-tag" type="number" v-model="inputValue.stock" placeholder="库存量"  ref="saveTagInput" size="small" >
                                 </el-input>
                               <div class="headAttrsUrl" v-if="inputValue.imageUrl">
 <!--                                <i class="el-icon-plus"></i>-->
@@ -300,7 +300,7 @@
                         <el-input v-model="commodityDetails.barNumber" placeholder="请输入商品条形码编号"></el-input>
                     </el-form-item>
                     <el-form-item label="保质期（天）">
-                        <el-input v-model="commodityDetails.expirationDate" placeholder="请输入保质期"></el-input>
+                        <el-input type="number" v-model="commodityDetails.expirationDate" placeholder="请输入保质期"></el-input>
                     </el-form-item>
                     <el-form-item label="原产地">
                         <el-input v-model="commodityDetails.origin" placeholder="请输入原产地"></el-input>
