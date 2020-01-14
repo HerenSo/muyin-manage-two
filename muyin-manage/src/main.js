@@ -40,8 +40,10 @@ Vue.prototype.$axios = axios;
 
 // 生产环境
 // Vue.prototype.baseUrl = 'http://120.79.56.120:8080';
-Vue.prototype.baseUrl = 'https://wbysc.com.cn/wby';
-// Vue.prototype.baseUrl = 'https://www.geeso.cn/';
+// 正式
+// Vue.prototype.baseUrl = 'https://wbysc.com.cn/wby'; 
+ //测试
+Vue.prototype.baseUrl = 'https://www.geeso.cn/';
 
 
 
